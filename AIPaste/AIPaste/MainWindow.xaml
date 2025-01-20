@@ -10,8 +10,10 @@
     <Grid Background="#F8F9FA" Margin="10">
         <!-- 行定義 -->
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/> <!-- メインコンテンツ（スクロール可能） -->
-            <RowDefinition Height="Auto"/> <!-- 固定入力エリア -->
+            <RowDefinition Height="*"/>
+            <!-- メインコンテンツ（スクロール可能） -->
+            <RowDefinition Height="Auto"/>
+            <!-- 固定入力エリア -->
         </Grid.RowDefinitions>
 
         <!-- メインコンテンツ（スクロールビュー内にコピー文章と生成結果を縦並びで配置） -->
@@ -24,7 +26,8 @@
                                FontSize="20" 
                                FontWeight="Bold" 
                                Foreground="#6C757D" 
-                               Margin="0,0,0,8"/> <!-- グレーのタイトル -->
+                               Margin="0,0,0,8"/>
+                    <!-- グレーのタイトル -->
 
                     <!-- コピー内容 -->
                     <Border BorderBrush="#DEE2E6" BorderThickness="2" CornerRadius="8" Background="#FFFFFF" Padding="15">
@@ -36,7 +39,7 @@
                                    Text="Copied text will appear here."/>
                     </Border>
                 </StackPanel>
-                
+
                 <!-- 生成結果表示 -->
                 <StackPanel>
                     <!-- タイトル -->
@@ -44,30 +47,33 @@
                                FontSize="20" 
                                FontWeight="Bold" 
                                Foreground="#6C757D" 
-                               Margin="0,20,0,8"/> <!-- グレーのタイトル -->
+                               Margin="0,20,0,8"/>
+                    <!-- グレーのタイトル -->
 
-                    <!-- 生成結果内容 -->
-                    <Grid>
-                        <Border BorderBrush="#DEE2E6" BorderThickness="2" CornerRadius="8" Background="#FFFFFF" Padding="15">
+                    <!-- 生成結果内容と決定ボタン -->
+                    <Border BorderBrush="#DEE2E6" BorderThickness="2" CornerRadius="8" Background="#FFFFFF" Padding="15">
+                        <Grid>
+                            <!-- 生成結果表示 -->
                             <TextBlock x:Name="OutputTextBlock" 
                                        TextWrapping="Wrap" 
-                                       VerticalAlignment="Top" 
-                                       FontSize="16" 
+                                       VerticalAlignment="Top"
+                                       HorizontalAlignment="Left"
+                                       FontSize="16"
                                        Foreground="#495057"
+                                       Margin="0,0,0,40"
                                        Text="Generated text will appear here."/>
-                        </Border>
 
-                        <!-- 決定ボタン -->
-                        <Button Content="決定"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Bottom"
-                                Margin="10"
-                                Background="#007BFF"
-                                Foreground="#FFFFFF"
-                                FontWeight="Bold"
-                                Padding="10,5"
-                                Click="ConfirmButton_Click"/>
-                    </Grid>
+                            <!-- 決定ボタン -->
+                            <Button Content="決定"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Margin="0,10,10,0"
+                                    Padding="10,5"
+                                    Background="#007BFF"
+                                    Foreground="#FFFFFF"
+                                    Click="ConfirmButton_Click"/>
+                        </Grid>
+                    </Border>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
@@ -75,8 +81,10 @@
         <!-- 入力エリア（常に画面下部に固定） -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/> <!-- 入力欄 -->
-                <ColumnDefinition Width="Auto"/> <!-- ボタン -->
+                <ColumnDefinition Width="*"/>
+                <!-- 入力欄 -->
+                <ColumnDefinition Width="Auto"/>
+                <!-- ボタン -->
             </Grid.ColumnDefinitions>
 
             <!-- ユーザー入力 -->
@@ -91,7 +99,8 @@
                     Background="#007BFF"
                     Foreground="#FFFFFF"
                     FontWeight="Bold"
-                    Padding="10,5"/>
+                    Padding="10,5"
+                    Click="GenerateButton_Click"/>
         </Grid>
     </Grid>
 </Window>
