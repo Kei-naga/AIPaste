@@ -6,6 +6,16 @@ namespace AIPaste.Services.ClipboardOperator
 {
     public class ClipboardOperator
     {
+        private string _text;
+        public string Text
+        {
+            get => _text;
+            set
+            {
+                _text = value;
+                SetText(value);
+            }
+        }
         /// <summary>
         /// get text from clipboard asynchronously
         /// </summary>

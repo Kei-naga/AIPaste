@@ -16,7 +16,19 @@ namespace AIPaste.ViewModels
         private LLMService _llmService;
         private ClipboardOperator _clipboardOperator = new ClipboardOperator();
 
-        public string TargetText { get; private set; }
+        private string _targetText;
+        public string TargetText
+        {
+            get => _targetText;
+            private set
+            {
+                if (_targetText != value)
+                {
+                    _targetText = value;
+                    OnPropertyChanged(nameof(TargetText));
+                }
+            }
+        }
         private string _outputText;
         public string outputText
         {
@@ -50,7 +62,7 @@ namespace AIPaste.ViewModels
             _clipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             _llmService = new LocalLLMService(llmModelSettings);
             _llmService.Initialize();
-            TargetText = GetTextFromClipboard();
+            SetTargetTextFromClipboard();
             const string modelTargetText = "この部分なんだけどさあ、もっと前後関係わかるようにしといて、";
             const string modelInput = "敬語にして";
             string modelPrompt = CreateReq(modelTargetText, modelInput);
@@ -60,6 +72,7 @@ namespace AIPaste.ViewModels
 
         public async Task GeneratingText(string userInput)
         {
+            outputText = "";
             var req = CreateReq(TargetText, userInput);
             await foreach (var chunk in _llmService.GeneratingText(req))
             {
@@ -94,9 +107,9 @@ namespace AIPaste.ViewModels
             return "対象テキスト：" + targetText + Environment.NewLine + "ユーザ指示：" + input;
         }
 
-        private string GetTextFromClipboard()
+        async private void SetTargetTextFromClipboard()
         {
-            return _clipboardOperator.GetTextAsync().Result;
+            TargetText =  await _clipboardOperator.GetTextAsync();
         }
 
         private string GetSystemPrompt()
@@ -105,9 +118,9 @@ namespace AIPaste.ViewModels
         }
 
         [MemberNotNull(nameof(TargetText))]
-        void OnClipboardContentChanged(object? sender, object? e)
+        async void OnClipboardContentChanged(object? sender, object? e)
         {
-            TargetText = GetTextFromClipboard();
+            SetTargetTextFromClipboard();
         }
 
     }
