@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.UI.Content;
 
-namespace AIPaste.Models
+namespace AIPaste.Models.Settings
 {
     internal struct LLMModelSettings(string ModelPath, int GpuLayerCount, uint ContextSize, string[] antiPrompts, int MaxTokens)
     {

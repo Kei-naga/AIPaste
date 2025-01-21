@@ -11,12 +11,12 @@ using ManagedCuda;
 using LLama.Abstractions;
 using static System.Collections.Specialized.BitVector32;
 using LLama.Sampling;
-using AIPaste.Models;
 using System.Text.RegularExpressions;
+using AIPaste.Models.Settings;
 
-namespace AIPaste.Services
+namespace AIPaste.Services.LLMServices
 {
-    internal class LLMService(LLMModelSettings modelSettings)
+    internal class LocalLLMService(LLMModelSettings modelSettings) : LLMService
     {
         private InteractiveExecutor? Executor { get; set; } = null;
         private ChatSession? ChatSession { get; set; } = null;
@@ -81,13 +81,12 @@ namespace AIPaste.Services
                 responseBuilder.Add(text);
                 yield return text;
             }
-            PresentResponse = GetPresentResponse(responseBuilder);
+            PresentResponse = GetTrimmedResponse(responseBuilder);
         }
 
-        private string GetPresentResponse(List<string> responseBuilder)
+        private string GetTrimmedResponse(List<string> responseBuilder)
         {
             string text = string.Join("", responseBuilder);
-            // text = text.Replace("assistant: ", "");
             text = Regex.Replace(text, $"{Regex.Escape("assistant:")}\\s*", "");
             text = text.Replace("�END", "");
             return text;

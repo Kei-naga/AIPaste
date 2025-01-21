@@ -1,18 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AIPaste.Models;
-using AIPaste.Services;
+using AIPaste.Models.Settings;
+using AIPaste.Services.LLMServices;
+using AIPaste.Services.ClipboardOperator;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AIPaste.ViewModels
 {
-    internal class MainWindowViewModel
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
         private LLMService _llmService;
+        private ClipboardOperator _clipboardOperator = new ClipboardOperator();
+
         public string TargetText { get; private set; }
-        public string outputText { get; private set; }
+        private string _outputText;
+        public string outputText
+        {
+            get => _outputText;
+            private set
+            {
+                if (_outputText != value)
+                {
+                    _outputText = value;
+                    OnPropertyChanged(nameof(outputText));
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public MainWindowViewModel()
         {
@@ -23,9 +47,10 @@ namespace AIPaste.ViewModels
                 antiPrompts: new string[] { "END" },
                 MaxTokens: 256
             );
-            _llmService = new LLMService(llmModelSettings);
+            _clipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
+            _llmService = new LocalLLMService(llmModelSettings);
             _llmService.Initialize();
-            TargetText = GetTargetText();
+            TargetText = GetTextFromClipboard();
             const string modelTargetText = "この部分なんだけどさあ、もっと前後関係わかるようにしといて、";
             const string modelInput = "敬語にして";
             string modelPrompt = CreateReq(modelTargetText, modelInput);
@@ -33,12 +58,12 @@ namespace AIPaste.ViewModels
             _llmService.StartChat(GetSystemPrompt(), modelPrompt, modelAns);
         }
 
-        public async IAsyncEnumerable<string> GeneratingText(string userInput)
+        public async Task GeneratingText(string userInput)
         {
             var req = CreateReq(TargetText, userInput);
-            await foreach (var response in _llmService.GeneratingText(req))
+            await foreach (var chunk in _llmService.GeneratingText(req))
             {
-                yield return response;
+                outputText += chunk;
             }
             if (CheckResponse(_llmService.PresentResponse))
             {
@@ -61,7 +86,7 @@ namespace AIPaste.ViewModels
 
         public void ChangeTargetText()
         {
-            TargetText = _llmService.PresentResponse;
+            _clipboardOperator.SetText(outputText);
         }
 
         private string CreateReq(string targetText, string input)
@@ -69,15 +94,22 @@ namespace AIPaste.ViewModels
             return "対象テキスト：" + targetText + Environment.NewLine + "ユーザ指示：" + input;
         }
 
-        private string GetTargetText()
+        private string GetTextFromClipboard()
         {
-            return "モデルが不適切なやつ表示したらまずいから、特定のフレーズ避けるようにできる";
+            return _clipboardOperator.GetTextAsync().Result;
         }
 
         private string GetSystemPrompt()
         {
             return "あなたは文章編集の専門家です。対象テキストとユーザ指示を与えるので、対象テキストをユーザ指示に厳密に従って、適切に修正してください。回答は理由等はなにも書かず、修正した文章のみを記載してください。また元の意味や意図が変わらないよう注意してください。";
         }
+
+        [MemberNotNull(nameof(TargetText))]
+        void OnClipboardContentChanged(object? sender, object? e)
+        {
+            TargetText = GetTextFromClipboard();
+        }
+
     }
 
 

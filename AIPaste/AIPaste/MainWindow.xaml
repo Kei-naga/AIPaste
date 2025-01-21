@@ -36,7 +36,7 @@
                                    VerticalAlignment="Top" 
                                    FontSize="16" 
                                    Foreground="#495057"
-                                   Text="Copied text will appear here."/>
+                                   Text="{x:Bind ViewModel.TargetText, Mode=OneWay}"/>
                     </Border>
                 </StackPanel>
 
@@ -61,7 +61,7 @@
                                        FontSize="16"
                                        Foreground="#495057"
                                        Margin="0,0,0,40"
-                                       Text="Generated text will appear here."/>
+                                       Text="{x:Bind ViewModel.outputText, Mode=OneWay}"/>
 
                             <!-- 決定ボタン -->
                             <Button Content="決定"

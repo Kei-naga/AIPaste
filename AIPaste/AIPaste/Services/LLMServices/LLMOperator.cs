@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AIPaste.Services
+namespace AIPaste.Services.LLMServices
 {
-    internal interface Interface1
+    internal class LLMOperator
     {
     }
 }

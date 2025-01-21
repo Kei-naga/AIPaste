@@ -4,12 +4,13 @@ using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using AIPaste.Services;
 using AIPaste.ViewModels;
+using System.ComponentModel;
 
 namespace AIPaste
 {
     public sealed partial class MainWindow : Window
     {
-        private readonly MainWindowViewModel _mainWindowViewModel;
+        public MainWindowViewModel ViewModel;
 
         public MainWindow()
         {
@@ -18,8 +19,7 @@ namespace AIPaste
             this.ExtendsContentIntoTitleBar = false; // タイトルバーのカスタマイズを無効化
             this.SetWindowSize(600, 400);
 
-            _mainWindowViewModel = new MainWindowViewModel();
-            TargetTextBlock.Text = _mainWindowViewModel.TargetText;
+           ViewModel = new MainWindowViewModel();
         }
 
         private async void GenerateButton_Click(object sender, RoutedEventArgs e)
@@ -33,24 +33,14 @@ namespace AIPaste
                 return;
             }
 
-            // 出力エリアをクリア
-            OutputTextBlock.Text = "";
-
             // 生成結果をリアルタイムで表示
-            var sb = new StringBuilder();
-            await foreach (var chunk in _mainWindowViewModel.GeneratingText(userInput))
-            {
-                sb.Append(chunk);
-                OutputTextBlock.Text = sb.ToString(); // リアルタイム更新
-            }
-            OutputTextBlock.Text = _mainWindowViewModel.outputText;
+            await ViewModel.GeneratingText(userInput);
             UserInputBox.Text = "";
         }
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
-            _mainWindowViewModel.ChangeTargetText();
-            TargetTextBlock.Text = _mainWindowViewModel.TargetText;
+            ViewModel.ChangeTargetText();
         }
 
         private void SetWindowSize(int width, int height)

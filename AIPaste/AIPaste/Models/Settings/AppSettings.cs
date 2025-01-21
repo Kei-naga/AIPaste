@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ManagedCuda;
 
-namespace AIPaste.Models
+namespace AIPaste.Models.Settings
 {
     internal class AppSettings
     {
@@ -33,20 +33,6 @@ namespace AIPaste.Models
             {
                 return false;
             }
-        }
-
-        public void SaveSettings()
-        {
-            // Save settings to file
-        }
-
-        public void LoadSettings() 
-        {
-        }
-
-        public void ResetSettings()
-        {
-            // Reset settings to default
         }
 
     }

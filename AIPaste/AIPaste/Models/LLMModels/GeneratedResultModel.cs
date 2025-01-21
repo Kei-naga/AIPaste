@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AIPaste.Models
+namespace AIPaste.Models.LLMModels
 {
-    internal struct KeySettings
+    internal class GeneratedResultModel
     {
     }
 }
