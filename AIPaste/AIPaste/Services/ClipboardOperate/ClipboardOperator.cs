@@ -6,7 +6,7 @@ namespace AIPaste.Services.ClipboardOperator
 {
     public class ClipboardOperator
     {
-        private string _text;
+        private string _text = "";
         public string Text
         {
             get => _text;

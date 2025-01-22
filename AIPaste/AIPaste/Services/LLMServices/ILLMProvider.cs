@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace AIPaste.Services.LLMServices
 {
-    internal interface LLMService
+    internal interface ILLMProvider
     {
         string PresentResponse { get; }
         void Initialize();
-        void StartChat(string SystemPrompt, string modelReq, string modelAns);
+        void SetSystemPrompt(string SystemPrompt);
+        void StartChat();
+        void AddChatHistory(string modelReq, string modelAns);
         IAsyncEnumerable<string> GeneratingText(string req);
     }
 }

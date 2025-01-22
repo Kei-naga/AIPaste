@@ -16,12 +16,13 @@ using AIPaste.Models.Settings;
 
 namespace AIPaste.Services.LLMServices
 {
-    internal class LocalLLMService(LLMModelSettings modelSettings) : LLMService
+    internal class LocalLLMProvider(LLMModelSettings modelSettings) : ILLMProvider
     {
-        private InteractiveExecutor? Executor { get; set; } = null;
-        private ChatSession? ChatSession { get; set; } = null;
-        private InferenceParams? InferenceParams { get; set; } = null;
+        private InteractiveExecutor? _executor { get; set; } = null;
+        private ChatSession? _chatSession { get; set; } = null;
+        private InferenceParams? _inferenceParams { get; set; } = null;
         LLMModelSettings ModelSettings = modelSettings;
+        private string SystemPrompt { get; set; } = "";
         public string PresentResponse { get; private set; } = "";
 
         public void Initialize()
@@ -34,7 +35,7 @@ namespace AIPaste.Services.LLMServices
                     GpuLayerCount = ModelSettings.GpuLayerCount,
                 };
 
-                InferenceParams = new InferenceParams()
+                _inferenceParams = new InferenceParams()
                 {
                     MaxTokens = ModelSettings.MaxTokens,
                     AntiPrompts = ModelSettings.antiPrompts,
@@ -45,7 +46,7 @@ namespace AIPaste.Services.LLMServices
                 var model = LLamaWeights.LoadFromFile(parameters);
                 var context = model.CreateContext(parameters);
 
-                Executor = new InteractiveExecutor(context);
+                _executor = new InteractiveExecutor(context);
             }
             catch (Exception ex)
             {
@@ -53,30 +54,49 @@ namespace AIPaste.Services.LLMServices
             }
         }
 
-        public void StartChat(string SystemPrompt, string modelReq, string modelAns)
+        public void StartChat()
         {
-            if (Executor == null)
+            if (_executor == null)
             {
                 throw new InvalidOperationException("Model has not been initialized. Please call Initialize() first.");
             }
             var chatHistory = new ChatHistory();
-            chatHistory.AddMessage(AuthorRole.System, SystemPrompt);
-            chatHistory.AddMessage(AuthorRole.User, modelReq);
-            chatHistory.AddMessage(AuthorRole.Assistant, modelAns);
-            ChatSession = new ChatSession(Executor, chatHistory);
+            if (!string.IsNullOrEmpty(SystemPrompt))
+            {
+                chatHistory.AddMessage(AuthorRole.System, SystemPrompt);
+            }
+            _chatSession = new ChatSession(_executor, chatHistory);
+        }
+        public void SetSystemPrompt(string systemPrompt)
+        {
+            SystemPrompt = systemPrompt;
+            if (_chatSession != null)
+            {
+                _chatSession.AddSystemMessage(SystemPrompt);
+            }
+        }
+
+        public void AddChatHistory(string modelReq, string modelAns)
+        {
+            if (_chatSession == null)
+            {
+                throw new InvalidOperationException("Chat session has not been started. Please call StartChat() first.");
+            }
+            _chatSession.AddUserMessage(modelReq);
+            _chatSession.AddAssistantMessage(modelAns);
         }
 
         public async IAsyncEnumerable<string> GeneratingText(string req)
         {
-            if (ChatSession == null)
+            if (_chatSession == null)
             {
                 throw new InvalidOperationException("Chat session has not been started. Please call StartChat() first.");
             }
 
             var responseBuilder = new List<string>();
-            await foreach (var text in ChatSession.ChatAsync(
+            await foreach (var text in _chatSession.ChatAsync(
                 new ChatHistory.Message(AuthorRole.User, req),
-                InferenceParams))
+                _inferenceParams))
             {
                 responseBuilder.Add(text);
                 yield return text;

@@ -61,7 +61,7 @@
                                        FontSize="16"
                                        Foreground="#495057"
                                        Margin="0,0,0,40"
-                                       Text="{x:Bind ViewModel.outputText, Mode=OneWay}"/>
+                                       Text="{x:Bind ViewModel.OutputText, Mode=OneWay}"/>
 
                             <!-- 決定ボタン -->
                             <Button Content="決定"
