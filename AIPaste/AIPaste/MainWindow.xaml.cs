@@ -1,57 +1,49 @@
 using System;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using AIPaste.Views;
 using Microsoft.UI.Xaml;
-using AIPaste.Services;
-using AIPaste.ViewModels;
-using System.ComponentModel;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Navigation;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+
+// To learn more about WinUI, the WinUI project structure,
+// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace AIPaste
 {
+    /// <summary>
+    /// An empty window that can be used on its own or navigated to within a Frame.
+    /// </summary>
     public sealed partial class MainWindow : Window
     {
-        public MainWindowViewModel ViewModel;
-
         public MainWindow()
         {
-            this.InitializeComponent();
-            // ウィンドウサイズを設定
-            this.ExtendsContentIntoTitleBar = false; // タイトルバーのカスタマイズを無効化
-            this.SetWindowSize(600, 400);
-
-           ViewModel = new MainWindowViewModel();
+            InitializeComponent();
+            mainTab.SelectedItem = mainTab.MenuItems[0];
         }
 
-        private async void GenerateButton_Click(object sender, RoutedEventArgs e)
+        private void OnNavigationViewSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            // ユーザー入力取得
-            string userInput = UserInputBox.Text;
-
-            if (string.IsNullOrWhiteSpace(userInput))
+            if (args.SelectedItemContainer != null)
             {
-                OutputTextBlock.Text = "Please enter a valid prompt.";
-                return;
-            }
-
-            // 生成結果をリアルタイムで表示
-            await ViewModel.GeneratingText(userInput);
-            UserInputBox.Text = "";
-        }
-
-        private void ConfirmButton_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.ChangeTargetText();
-        }
-
-        private void SetWindowSize(int width, int height)
-        {
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-            var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
-            var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
-
-            if (appWindow != null)
-            {
-                appWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
+                var selectedItemTag = args.SelectedItemContainer.Tag.ToString();
+                switch (selectedItemTag)
+                {
+                    case "AiPastePage":
+                        contentFrame.Navigate(typeof(AiPastePage));
+                        break;
+                    case "SettingsPage":
+                        contentFrame.Navigate(typeof(SettingsPage));
+                        break;
+                }
             }
         }
     }

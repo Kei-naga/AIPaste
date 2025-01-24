@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace AIPaste.Models.Settings
 {
-    internal struct KeySettings
+    internal struct KeySettings(string KeyPattern)
     {
+        public string KeyPattern = KeyPattern;
     }
 }

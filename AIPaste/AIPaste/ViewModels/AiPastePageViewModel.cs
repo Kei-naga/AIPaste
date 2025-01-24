@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace AIPaste.ViewModels
 {
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class AiPastePageViewModel : INotifyPropertyChanged
     {
         private readonly ILLMStrategy _llmStrategy;
         private readonly ClipboardOperator _clipboardOperator = new();
@@ -51,13 +51,13 @@ namespace AIPaste.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public MainWindowViewModel()
+        public AiPastePageViewModel()
         {
             var llmModelSettings = new LLMModelSettings(
                 ModelPath: @"C:\Users\keita\llama\Llama-3-ELYZA-JP-8B-GGUF\Llama-3-ELYZA-JP-8B-q4_k_m.gguf",
                 GpuLayerCount: 32,
                 ContextSize: 1024,
-                antiPrompts: ["END"],
+                AntiPrompts: ["END",],
                 MaxTokens: 256
             );
             _clipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
@@ -66,7 +66,7 @@ namespace AIPaste.ViewModels
             _llmStrategy = new LocalLLMStrategy();
             _llmProvider.Initialize();
             _llmProvider.SetSystemPrompt(_llmStrategy.GetSystemPrompt());
-            _llmProvider.StartChat();
+            _llmProvider.StartNewChat();
             (string modelReq, string modelAns) = _llmStrategy.CreateModelPrompt();
             _llmProvider.AddChatHistory(modelReq,modelAns);
         }

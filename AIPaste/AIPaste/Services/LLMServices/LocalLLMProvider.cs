@@ -16,12 +16,12 @@ using AIPaste.Models.Settings;
 
 namespace AIPaste.Services.LLMServices
 {
-    internal class LocalLLMProvider(LLMModelSettings modelSettings) : ILLMProvider
+    internal class LocalLLMProvider(LLMModelSettings modelSettings) : ILLMProvider, IDisposable
     {
-        private InteractiveExecutor? _executor { get; set; } = null;
-        private ChatSession? _chatSession { get; set; } = null;
-        private InferenceParams? _inferenceParams { get; set; } = null;
-        LLMModelSettings ModelSettings = modelSettings;
+        static private InteractiveExecutor? _executor = null;
+        private ChatSession? _chatSession = null;
+        private InferenceParams? _inferenceParams;
+        private LLMModelSettings _modelSettings = modelSettings;
         private string SystemPrompt { get; set; } = "";
         public string PresentResponse { get; private set; } = "";
 
@@ -29,24 +29,25 @@ namespace AIPaste.Services.LLMServices
         {
             try
             {
-                var parameters = new ModelParams(ModelSettings.ModelPath)
-                {
-                    ContextSize = ModelSettings.ContextSize,
-                    GpuLayerCount = ModelSettings.GpuLayerCount,
-                };
-
                 _inferenceParams = new InferenceParams()
-                {
-                    MaxTokens = ModelSettings.MaxTokens,
-                    AntiPrompts = ModelSettings.antiPrompts,
+                    {
+                        MaxTokens = _modelSettings.MaxTokens,
+                        AntiPrompts = _modelSettings.AntiPrompts,
 
-                    SamplingPipeline = new DefaultSamplingPipeline(),
-                };
+                        SamplingPipeline = new DefaultSamplingPipeline(),
+                    };
 
-                var model = LLamaWeights.LoadFromFile(parameters);
-                var context = model.CreateContext(parameters);
+                if (_executor == null) { 
+                    var parameters = new ModelParams(_modelSettings.ModelPath)
+                    {
+                        ContextSize = _modelSettings.ContextSize,
+                        GpuLayerCount = _modelSettings.GpuLayerCount,
+                    };
 
-                _executor = new InteractiveExecutor(context);
+                    var model = LLamaWeights.LoadFromFile(parameters);
+                    var context = model.CreateContext(parameters);
+                    _executor = new InteractiveExecutor(context);
+                }
             }
             catch (Exception ex)
             {
@@ -54,7 +55,13 @@ namespace AIPaste.Services.LLMServices
             }
         }
 
-        public void StartChat()
+        public void Dispose()
+        {
+            _executor?.Context.Dispose();
+            _executor = null;
+        }
+
+        public void StartNewChat()
         {
             if (_executor == null)
             {
@@ -72,6 +79,7 @@ namespace AIPaste.Services.LLMServices
             SystemPrompt = systemPrompt;
             if (_chatSession != null)
             {
+                _chatSession.History.Messages.Clear();
                 _chatSession.AddSystemMessage(SystemPrompt);
             }
         }

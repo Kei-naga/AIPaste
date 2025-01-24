@@ -7,12 +7,12 @@ using Microsoft.UI.Content;
 
 namespace AIPaste.Models.Settings
 {
-    internal struct LLMModelSettings(string ModelPath, int GpuLayerCount, uint ContextSize, string[] antiPrompts, int MaxTokens)
+    internal struct LLMModelSettings(string ModelPath, int GpuLayerCount, uint ContextSize, string[] AntiPrompts, int MaxTokens)
     {
         public string ModelPath { get; set; } = ModelPath;
         public int GpuLayerCount { get; set; } = GpuLayerCount;
         public uint ContextSize { get; set; } = ContextSize;
-        public string[] antiPrompts { get; set; } = antiPrompts;
+        public string[] AntiPrompts { get; set; } = AntiPrompts;
         public int MaxTokens { get; set; } = MaxTokens;
     }
 }

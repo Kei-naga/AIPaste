@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="AIPaste.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:AIPaste.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <Grid Padding="20">
+        <StackPanel>
+            <!-- AppSettings.csの設定項目に対応するコントロールを配置します -->
+            <TextBlock Text="LLM Model Path" Margin="0,0,0,5"/>
+            <TextBox Text="{x:Bind ViewModel.LLMModelPath, Mode=OneWay}" Margin="0,0,0,10"/>
+
+            <TextBlock Text="GPU Layer Count" Margin="0,0,0,5"/>
+            <NumberBox Value="{x:Bind Path=ViewModel.GpuLayerCount, Mode=TwoWay}" />
+
+            <TextBlock Text="Max Token Count" Margin="0,0,0,5"/>
+            <NumberBox Value="{x:Bind Path=ViewModel.MaxTokens, Mode=TwoWay}" />
+
+            <TextBlock Text="Using GPU" Margin="0,0,0,5"/>
+            <CheckBox IsChecked="{x:Bind ViewModel.GpuEnabled, Mode=TwoWay}" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Key Pattern" Margin="0,0,0,5"/>
+            <TextBox Text="{x:Bind ViewModel.KeyPattern, Mode=OneWay}" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Auto Start" Margin="0,0,0,5"/>
+            <CheckBox IsChecked="{x:Bind ViewModel.AutoStart, Mode=TwoWay}" Margin="0,0,0,10"/>
+
+            <!-- 他の設定項目も同様に追加 -->
+
+            <Button Content="保存" HorizontalAlignment="Right" Click="OnSaveButtonClicked"/>
+        </StackPanel>
+    </Grid>
+</Page>
