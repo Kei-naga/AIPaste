@@ -4,25 +4,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ManagedCuda;
+using Windows.Storage;
 
 namespace AIPaste.Models.Settings
 {
-    internal class AppSettings
+    internal class AppSettings(LLMModelSettings modelSettings, KeySettings keySettings, bool autoStartSetting, bool gpuAvailable)
     {
-        public LLMModelSettings LLMModelSettings { get; set; }
-        public bool GpuEnabled { get; set; }
-        public bool AutoStart { get; set; }
-        public KeySettings KeySettings { get; set; }
+        public LLMModelSettings LLMModelSettings { get; set; } = modelSettings;
+        public bool GpuEnabled { get; set; } = gpuAvailable;
+        public bool AutoStart { get; set; } = autoStartSetting;
+        public KeySettings KeySettings { get; set; } = keySettings;
 
-        public AppSettings(LLMModelSettings modelSettings, bool autoStartSetting, KeySettings keySettings)
+        public static AppSettings GetDefaultSettings()
         {
-            LLMModelSettings = modelSettings;
-            GpuEnabled = IsGpuAvailable();
-            AutoStart = autoStartSetting;
-            KeySettings = keySettings;
+            var llmModelSettings = LLMModelSettings.GetDefaultSettings();
+            var keySettings = KeySettings.GetDefaultSettings();
+            return new AppSettings(
+                modelSettings: llmModelSettings,
+                keySettings: keySettings,
+                autoStartSetting: true,
+                gpuAvailable: IsGpuAvailable()
+            );
         }
 
-        private bool IsGpuAvailable() // cheking for only nvidia gpu
+        private static bool IsGpuAvailable() // cheking for only nvidia gpu
         {
             try
             {
@@ -34,6 +39,5 @@ namespace AIPaste.Models.Settings
                 return false;
             }
         }
-
     }
 }

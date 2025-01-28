@@ -118,10 +118,11 @@ namespace AIPaste.ViewModels
                 MaxTokens: MaxTokens
             );
             var keySettings = new KeySettings(KeyPattern);
-            // AppSettingsに値を保存
-            _settingsService.SaveSettings(new AppSettings(
-                modelSettings, AutoStart, keySettings
-            ));
+            var newSettings = new AppSettings(
+                modelSettings, keySettings, AutoStart, GpuEnabled
+            );
+            _settingsService.SaveSettings(newSettings);
+
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

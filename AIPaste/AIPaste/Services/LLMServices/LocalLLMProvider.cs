@@ -16,64 +16,84 @@ using AIPaste.Models.Settings;
 
 namespace AIPaste.Services.LLMServices
 {
-    internal class LocalLLMProvider(LLMModelSettings modelSettings) : ILLMProvider, IDisposable
+    internal class LocalLLMProvider : ILLMProvider
     {
-        static private InteractiveExecutor? _executor = null;
+        static private readonly object _lock = new();
+        static private LLamaWeights? _model = null;
+        static private LLamaContext? _context = null;
+        static private LLMModelSettings _modelSettings;
         private ChatSession? _chatSession = null;
         private InferenceParams? _inferenceParams;
-        private LLMModelSettings _modelSettings = modelSettings;
         private string SystemPrompt { get; set; } = "";
         public string PresentResponse { get; private set; } = "";
 
-        public void Initialize()
+        public LocalLLMProvider(LLMModelSettings modelSettings)
         {
-            try
+            if (!modelSettings.Equals(_modelSettings))
             {
-                _inferenceParams = new InferenceParams()
-                    {
-                        MaxTokens = _modelSettings.MaxTokens,
-                        AntiPrompts = _modelSettings.AntiPrompts,
-
-                        SamplingPipeline = new DefaultSamplingPipeline(),
-                    };
-
-                if (_executor == null) { 
-                    var parameters = new ModelParams(_modelSettings.ModelPath)
-                    {
-                        ContextSize = _modelSettings.ContextSize,
-                        GpuLayerCount = _modelSettings.GpuLayerCount,
-                    };
-
-                    var model = LLamaWeights.LoadFromFile(parameters);
-                    var context = model.CreateContext(parameters);
-                    _executor = new InteractiveExecutor(context);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(" Model initialization failed. Please check the model path and parameters.", ex);
+                Dispose();
+                _modelSettings = modelSettings;
             }
         }
 
-        public void Dispose()
+        public void Initialize()
         {
-            _executor?.Context.Dispose();
-            _executor = null;
+            lock (_lock)
+            {
+                try
+                {
+                    _inferenceParams = new InferenceParams()
+                    {
+                        MaxTokens = _modelSettings.MaxTokens,
+                        AntiPrompts = _modelSettings.AntiPrompts,
+                        SamplingPipeline = new DefaultSamplingPipeline(),
+                    };
+                    if (_context == null || _model == null)
+                    {
+                        var parameters = new ModelParams(_modelSettings.ModelPath)
+                        {
+                            ContextSize = _modelSettings.ContextSize,
+                            GpuLayerCount = _modelSettings.GpuLayerCount,
+                        };
+
+                        _model = LLamaWeights.LoadFromFile(parameters);
+                        _context = _model.CreateContext(parameters);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException("Model initialization failed. Please check the model path and parameters.", ex);
+                }
+            }
+        }
+
+        public static void Dispose()
+        {
+            lock (_lock)
+            {
+                _model?.Dispose();
+                _context?.Dispose();
+                _model = null;
+                _context = null;
+                _modelSettings = default;
+            }
         }
 
         public void StartNewChat()
         {
-            if (_executor == null)
+            if (_context == null)
             {
                 throw new InvalidOperationException("Model has not been initialized. Please call Initialize() first.");
             }
+            var executor = new InteractiveExecutor(_context);
             var chatHistory = new ChatHistory();
             if (!string.IsNullOrEmpty(SystemPrompt))
             {
                 chatHistory.AddMessage(AuthorRole.System, SystemPrompt);
             }
-            _chatSession = new ChatSession(_executor, chatHistory);
+            _chatSession = new ChatSession(executor, chatHistory);
         }
+
         public void SetSystemPrompt(string systemPrompt)
         {
             SystemPrompt = systemPrompt;
@@ -88,7 +108,7 @@ namespace AIPaste.Services.LLMServices
         {
             if (_chatSession == null)
             {
-                throw new InvalidOperationException("Chat session has not been started. Please call StartChat() first.");
+                throw new InvalidOperationException("Chat session has not been started. Please call StartNewChat() first.");
             }
             _chatSession.AddUserMessage(modelReq);
             _chatSession.AddAssistantMessage(modelAns);
@@ -98,21 +118,21 @@ namespace AIPaste.Services.LLMServices
         {
             if (_chatSession == null)
             {
-                throw new InvalidOperationException("Chat session has not been started. Please call StartChat() first.");
+                throw new InvalidOperationException("Chat session has not been started. Please call StartNewChat() first.");
             }
 
             var responseBuilder = new List<string>();
-            await foreach (var text in _chatSession.ChatAsync(
-                new ChatHistory.Message(AuthorRole.User, req),
-                _inferenceParams))
-            {
-                responseBuilder.Add(text);
-                yield return text;
+                await foreach (var text in _chatSession.ChatAsync(
+                    new ChatHistory.Message(AuthorRole.User, req),
+                    _inferenceParams))
+                {
+                    responseBuilder.Add(text);
+                    yield return text;
+                }
+                PresentResponse = GetTrimmedResponse(responseBuilder);
             }
-            PresentResponse = GetTrimmedResponse(responseBuilder);
-        }
 
-        private string GetTrimmedResponse(List<string> responseBuilder)
+        private static string GetTrimmedResponse(List<string> responseBuilder)
         {
             string text = string.Join("", responseBuilder);
             text = Regex.Replace(text, $"{Regex.Escape("assistant:")}\\s*", "");

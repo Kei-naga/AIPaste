@@ -8,10 +8,11 @@ using AIPaste.Models.Settings;
 using AIPaste.Services.LLMServices;
 using AIPaste.Services.ClipboardOperator;
 using System.Diagnostics.CodeAnalysis;
+using AIPaste.Services.SettingsServices;
 
 namespace AIPaste.ViewModels
 {
-    public class AiPastePageViewModel : INotifyPropertyChanged
+    public partial class AiPastePageViewModel : INotifyPropertyChanged
     {
         private readonly ILLMStrategy _llmStrategy;
         private readonly ClipboardOperator _clipboardOperator = new();
@@ -53,16 +54,11 @@ namespace AIPaste.ViewModels
 
         public AiPastePageViewModel()
         {
-            var llmModelSettings = new LLMModelSettings(
-                ModelPath: @"C:\Users\keita\llama\Llama-3-ELYZA-JP-8B-GGUF\Llama-3-ELYZA-JP-8B-q4_k_m.gguf",
-                GpuLayerCount: 32,
-                ContextSize: 1024,
-                AntiPrompts: ["END",],
-                MaxTokens: 256
-            );
+            var settingsService = new SettingsService();
+            var appSettings = settingsService.LoadSettings();
             _clipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
-            _llmProvider = new LocalLLMProvider(llmModelSettings);
+            _llmProvider = new LocalLLMProvider(appSettings.LLMModelSettings);
             _llmStrategy = new LocalLLMStrategy();
             _llmProvider.Initialize();
             _llmProvider.SetSystemPrompt(_llmStrategy.GetSystemPrompt());
@@ -93,7 +89,7 @@ namespace AIPaste.ViewModels
             OutputText = _llmProvider.PresentResponse;
         }
 
-        private bool CheckResponse(string response)
+        private static bool CheckResponse(string response)
         {
             return response != "";
         }
