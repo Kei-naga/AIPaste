@@ -17,5 +17,10 @@ namespace AIPaste.Models.Settings
                 KeyPattern: "Ctrl+Shift+V"
             );
         }
+
+        public override string ToString()
+        {
+            return KeyPattern;
+        }
     }
 }

@@ -13,19 +13,33 @@ using static System.Collections.Specialized.BitVector32;
 using LLama.Sampling;
 using System.Text.RegularExpressions;
 using AIPaste.Models.Settings;
+using NLog;
 
 namespace AIPaste.Services.LLMServices
 {
     internal class LocalLLMProvider : ILLMProvider
     {
+        static private Logger _logger = LogManager.GetCurrentClassLogger();
         static private readonly object _lock = new();
         static private LLamaWeights? _model = null;
         static private LLamaContext? _context = null;
         static private LLMModelSettings _modelSettings;
         private ChatSession? _chatSession = null;
         private InferenceParams? _inferenceParams;
-        private string SystemPrompt { get; set; } = "";
-        public string PresentResponse { get; private set; } = "";
+        public string SystemPrompt { get; private set; } = "";
+        private string _presentResponse = "";
+        public string PresentResponse
+        {
+            get => _presentResponse;
+            private set
+            {
+                if (_presentResponse != value)
+                {
+                    _presentResponse = value;
+                    _logger.Debug($"PresentResponse changed to {value}");
+                }
+            }
+        }
 
         public LocalLLMProvider(LLMModelSettings modelSettings)
         {
@@ -33,6 +47,7 @@ namespace AIPaste.Services.LLMServices
             {
                 Dispose();
                 _modelSettings = modelSettings;
+                _logger.Debug($"Model settings changed to {modelSettings}");
             }
         }
 
@@ -50,6 +65,7 @@ namespace AIPaste.Services.LLMServices
                     };
                     if (_context == null || _model == null)
                     {
+                        _logger.Info("creating Model");
                         var parameters = new ModelParams(_modelSettings.ModelPath)
                         {
                             ContextSize = _modelSettings.ContextSize,
@@ -58,6 +74,7 @@ namespace AIPaste.Services.LLMServices
 
                         _model = LLamaWeights.LoadFromFile(parameters);
                         _context = _model.CreateContext(parameters);
+                        _logger.Info("successfully created model");
                     }
                 }
                 catch (Exception ex)
@@ -76,6 +93,8 @@ namespace AIPaste.Services.LLMServices
                 _model = null;
                 _context = null;
                 _modelSettings = default;
+
+                _logger.Info("disposed Model");
             }
         }
 
@@ -96,6 +115,7 @@ namespace AIPaste.Services.LLMServices
 
         public void SetSystemPrompt(string systemPrompt)
         {
+            _logger.Debug($"Setting SystemPrompt: {systemPrompt}");
             SystemPrompt = systemPrompt;
             if (_chatSession != null)
             {
@@ -116,6 +136,7 @@ namespace AIPaste.Services.LLMServices
 
         public async IAsyncEnumerable<string> GeneratingText(string req)
         {
+            _logger.Debug($"GeneratingText called with {Environment.NewLine}{req}");
             if (_chatSession == null)
             {
                 throw new InvalidOperationException("Chat session has not been started. Please call StartNewChat() first.");

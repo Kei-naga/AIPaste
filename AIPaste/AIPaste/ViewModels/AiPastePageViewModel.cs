@@ -56,7 +56,7 @@ namespace AIPaste.ViewModels
         {
             var settingsService = new SettingsService();
             var appSettings = settingsService.LoadSettings();
-            _clipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
+            ClipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
             _llmProvider = new LocalLLMProvider(appSettings.LLMModelSettings);
             _llmStrategy = new LocalLLMStrategy();
@@ -96,7 +96,7 @@ namespace AIPaste.ViewModels
 
         public void ChangeTargetText()
         {
-            _clipboardOperator.SetText(OutputText);
+            ClipboardOperator.SetText(OutputText);
         }
 
         async private void SetTargetTextFromClipboard()

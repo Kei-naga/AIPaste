@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ManagedCuda;
-using Windows.Storage;
+﻿using ManagedCuda;
 
 namespace AIPaste.Models.Settings
 {
@@ -39,5 +33,13 @@ namespace AIPaste.Models.Settings
                 return false;
             }
         }
+
+        public override string ToString()
+        {
+            return $"ModelSettings: {LLMModelSettings}, KeySettings: {KeySettings}, AutoStart: {AutoStart}, GpuEnabled: {GpuEnabled}";
+        }
     }
 }
+
+
+

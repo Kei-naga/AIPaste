@@ -12,6 +12,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
+using NLog;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -34,6 +35,17 @@ namespace AIPaste
         public App()
         {
             this.InitializeComponent();
+            var logger = LogManager.GetCurrentClassLogger();
+            if (IsDevelopmentMode())
+            {
+                LogManager.Configuration.Variables["isDevelopment"] = "true";
+            }
+            else
+            {
+                LogManager.Configuration.Variables["isDevelopment"] = "false";
+            }
+            logger.Info("Start AIPaste!");
+            logger.Debug("Start on debug mode");
         }
 
         private Window? _window;
@@ -51,6 +63,11 @@ namespace AIPaste
         void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
+        }
+
+        private bool IsDevelopmentMode()
+        {
+            return true;
         }
     }
 }

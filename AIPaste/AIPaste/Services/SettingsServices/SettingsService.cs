@@ -1,5 +1,6 @@
 ﻿using AIPaste.Models.Settings;
 using ManagedCuda;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace AIPaste.Services.SettingsServices
     internal class SettingsService
     {
         private Windows.Storage.ApplicationDataContainer _container;
+        private Logger _logger = LogManager.GetCurrentClassLogger();
 
         public SettingsService()
         {
@@ -23,6 +25,7 @@ namespace AIPaste.Services.SettingsServices
         {
             try
             {
+                _logger.Info("Loading settings");
                 var modelPath = (string)_container.Values["ModelPath"];
                 var gpuLayerCount = (int)_container.Values["GpuLayerCount"];
                 var contextSize = (uint)_container.Values["ContextSize"];
@@ -41,7 +44,9 @@ namespace AIPaste.Services.SettingsServices
                     );
                 var AutoStart = (bool)_container.Values["AutoStart"];
                 var gpuAvailable = (bool)_container.Values["GpuEnabled"];
-                return new AppSettings(llmModelSettings, keySettings, AutoStart, gpuAvailable);
+                var loadedSettings = new AppSettings(llmModelSettings, keySettings, AutoStart, gpuAvailable);
+                _logger.Debug($"Loaded settimgs: {loadedSettings}");
+                return loadedSettings;
             }
             catch(Exception e)
             {
@@ -51,6 +56,7 @@ namespace AIPaste.Services.SettingsServices
 
         public void SaveSettings(AppSettings appSettings)
         {
+            _logger.Info("Saving settings");
             _container.Values["GpuEnabled"] = appSettings.GpuEnabled;
             _container.Values["AutoStart"] = appSettings.AutoStart;
             _container.Values["KeyPattern"] = appSettings.KeySettings.KeyPattern;
@@ -59,10 +65,12 @@ namespace AIPaste.Services.SettingsServices
             _container.Values["ContextSize"] = appSettings.LLMModelSettings.ContextSize;
             _container.Values["AntiPrompts"] = appSettings.LLMModelSettings.AntiPrompts.ToArray();
             _container.Values["MaxTokens"] = appSettings.LLMModelSettings.MaxTokens;
+            _logger.Debug($"Saved settings: {appSettings}");
         }
 
         public AppSettings ResetSettings()
         {
+            _logger.Info("Resetting settings");
             var defaultSettings = AppSettings.GetDefaultSettings();
             _container.Values.Clear();
             SaveSettings(defaultSettings);

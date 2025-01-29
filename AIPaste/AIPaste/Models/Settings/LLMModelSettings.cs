@@ -35,5 +35,9 @@ namespace AIPaste.Models.Settings
                 MaxTokens == otherSettings.MaxTokens;
         }
 
+        public override readonly string ToString()
+        {
+            return $"ModelPath: {ModelPath}, GpuLayerCount: {GpuLayerCount}, ContextSize: {ContextSize}, AntiPrompts: {AntiPrompts}, MaxTokens: {MaxTokens}";
+        }
     }
 }

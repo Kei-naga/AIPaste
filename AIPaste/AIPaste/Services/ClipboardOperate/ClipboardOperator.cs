@@ -1,21 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
+using NLog;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace AIPaste.Services.ClipboardOperator
 {
     public class ClipboardOperator
     {
-        private string _text = "";
-        public string Text
-        {
-            get => _text;
-            set
-            {
-                _text = value;
-                SetText(value);
-            }
-        }
+        private Logger _logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// get text from clipboard asynchronously
         /// </summary>
@@ -26,7 +19,9 @@ namespace AIPaste.Services.ClipboardOperator
                 var content = Clipboard.GetContent();
                 if (content.Contains(StandardDataFormats.Text))
                 {
-                    return await content.GetTextAsync();
+                    var text = await content.GetTextAsync();
+                    _logger.Debug($"get clipboard text: {text}");
+                    return text;
                 }
                 else
                 {
@@ -42,7 +37,7 @@ namespace AIPaste.Services.ClipboardOperator
         /// <summary>
         /// set text from clipboard asynchronously
         /// </summary>
-        public void SetText(string text)
+        public static void SetText(string text)
         {
             try
             {
@@ -65,7 +60,7 @@ namespace AIPaste.Services.ClipboardOperator
         /// register clipboard content changed handler
         /// </summary>
         /// <param name="onContentChanged">A delegate that will be called on change</param>
-        public void RegisterContentChangedHandler(EventHandler<object> onContentChanged)
+        public static void RegisterContentChangedHandler(EventHandler<object> onContentChanged)
         {
             Clipboard.ContentChanged += onContentChanged;
         }
@@ -74,7 +69,7 @@ namespace AIPaste.Services.ClipboardOperator
         /// unregister clipboard content changed handler
         /// </summary>
         /// <param name="onContentChanged">a delegate  </param>
-        public void UnregisterContentChangedHandler(EventHandler<object> onContentChanged)
+        public static void UnregisterContentChangedHandler(EventHandler<object> onContentChanged)
         {
             Clipboard.ContentChanged -= onContentChanged;
         }
