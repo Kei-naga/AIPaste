@@ -92,7 +92,8 @@
                      Background="#FFFFFF"
                      Foreground="#495057"
                      BorderBrush="#CED4DA"
-                     FontSize="14"/>
+                     FontSize="14"
+                     PreviewKeyDown="UserInputBox_KeyDown"/>
 
             <!-- 実行ボタン -->
             <Button x:Name="GenerateButton" Grid.Column="1" Content="Generate Text"

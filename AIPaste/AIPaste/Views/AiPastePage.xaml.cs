@@ -8,6 +8,8 @@ using System.ComponentModel;
 using WinRT;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Devices.Enumeration;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Input;
 
 namespace AIPaste.Views
 {
@@ -23,8 +25,9 @@ namespace AIPaste.Views
 
         private async void GenerateButton_Click(object sender, RoutedEventArgs e)
         {
-            // ユーザー入力取得
+            UserInputBox.IsEnabled = false;
             string userInput = UserInputBox.Text;
+            UserInputBox.Text = "";
 
             if (string.IsNullOrWhiteSpace(userInput))
             {
@@ -34,12 +37,22 @@ namespace AIPaste.Views
 
             // 生成結果をリアルタイムで表示
             await ViewModel.GeneratingText(userInput);
-            UserInputBox.Text = "";
+            UserInputBox.IsEnabled = true;
         }
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.ChangeTargetText();
+        }
+
+        private void UserInputBox_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Enter &&
+                !InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Shift).HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down))
+            {
+                e.Handled = true;
+                GenerateButton_Click(sender, e);
+            }
         }
 
     }
