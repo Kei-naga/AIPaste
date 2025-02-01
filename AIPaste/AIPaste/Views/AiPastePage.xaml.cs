@@ -25,17 +25,13 @@ namespace AIPaste.Views
 
         private async void GenerateButton_Click(object sender, RoutedEventArgs e)
         {
-            UserInputBox.IsEnabled = false;
             string userInput = UserInputBox.Text;
-            UserInputBox.Text = "";
-
             if (string.IsNullOrWhiteSpace(userInput))
             {
-                OutputTextBlock.Text = "Please enter a valid prompt.";
                 return;
             }
-
-            // 生成結果をリアルタイムで表示
+            UserInputBox.IsEnabled = false;
+            UserInputBox.Text = "";
             await ViewModel.GeneratingText(userInput);
             UserInputBox.IsEnabled = true;
         }
