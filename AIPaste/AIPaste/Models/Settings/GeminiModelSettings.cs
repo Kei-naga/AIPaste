@@ -7,15 +7,15 @@ using Microsoft.UI.Content;
 
 namespace AIPaste.Models.Settings
 {
-    class GeminiModelSettings : ILLMModelSettings
+    class GeminiModelSettings(string apiKey) : ILLMModelSettings
     {
-        public string ApiKey { get; } = "";
+        public string ApiKey { get; } = apiKey;
         public string ModelName { get; } = "";
         public string Location { get; } = "";
 
         public static ILLMModelSettings GetDefaultSettings()
         {
-            return new GeminiModelSettings();
+            return new GeminiModelSettings("");
         }
 
         public bool Equals(ILLMModelSettings otherSettings)

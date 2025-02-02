@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using AIPaste.Models.Settings;
 using GenerativeAI;
@@ -39,12 +40,7 @@ namespace AIPaste.Services.LLMServices
         {
             _modelSettings = modelSettings;
             _model = new GenerativeModel(_modelSettings.ApiKey);
-        }
-
-        public void Initialize()
-        {
-            // Gemini APIの初期化処理をここに記述
-            _logger.Info("Gemini API initialized.");
+            _logger.Debug($"Staeted Gemini");
         }
 
         public void SetSystemPrompt(string systemPrompt)
@@ -94,16 +90,24 @@ namespace AIPaste.Services.LLMServices
             }
 
             var responseBuilder = new List<string>();
+            var timeout = TimeSpan.FromSeconds(1);
 
             var task = _model.StreamContentAsync(req, Handler);
             while (!task.IsCompleted)
             {
-                await tcs.Task;
-                tcs = new TaskCompletionSource();
-                yield return string.Join("", responseChunks);
+                var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(timeout));
+                if (completedTask == tcs.Task)
+                {
+                    tcs = new TaskCompletionSource();
+                    yield return string.Join("", responseChunks);
 
-                responseBuilder.AddRange(responseChunks);
-                responseChunks.Clear();
+                    responseBuilder.AddRange(responseChunks);
+                    responseChunks.Clear();
+                }
+                else
+                {
+                    _logger.Debug("Streaming timed out.");
+                }
             }
 
             PresentResponse = OptimizeResponse(responseBuilder);
