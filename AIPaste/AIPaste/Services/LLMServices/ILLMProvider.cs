@@ -10,7 +10,6 @@ namespace AIPaste.Services.LLMServices
     internal interface ILLMProvider
     {
         string PresentResponse { get; }
-        void Initialize();
         void SetSystemPrompt(string SystemPrompt);
         // static abstract ILLMProvider Instance(LLMModelSettings modelSettings);
         void StartNewChat();

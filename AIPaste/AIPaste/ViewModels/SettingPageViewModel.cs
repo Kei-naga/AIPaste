@@ -16,10 +16,10 @@ namespace AIPaste.ViewModels
             _appSettings = _settingsService.LoadSettings();
 
             // プロパティの初期化
-            LLMModelPath = _appSettings.LLMModelSettings.ModelPath;
-            GpuLayerCount = _appSettings.LLMModelSettings.GpuLayerCount;
-            MaxTokens = _appSettings.LLMModelSettings.MaxTokens;
-            GpuEnabled = _appSettings.GpuEnabled;
+            LLMModelPath = _appSettings.LocalLLMSettings.ModelPath;
+            GpuLayerCount = _appSettings.LocalLLMSettings.GpuLayerCount;
+            MaxTokens = _appSettings.LocalLLMSettings.MaxTokens;
+            GpuEnabled = _appSettings.LocalLLMSettings.GpuEnabled;
             KeyPattern = _appSettings.KeySettings.KeyPattern;
             AutoStart = _appSettings.AutoStart;
         }
@@ -110,16 +110,21 @@ namespace AIPaste.ViewModels
 
         public void SaveSettings()
         {
-            var modelSettings = new LLMModelSettings(
+            var modelSettings = new LLMLocalModelSettings(
                 ModelPath: LLMModelPath,
+                GpuEnable: GpuEnabled,
                 GpuLayerCount: GpuLayerCount,
-                ContextSize: _appSettings.LLMModelSettings.ContextSize,
-                AntiPrompts: _appSettings.LLMModelSettings.AntiPrompts,
+                ContextSize: _appSettings.LocalLLMSettings.ContextSize,
+                AntiPrompts: _appSettings.LocalLLMSettings.AntiPrompts,
                 MaxTokens: MaxTokens
             );
             var keySettings = new KeySettings(KeyPattern);
             var newSettings = new AppSettings(
-                modelSettings, keySettings, AutoStart, GpuEnabled
+                AutoStart,
+                _appSettings.ModelType,
+                keySettings,
+                modelSettings,
+                _appSettings.GeminiSettings
             );
             _settingsService.SaveSettings(newSettings);
 

@@ -23,7 +23,7 @@ namespace AIPaste.Services.LLMServices
         static private readonly object _lock = new();
         static private LLamaWeights? _model = null;
         static private LLamaContext? _context = null;
-        static private LLMModelSettings _modelSettings;
+        static private LLMLocalModelSettings? _modelSettings = null;
         private ChatSession? _chatSession = null;
         private InferenceParams? _inferenceParams;
         public string SystemPrompt { get; private set; } = "";
@@ -41,22 +41,29 @@ namespace AIPaste.Services.LLMServices
             }
         }
 
-        public LocalLLMProvider(LLMModelSettings modelSettings)
+        public LocalLLMProvider(LLMLocalModelSettings modelSettings)
         {
-            if (!modelSettings.Equals(_modelSettings))
+            if (_modelSettings == null || !modelSettings.Equals(_modelSettings))
             {
                 Dispose();
                 _modelSettings = modelSettings;
                 _logger.Debug($"Model settings changed to {modelSettings}");
+                Initialize();
             }
+
         }
 
-        public void Initialize()
+        private void Initialize()
         {
             lock (_lock)
             {
                 try
                 {
+                    if (_modelSettings == null)
+                    {
+                        throw new InvalidOperationException("Model settings have not been provided.");
+                    }
+
                     _inferenceParams = new InferenceParams()
                     {
                         MaxTokens = _modelSettings.MaxTokens,

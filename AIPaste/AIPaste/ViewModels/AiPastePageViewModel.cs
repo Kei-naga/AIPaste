@@ -58,9 +58,8 @@ namespace AIPaste.ViewModels
             var appSettings = settingsService.LoadSettings();
             ClipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
-            _llmProvider = new LocalLLMProvider(appSettings.LLMModelSettings);
+            _llmProvider = new LocalLLMProvider(appSettings.LocalLLMSettings);
             _llmStrategy = new LocalLLMStrategy();
-            _llmProvider.Initialize();
             _llmProvider.SetSystemPrompt(_llmStrategy.GetSystemPrompt());
             _llmProvider.StartNewChat();
             (string modelReq, string modelAns) = _llmStrategy.CreateModelPrompt();

@@ -1,43 +1,38 @@
-﻿using ManagedCuda;
+﻿using System;
+using ManagedCuda;
 
 namespace AIPaste.Models.Settings
 {
-    internal class AppSettings(LLMModelSettings modelSettings, KeySettings keySettings, bool autoStartSetting, bool gpuAvailable)
+    internal class AppSettings(bool autoStartSetting, ModelType modelType, KeySettings keySettings, LLMLocalModelSettings llmLocalModelSettings, GeminiModelSettings geminiModelSettings)
     {
-        public LLMModelSettings LLMModelSettings { get; set; } = modelSettings;
-        public bool GpuEnabled { get; set; } = gpuAvailable;
         public bool AutoStart { get; set; } = autoStartSetting;
+        public ModelType ModelType { get; set; } = modelType;
         public KeySettings KeySettings { get; set; } = keySettings;
+        public LLMLocalModelSettings LocalLLMSettings { get; set; } = llmLocalModelSettings;
+        public GeminiModelSettings GeminiSettings { get; set; } = geminiModelSettings;
 
         public static AppSettings GetDefaultSettings()
         {
-            var llmModelSettings = LLMModelSettings.GetDefaultSettings();
-            var keySettings = KeySettings.GetDefaultSettings();
             return new AppSettings(
-                modelSettings: llmModelSettings,
-                keySettings: keySettings,
                 autoStartSetting: true,
-                gpuAvailable: IsGpuAvailable()
+                modelType: ModelType.LocalLLM,
+                keySettings: (KeySettings)KeySettings.GetDefaultSettings(),
+                llmLocalModelSettings: (LLMLocalModelSettings)LLMLocalModelSettings.GetDefaultSettings(),
+                geminiModelSettings: (GeminiModelSettings)GeminiModelSettings.GetDefaultSettings()
             );
-        }
-
-        private static bool IsGpuAvailable() // cheking for only nvidia gpu
-        {
-            try
-            {
-                using var cudaContext = new CudaContext();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
 
         public override string ToString()
         {
-            return $"ModelSettings: {LLMModelSettings}, KeySettings: {KeySettings}, AutoStart: {AutoStart}, GpuEnabled: {GpuEnabled}";
+            return $"ModelSettings:  AutoStart: {AutoStart}, ModelType: {ModelType}";
         }
+    }
+
+
+    enum ModelType
+    {
+        LocalLLM,
+        Gemini,
     }
 }
 

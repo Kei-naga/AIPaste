@@ -26,55 +26,92 @@ namespace AIPaste.Services.SettingsServices
             try
             {
                 _logger.Info("Loading settings");
-                var modelPath = (string)_container.Values["ModelPath"];
-                var gpuLayerCount = (int)_container.Values["GpuLayerCount"];
-                var contextSize = (uint)_container.Values["ContextSize"];
-                var antiPrompts = new List<string>((string[])_container.Values["AntiPrompts"]);
-                var maxTokens = (int)_container.Values["MaxTokens"];
-
-                var llmModelSettings = new LLMModelSettings(
-                        ModelPath: modelPath,
-                        GpuLayerCount: gpuLayerCount,
-                        ContextSize: contextSize,
-                        AntiPrompts: antiPrompts,
-                        MaxTokens: maxTokens
-                        );
-                var keySettings = new KeySettings(
-                    KeyPattern: (string)_container.Values["KeyPattern"]
-                    );
+                var llmModelSettings = LoadLocalLLMModelSettings();
+                var geminiModelSettings = LoadGeminiModelSettings();
+                var keySettings = LoadKeySettings();
                 var AutoStart = (bool)_container.Values["AutoStart"];
-                var gpuAvailable = (bool)_container.Values["GpuEnabled"];
-                var loadedSettings = new AppSettings(llmModelSettings, keySettings, AutoStart, gpuAvailable);
-                _logger.Debug($"Loaded settimgs: {loadedSettings}");
-                return loadedSettings;
+                var modelType = (ModelType)_container.Values["ModelType"];
+                var appSettings = new AppSettings(AutoStart, modelType, keySettings, llmModelSettings, geminiModelSettings);
+                _logger.Debug($"Loaded settimgs: {appSettings}");
+                return appSettings;
             }
             catch(Exception e)
             {
+                _logger.Debug(e, "Failed to load settings, resetting settings");
                 return ResetSettings();
             }
+        }
+
+        private LLMLocalModelSettings LoadLocalLLMModelSettings()
+        {
+            var modelPath = (string)_container.Values["ModelPath"];
+            var gpuEnabled = (bool)_container.Values["GpuEnabled"];
+            var gpuLayerCount = (int)_container.Values["GpuLayerCount"];
+            var contextSize = (uint)_container.Values["ContextSize"];
+            var antiPrompts = new List<string>((string[])_container.Values["AntiPrompts"]);
+            var maxTokens = (int)_container.Values["MaxTokens"];
+
+            return new LLMLocalModelSettings(
+                    ModelPath: modelPath,
+                    GpuEnable: gpuEnabled,
+                    GpuLayerCount: gpuLayerCount,
+                    ContextSize: contextSize,
+                    AntiPrompts: antiPrompts,
+                    MaxTokens: maxTokens
+                    );
+        }
+
+        private GeminiModelSettings LoadGeminiModelSettings()
+        {
+            // TODO: Implement loading GeminiModelSettings
+            return (GeminiModelSettings)GeminiModelSettings.GetDefaultSettings();
+        }
+
+        private KeySettings LoadKeySettings()
+        {
+            return new KeySettings(
+                    KeyPattern: (string)_container.Values["KeyPattern"]
+                    );
         }
 
         public void SaveSettings(AppSettings appSettings)
         {
             _logger.Info("Saving settings");
-            _container.Values["GpuEnabled"] = appSettings.GpuEnabled;
             _container.Values["AutoStart"] = appSettings.AutoStart;
-            _container.Values["KeyPattern"] = appSettings.KeySettings.KeyPattern;
-            _container.Values["ModelPath"] = appSettings.LLMModelSettings.ModelPath;
-            _container.Values["GpuLayerCount"] = appSettings.LLMModelSettings.GpuLayerCount;
-            _container.Values["ContextSize"] = appSettings.LLMModelSettings.ContextSize;
-            _container.Values["AntiPrompts"] = appSettings.LLMModelSettings.AntiPrompts.ToArray();
-            _container.Values["MaxTokens"] = appSettings.LLMModelSettings.MaxTokens;
+            _container.Values["ModelType"] = (int)appSettings.ModelType;
+            SaveKeySettings(appSettings.KeySettings);
+            SaveLocalLLMModelSettings(appSettings.LocalLLMSettings);
+            SaveGeminiModelSettings(appSettings.GeminiSettings);
             _logger.Debug($"Saved settings: {appSettings}");
+        }
+
+        private void SaveLocalLLMModelSettings(LLMLocalModelSettings llmModelSettings)
+        {
+            _container.Values["ModelPath"] = llmModelSettings.ModelPath;
+            _container.Values["GpuEnabled"] = llmModelSettings.GpuEnabled;
+            _container.Values["GpuLayerCount"] = llmModelSettings.GpuLayerCount;
+            _container.Values["ContextSize"] = llmModelSettings.ContextSize;
+            _container.Values["AntiPrompts"] = llmModelSettings.AntiPrompts.ToArray();
+            _container.Values["MaxTokens"] = llmModelSettings.MaxTokens;
+        }
+
+        private void SaveGeminiModelSettings(GeminiModelSettings geminiModelSettings)
+        {
+            // TODO: Implement saving GeminiModelSettings
+        }
+
+        private void SaveKeySettings(KeySettings keySettings)
+        {
+            _container.Values["KeyPattern"] = keySettings.KeyPattern;
         }
 
         public AppSettings ResetSettings()
         {
             _logger.Info("Resetting settings");
-            var defaultSettings = AppSettings.GetDefaultSettings();
+            var defaultAppSettings = AppSettings.GetDefaultSettings();
             _container.Values.Clear();
-            SaveSettings(defaultSettings);
-            return defaultSettings;
+            SaveSettings(defaultAppSettings);
+            return defaultAppSettings;
         }
 
     }
