@@ -11,7 +11,7 @@
         <StackPanel>
             <!-- AppSettings.csの設定項目に対応するコントロールを配置します -->
             <TextBlock Text="LLM Model Path" Margin="0,0,0,5"/>
-            <TextBox Text="{x:Bind ViewModel.LLMModelPath, Mode=OneWay}" Margin="0,0,0,10"/>
+            <TextBox Text="{x:Bind ViewModel.LLMModelPath, Mode=TwoWay}" Margin="0,0,0,10"/>
 
             <TextBlock Text="GPU Layer Count" Margin="0,0,0,5"/>
             <NumberBox Value="{x:Bind Path=ViewModel.GpuLayerCount, Mode=TwoWay}" />
@@ -23,10 +23,22 @@
             <CheckBox IsChecked="{x:Bind ViewModel.GpuEnabled, Mode=TwoWay}" Margin="0,0,0,10"/>
 
             <TextBlock Text="Key Pattern" Margin="0,0,0,5"/>
-            <TextBox Text="{x:Bind ViewModel.KeyPattern, Mode=OneWay}" Margin="0,0,0,10"/>
+            <TextBox Text="{x:Bind ViewModel.KeyPattern, Mode=TwoWay}" Margin="0,0,0,10"/>
 
             <TextBlock Text="Auto Start" Margin="0,0,0,5"/>
             <CheckBox IsChecked="{x:Bind ViewModel.AutoStart, Mode=TwoWay}" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Model Type" Margin="0,0,0,5"/>
+            <ComboBox x:Name="ModelTypesCombo"
+                ItemsSource="{x:Bind ViewModel.ModelTypes}"
+                      DisplayMemberPath="Item1"
+                      SelectedValuePath="Item2"
+                      SelectedValue="{x:Bind ViewModel.ModelType, Mode=TwoWay}" 
+                      Margin="0,0,0,10"
+                      Loaded="ModelTypesLoaded"/>   
+
+            <TextBlock Text="Gemini API Key" Margin="0,0,0,5"/>
+            <TextBox Text="{x:Bind ViewModel.ApiKey, Mode=TwoWay}" Margin="0,0,0,10"/>
 
             <!-- 他の設定項目も同様に追加 -->
 

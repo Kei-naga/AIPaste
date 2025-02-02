@@ -29,7 +29,7 @@ namespace AIPaste.Models.Settings
     }
 
 
-    enum ModelType
+    public enum ModelType
     {
         LocalLLM,
         Gemini,

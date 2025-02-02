@@ -9,6 +9,7 @@ using AIPaste.Services.LLMServices;
 using AIPaste.Services.ClipboardOperator;
 using System.Diagnostics.CodeAnalysis;
 using AIPaste.Services.SettingsServices;
+using NLog;
 
 namespace AIPaste.ViewModels
 {
@@ -17,6 +18,7 @@ namespace AIPaste.ViewModels
         private readonly ILLMStrategy _llmStrategy;
         private readonly ClipboardOperator _clipboardOperator = new();
         private readonly ILLMProvider _llmProvider;
+        private Logger _logger = LogManager.GetCurrentClassLogger();
 
         private string _targetText = "";
         public string TargetText
@@ -54,17 +56,32 @@ namespace AIPaste.ViewModels
 
         public AiPastePageViewModel()
         {
+            _logger.Debug("AiPastePageViewModel created");
             var settingsService = new SettingsService();
             var appSettings = settingsService.LoadSettings();
             ClipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
             // _llmProvider = new LocalLLMProvider(appSettings.LocalLLMSettings);
-            _llmProvider = new GeminiProvider(new GeminiModelSettings("AIzaSyCndL3XETlvzL3j0OJ6wQsDE458joENVnw"));
+            // _llmProvider = new GeminiProvider(new GeminiModelSettings("AIzaSyCndL3XETlvzL3j0OJ6wQsDE458joENVnw"));
+            _llmProvider = GetLLMProvider(appSettings);
             _llmStrategy = new LocalLLMStrategy();
             _llmProvider.SetSystemPrompt(_llmStrategy.GetSystemPrompt());
             _llmProvider.StartNewChat();
             (string modelReq, string modelAns) = _llmStrategy.CreateModelPrompt();
             _llmProvider.AddChatHistory(modelReq,modelAns);
+        }
+
+        private ILLMProvider GetLLMProvider(AppSettings appSettings)
+        {
+            switch (appSettings.ModelType)
+            {
+                case ModelType.LocalLLM:
+                    return new LocalLLMProvider(appSettings.LocalLLMSettings);
+                case ModelType.Gemini:
+                    return new GeminiProvider(appSettings.GeminiSettings);
+                default:
+                    throw new InvalidOperationException("Invalid model type");
+            }
         }
 
         public async Task GeneratingText(string userInput)

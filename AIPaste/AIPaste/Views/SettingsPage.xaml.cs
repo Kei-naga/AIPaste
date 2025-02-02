@@ -17,7 +17,11 @@ namespace AIPaste.Views
         private void OnSaveButtonClicked(object sender, RoutedEventArgs e)
         {
             ViewModel.SaveSettings();
-            // 必要に応じてメッセージや処理を追加
+        }
+
+        private void ModelTypesLoaded(object sender, RoutedEventArgs e)
+        {
+            ModelTypesCombo.SelectedIndex = (int)ViewModel.ModelType;
         }
     }
 }

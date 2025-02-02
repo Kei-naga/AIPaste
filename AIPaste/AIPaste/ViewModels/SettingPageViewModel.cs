@@ -1,6 +1,11 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using AIPaste.Models.Settings;
+using AIPaste.Services.LLMServices;
 using AIPaste.Services.SettingsServices;
+using NLog;
 
 namespace AIPaste.ViewModels
 {
@@ -8,21 +13,29 @@ namespace AIPaste.ViewModels
     {
         private AppSettings _appSettings;
         private SettingsService _settingsService;
+        private Logger _logger = LogManager.GetCurrentClassLogger();
 
         public SettingsPageViewModel()
         {
-            // AppSettingsの読み込み
             _settingsService = new SettingsService();
             _appSettings = _settingsService.LoadSettings();
 
-            // プロパティの初期化
             LLMModelPath = _appSettings.LocalLLMSettings.ModelPath;
             GpuLayerCount = _appSettings.LocalLLMSettings.GpuLayerCount;
             MaxTokens = _appSettings.LocalLLMSettings.MaxTokens;
             GpuEnabled = _appSettings.LocalLLMSettings.GpuEnabled;
             KeyPattern = _appSettings.KeySettings.KeyPattern;
             AutoStart = _appSettings.AutoStart;
+            ModelType = _appSettings.ModelType;
+            ApiKey = _appSettings.GeminiSettings.ApiKey;
         }
+
+        public List<Tuple<string, ModelType>> ModelTypes = Enum.GetValues(typeof(ModelType))
+                .Cast<ModelType>()
+                .Select(mt => new Tuple<string, ModelType>(mt.ToString(), mt))
+                .ToList();
+
+        private bool _settingsChanged = false;
 
         private string _llmModelPath = "";
         public string LLMModelPath
@@ -34,6 +47,7 @@ namespace AIPaste.ViewModels
                 {
                     _llmModelPath = value;
                     OnPropertyChanged(nameof(LLMModelPath));
+                    _settingsChanged = true;
                 }
             }
         }
@@ -48,6 +62,7 @@ namespace AIPaste.ViewModels
                 {
                     _gpuLayerCount = value;
                     OnPropertyChanged(nameof(GpuLayerCount));
+                    _settingsChanged = true;
                 }
             }
         }
@@ -62,6 +77,7 @@ namespace AIPaste.ViewModels
                 {
                     _maxTokens = value;
                     OnPropertyChanged(nameof(MaxTokens));
+                    _settingsChanged = true;
                 }
             }
         }
@@ -76,9 +92,11 @@ namespace AIPaste.ViewModels
                 {
                     _gpuEnabled = value;
                     OnPropertyChanged(nameof(GpuEnabled));
+                    _settingsChanged = true;
                 }
             }
         }
+
         private string _keyPattern = "Ctrl+Shift+V";
         public string KeyPattern
         {
@@ -89,11 +107,12 @@ namespace AIPaste.ViewModels
                 {
                     _keyPattern = value;
                     OnPropertyChanged(nameof(KeyPattern));
+                    _settingsChanged = true;
                 }
             }
         }
 
-        bool _autoStart = true;
+        private bool _autoStart = true;
         public bool AutoStart
         {
             get => _autoStart;
@@ -103,14 +122,51 @@ namespace AIPaste.ViewModels
                 {
                     _autoStart = value;
                     OnPropertyChanged(nameof(AutoStart));
+                    _settingsChanged = true;
                 }
             }
         }
 
+        private ModelType _modelType = ModelType.LocalLLM;
+        public ModelType ModelType
+        {
+            get => _modelType;
+            set
+            {
+                if (_modelType != value)
+                {
+                    _modelType = value;
+                    OnPropertyChanged(nameof(ModelType));
+                    _settingsChanged = true;
+                }
+            }
+        }
+
+        private string _apiKey = "";
+        public string ApiKey
+        {
+            get => _apiKey;
+            set
+            {
+                if (_apiKey != value)
+                {
+                    _apiKey = value;
+                    OnPropertyChanged(nameof(ApiKey));
+                    _settingsChanged = true;
+                }
+            }
+        }
 
         public void SaveSettings()
         {
-            var modelSettings = new LLMLocalModelSettings(
+            if (!_settingsChanged)
+            {
+                _logger.Debug("No settings changed, not saving");
+                return;
+            }
+            _settingsChanged = false;
+            _logger.Info("Saving new Settings");
+            var localModelSettings = new LLMLocalModelSettings(
                 ModelPath: LLMModelPath,
                 GpuEnable: GpuEnabled,
                 GpuLayerCount: GpuLayerCount,
@@ -118,16 +174,21 @@ namespace AIPaste.ViewModels
                 AntiPrompts: _appSettings.LocalLLMSettings.AntiPrompts,
                 MaxTokens: MaxTokens
             );
+            var geminiModelSettings = new GeminiModelSettings(ApiKey);
             var keySettings = new KeySettings(KeyPattern);
             var newSettings = new AppSettings(
                 AutoStart,
-                _appSettings.ModelType,
+                ModelType,
                 keySettings,
-                modelSettings,
-                _appSettings.GeminiSettings
+                localModelSettings,
+                geminiModelSettings
             );
             _settingsService.SaveSettings(newSettings);
-
+            if (ModelType != ModelType.LocalLLM)
+            {
+                _logger.Info("Despose Local LLM");
+                LocalLLMProvider.Dispose();
+            }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

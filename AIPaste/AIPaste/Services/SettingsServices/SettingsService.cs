@@ -12,13 +12,17 @@ namespace AIPaste.Services.SettingsServices
 {
     internal class SettingsService
     {
-        private Windows.Storage.ApplicationDataContainer _container;
+        private Windows.Storage.ApplicationDataContainer _mainContainer;
+        private Windows.Storage.ApplicationDataContainer _localLlmContainer;
+        private Windows.Storage.ApplicationDataContainer _geminiContainer;
         private Logger _logger = LogManager.GetCurrentClassLogger();
 
         public SettingsService()
         {
             ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-            _container = localSettings.CreateContainer("AIPasteContainer", ApplicationDataCreateDisposition.Always);
+            _mainContainer = localSettings.CreateContainer("MainContainer", ApplicationDataCreateDisposition.Always);
+            _localLlmContainer = _mainContainer.CreateContainer("LocalLLMContainer", ApplicationDataCreateDisposition.Always);
+            _geminiContainer = _mainContainer.CreateContainer("GeminiContainer", ApplicationDataCreateDisposition.Always);
         }
 
         public AppSettings LoadSettings()
@@ -29,10 +33,12 @@ namespace AIPaste.Services.SettingsServices
                 var llmModelSettings = LoadLocalLLMModelSettings();
                 var geminiModelSettings = LoadGeminiModelSettings();
                 var keySettings = LoadKeySettings();
-                var AutoStart = (bool)_container.Values["AutoStart"];
-                var modelType = (ModelType)_container.Values["ModelType"];
+                var AutoStart = (bool)_mainContainer.Values["AutoStart"];
+                var modelType = (ModelType)_mainContainer.Values["ModelType"];
                 var appSettings = new AppSettings(AutoStart, modelType, keySettings, llmModelSettings, geminiModelSettings);
                 _logger.Debug($"Loaded settimgs: {appSettings}");
+                _logger.Debug($"Local LLM Settings: {llmModelSettings}");
+                _logger.Debug($"Gemini Setting: {geminiModelSettings}");
                 return appSettings;
             }
             catch(Exception e)
@@ -44,12 +50,12 @@ namespace AIPaste.Services.SettingsServices
 
         private LLMLocalModelSettings LoadLocalLLMModelSettings()
         {
-            var modelPath = (string)_container.Values["ModelPath"];
-            var gpuEnabled = (bool)_container.Values["GpuEnabled"];
-            var gpuLayerCount = (int)_container.Values["GpuLayerCount"];
-            var contextSize = (uint)_container.Values["ContextSize"];
-            var antiPrompts = new List<string>((string[])_container.Values["AntiPrompts"]);
-            var maxTokens = (int)_container.Values["MaxTokens"];
+            var modelPath = (string)_localLlmContainer.Values["ModelPath"];
+            var gpuEnabled = (bool)_localLlmContainer.Values["GpuEnabled"];
+            var gpuLayerCount = (int)_localLlmContainer.Values["GpuLayerCount"];
+            var contextSize = (uint)_localLlmContainer.Values["ContextSize"];
+            var antiPrompts = new List<string>((string[])_localLlmContainer.Values["AntiPrompts"]);
+            var maxTokens = (int)_localLlmContainer.Values["MaxTokens"];
 
             return new LLMLocalModelSettings(
                     ModelPath: modelPath,
@@ -63,22 +69,24 @@ namespace AIPaste.Services.SettingsServices
 
         private GeminiModelSettings LoadGeminiModelSettings()
         {
-            // TODO: Implement loading GeminiModelSettings
-            return (GeminiModelSettings)GeminiModelSettings.GetDefaultSettings();
+            var apiKey = (string)_geminiContainer.Values["ApiKey"];
+            var modelName = (string)_geminiContainer.Values["ModelName"];
+            var location = (string)_geminiContainer.Values["Location"];
+            return new GeminiModelSettings(apiKey, modelName, location);
         }
 
         private KeySettings LoadKeySettings()
         {
             return new KeySettings(
-                    KeyPattern: (string)_container.Values["KeyPattern"]
+                    KeyPattern: (string)_mainContainer.Values["KeyPattern"]
                     );
         }
 
         public void SaveSettings(AppSettings appSettings)
         {
             _logger.Info("Saving settings");
-            _container.Values["AutoStart"] = appSettings.AutoStart;
-            _container.Values["ModelType"] = (int)appSettings.ModelType;
+            _mainContainer.Values["AutoStart"] = appSettings.AutoStart;
+            _mainContainer.Values["ModelType"] = (int)appSettings.ModelType;
             SaveKeySettings(appSettings.KeySettings);
             SaveLocalLLMModelSettings(appSettings.LocalLLMSettings);
             SaveGeminiModelSettings(appSettings.GeminiSettings);
@@ -87,29 +95,34 @@ namespace AIPaste.Services.SettingsServices
 
         private void SaveLocalLLMModelSettings(LLMLocalModelSettings llmModelSettings)
         {
-            _container.Values["ModelPath"] = llmModelSettings.ModelPath;
-            _container.Values["GpuEnabled"] = llmModelSettings.GpuEnabled;
-            _container.Values["GpuLayerCount"] = llmModelSettings.GpuLayerCount;
-            _container.Values["ContextSize"] = llmModelSettings.ContextSize;
-            _container.Values["AntiPrompts"] = llmModelSettings.AntiPrompts.ToArray();
-            _container.Values["MaxTokens"] = llmModelSettings.MaxTokens;
+            _logger.Debug($"Saving Local LLM Settings: {llmModelSettings}");
+            _localLlmContainer.Values["ModelPath"] = llmModelSettings.ModelPath;
+            _localLlmContainer.Values["GpuEnabled"] = llmModelSettings.GpuEnabled;
+            _localLlmContainer.Values["GpuLayerCount"] = llmModelSettings.GpuLayerCount;
+            _localLlmContainer.Values["ContextSize"] = llmModelSettings.ContextSize;
+            _localLlmContainer.Values["AntiPrompts"] = llmModelSettings.AntiPrompts.ToArray();
+            _localLlmContainer.Values["MaxTokens"] = llmModelSettings.MaxTokens;
         }
 
         private void SaveGeminiModelSettings(GeminiModelSettings geminiModelSettings)
         {
-            // TODO: Implement saving GeminiModelSettings
+            _logger.Debug($"Saving Gemini Settings: {geminiModelSettings}");
+            _geminiContainer.Values["ApiKey"] = geminiModelSettings.ApiKey;
+            _geminiContainer.Values["ModelName"] = geminiModelSettings.ModelName;
+            _geminiContainer.Values["Location"] = geminiModelSettings.Location;
         }
 
         private void SaveKeySettings(KeySettings keySettings)
         {
-            _container.Values["KeyPattern"] = keySettings.KeyPattern;
+            _logger.Debug($"Saving Key Settings: {keySettings}");
+            _mainContainer.Values["KeyPattern"] = keySettings.KeyPattern;
         }
 
         public AppSettings ResetSettings()
         {
             _logger.Info("Resetting settings");
             var defaultAppSettings = AppSettings.GetDefaultSettings();
-            _container.Values.Clear();
+            _mainContainer.Values.Clear();
             SaveSettings(defaultAppSettings);
             return defaultAppSettings;
         }

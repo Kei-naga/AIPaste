@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,25 +8,32 @@ using Microsoft.UI.Content;
 
 namespace AIPaste.Models.Settings
 {
-    class GeminiModelSettings(string apiKey) : ILLMModelSettings
+    class GeminiModelSettings(string apiKey, string modelName = "gemini-1.5-flash", string location = "") : ILLMModelSettings
     {
-        public string ApiKey { get; } = apiKey;
-        public string ModelName { get; } = "";
-        public string Location { get; } = "";
+        public string ApiKey { get; set; } = apiKey;
+        public string ModelName { get; set; } = modelName;
+        public string Location { get; set; } = string.IsNullOrEmpty(location) ? CultureInfo.CurrentCulture.TwoLetterISOLanguageName : location;
 
         public static ILLMModelSettings GetDefaultSettings()
         {
-            return new GeminiModelSettings("");
+            return new GeminiModelSettings("", "gemini-1.5-flash", CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
         }
 
         public bool Equals(ILLMModelSettings otherSettings)
         {
-            throw new NotImplementedException();
+            if (otherSettings is not GeminiModelSettings)
+            {
+                return false;
+            }
+            var geminiOtherSetitngs = (GeminiModelSettings)otherSettings;
+            return ApiKey == geminiOtherSetitngs.ApiKey &&
+                ModelName == geminiOtherSetitngs.ModelName &&
+                Location == geminiOtherSetitngs.Location;
         }
 
         public override string ToString()
         {
-            return "";
+            return $"ApiKey: {ApiKey}, Model Name: {ModelName}, Location: {Location}";
         }
     }
 }

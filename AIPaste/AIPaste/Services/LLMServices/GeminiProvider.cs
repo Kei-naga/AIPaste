@@ -40,7 +40,7 @@ namespace AIPaste.Services.LLMServices
         {
             _modelSettings = modelSettings;
             _model = new GenerativeModel(_modelSettings.ApiKey);
-            _logger.Debug($"Staeted Gemini");
+            _logger.Debug($"Started Gemini");
         }
 
         public void SetSystemPrompt(string systemPrompt)
