@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using AIPaste.Models.LLMModels;
 using AIPaste.Models.Settings;
 using GenerativeAI;
 using GenerativeAI.Methods;
@@ -55,14 +56,14 @@ namespace AIPaste.Services.LLMServices
             _logger.Info("Started new chat session.");
         }
 
-        public void AddChatHistory(string modelReq, string modelAns)
+        public void AddChatHistory(LlmRequestModel modelReq, string modelAns)
         {
             if (_chatSession == null)
             {
                 _logger.Warn("Chat session is not started.");
                 return;
             }
-            _chatSession.History.Add(new Content(CreateParts(modelReq), "user"));
+            _chatSession.History.Add(new Content(CreateParts(modelReq.GetRequest()), "user"));
             _chatSession.History.Add(new Content(CreateParts(modelAns), "model"));
             _logger.Debug($"Added to chat history: {modelReq} -> {modelAns}");
         }
@@ -72,7 +73,7 @@ namespace AIPaste.Services.LLMServices
             return [new Part() { Text = text }];
         }
 
-        public async IAsyncEnumerable<string> GeneratingText(string req)
+        public async IAsyncEnumerable<string> GeneratingText(LlmRequestModel req)
         {
             _logger.Debug($"GeneratingText called with {Environment.NewLine}{req}");
             if (_chatSession == null)
@@ -92,7 +93,7 @@ namespace AIPaste.Services.LLMServices
             var responseBuilder = new List<string>();
             var timeout = TimeSpan.FromSeconds(1);
 
-            var task = _model.StreamContentAsync(req, Handler);
+            var task = _model.StreamContentAsync(req.GetRequest(), Handler);
             while (!task.IsCompleted)
             {
                 var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(timeout));

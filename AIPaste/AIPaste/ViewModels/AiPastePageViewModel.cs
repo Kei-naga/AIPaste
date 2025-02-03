@@ -10,12 +10,13 @@ using AIPaste.Services.ClipboardOperator;
 using System.Diagnostics.CodeAnalysis;
 using AIPaste.Services.SettingsServices;
 using NLog;
+using AIPaste.Models.LLMModels;
 
 namespace AIPaste.ViewModels
 {
     public partial class AiPastePageViewModel : INotifyPropertyChanged
     {
-        private readonly ILLMStrategy _llmStrategy;
+        private readonly LLMStrategy _llmStrategy;
         private readonly ClipboardOperator _clipboardOperator = new();
         private readonly ILLMProvider _llmProvider;
         private Logger _logger = LogManager.GetCurrentClassLogger();
@@ -62,10 +63,10 @@ namespace AIPaste.ViewModels
             ClipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
             _llmProvider = GetLLMProvider(appSettings);
-            _llmStrategy = new LocalLLMStrategy();
+            _llmStrategy = new LLMStrategy();
             _llmProvider.SetSystemPrompt(_llmStrategy.GetSystemPrompt());
             _llmProvider.StartNewChat();
-            (string modelReq, string modelAns) = _llmStrategy.CreateModelPrompt();
+            (LlmRequestModel modelReq, string modelAns) = _llmStrategy.CreateModelPrompt();
             _llmProvider.AddChatHistory(modelReq,modelAns);
         }
 
@@ -85,7 +86,7 @@ namespace AIPaste.ViewModels
         public async Task GeneratingText(string userInput)
         {
             OutputText = "";
-            string optimizedUserInput = _llmStrategy.CreateOptimizedReq(TargetText, userInput);
+            var optimizedUserInput = new LlmRequestModel(TargetText, userInput);
             try
             {
                 await foreach (var chunk in _llmProvider.GeneratingText(optimizedUserInput))

@@ -14,6 +14,7 @@ using LLama.Sampling;
 using System.Text.RegularExpressions;
 using AIPaste.Models.Settings;
 using NLog;
+using AIPaste.Models.LLMModels;
 
 namespace AIPaste.Services.LLMServices
 {
@@ -131,17 +132,17 @@ namespace AIPaste.Services.LLMServices
             }
         }
 
-        public void AddChatHistory(string modelReq, string modelAns)
+        public void AddChatHistory(LlmRequestModel modelReq, string modelAns)
         {
             if (_chatSession == null)
             {
                 throw new InvalidOperationException("Chat session has not been started. Please call StartNewChat() first.");
             }
-            _chatSession.AddUserMessage(modelReq);
+            _chatSession.AddUserMessage(modelReq.GetRequest());
             _chatSession.AddAssistantMessage(modelAns);
         }
 
-        public async IAsyncEnumerable<string> GeneratingText(string req)
+        public async IAsyncEnumerable<string> GeneratingText(LlmRequestModel req)
         {
             _logger.Debug($"GeneratingText called with {Environment.NewLine}{req}");
             if (_chatSession == null)
@@ -151,7 +152,7 @@ namespace AIPaste.Services.LLMServices
 
             var responseBuilder = new List<string>();
                 await foreach (var text in _chatSession.ChatAsync(
-                    new ChatHistory.Message(AuthorRole.User, req),
+                    new ChatHistory.Message(AuthorRole.User, req.GetRequest()),
                     _inferenceParams))
                 {
                     responseBuilder.Add(text);

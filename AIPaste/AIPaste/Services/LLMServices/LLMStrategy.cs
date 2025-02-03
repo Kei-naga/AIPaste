@@ -6,15 +6,17 @@ using System.Threading.Tasks;
 using LLama.Common;
 using LLama;
 using AIPaste.Models.Settings;
+using AIPaste.Models.LLMModels;
 
 namespace AIPaste.Services.LLMServices
 {
-    internal class LocalLLMStrategy() : ILLMStrategy
+    internal class LLMStrategy()
     {
-        public (string, string) CreateModelPrompt () {
+        public (LlmRequestModel, string) CreateModelPrompt()
+        {
             const string modelTargetText = "この部分なんだけどさあ、もっと前後関係わかるようにしといて、";
             const string modelInput = "敬語にして";
-            string modelPrompt = CreateOptimizedReq(modelTargetText, modelInput);
+            var modelPrompt = new LlmRequestModel(modelTargetText, modelInput);
             string modelAns = "こちらの部分ですが、もう少し前後の関係が分かるようにしていただけますでしょうか。";
             return (modelPrompt, modelAns);
         }
