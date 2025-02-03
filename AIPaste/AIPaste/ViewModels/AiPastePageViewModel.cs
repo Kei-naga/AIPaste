@@ -61,8 +61,6 @@ namespace AIPaste.ViewModels
             var appSettings = settingsService.LoadSettings();
             ClipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
-            // _llmProvider = new LocalLLMProvider(appSettings.LocalLLMSettings);
-            // _llmProvider = new GeminiProvider(new GeminiModelSettings("AIzaSyCndL3XETlvzL3j0OJ6wQsDE458joENVnw"));
             _llmProvider = GetLLMProvider(appSettings);
             _llmStrategy = new LocalLLMStrategy();
             _llmProvider.SetSystemPrompt(_llmStrategy.GetSystemPrompt());

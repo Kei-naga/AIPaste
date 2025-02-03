@@ -9,7 +9,6 @@
     mc:Ignorable="d">
     <Grid Padding="20">
         <StackPanel>
-            <!-- AppSettings.csの設定項目に対応するコントロールを配置します -->
             <TextBlock Text="LLM Model Path" Margin="0,0,0,5"/>
             <TextBox Text="{x:Bind ViewModel.LLMModelPath, Mode=TwoWay}" Margin="0,0,0,10"/>
 
@@ -39,8 +38,6 @@
 
             <TextBlock Text="Gemini API Key" Margin="0,0,0,5"/>
             <TextBox Text="{x:Bind ViewModel.ApiKey, Mode=TwoWay}" Margin="0,0,0,10"/>
-
-            <!-- 他の設定項目も同様に追加 -->
 
             <Button Content="保存" HorizontalAlignment="Right" Click="OnSaveButtonClicked"/>
         </StackPanel>
