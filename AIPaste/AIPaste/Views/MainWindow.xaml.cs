@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows.Input;
+using AIPaste.Common;
 using AIPaste.Views;
 using H.NotifyIcon;
 using Microsoft.UI.Xaml;
@@ -13,6 +14,7 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using NLog;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -26,18 +28,27 @@ namespace AIPaste
     /// </summary>
     public sealed partial class MainWindow : Window
     {
-        private readonly IconClickedCommand IconClicked;
-        private readonly ExitClickedCommand ExitClicked;
-        private readonly SettingsClickedCommand SettingsClicked;
-        private NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+        private readonly ICommand IconClicked;
+        private readonly ICommand ExitClicked;
+        private readonly ICommand SettingsClicked;
+        private readonly Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
         public MainWindow()
         {
             InitializeComponent();
-            IconClicked = new IconClickedCommand();
-            ExitClicked = new ExitClickedCommand();
-            SettingsClicked = new SettingsClickedCommand();
+            IconClicked = new RelayCommand(_ => App.MainWindow?.Activate());
+            ExitClicked = new RelayCommand(_ =>
+            {
+                App.MainWindow?.RestoreDefaultClosingBehavior();
+                App.Current.Exit();
+            });
+            SettingsClicked = new RelayCommand(_ =>
+            {
+                App.MainWindow?.SetFirstTab("SettingsPage");
+                App.MainWindow?.Activate();
+            });
             Closed += OnWindowHideInsteadOfClose;
-            mainTab.SelectedItem = mainTab.MenuItems[0];
+            SetFirstTab("AiPastePage");
         }
 
         private void OnWindowHideInsteadOfClose(object sender, WindowEventArgs args)
@@ -45,20 +56,21 @@ namespace AIPaste
             _logger.Info("Close Window");
             args.Handled = true;
             this.Hide();
-            this.SetFirstTab(0);
+            this.SetFirstTab("AiPastePage");
         }
 
         public void RestoreDefaultClosingBehavior()
         {
-            Closed += (sender, args) => {
+            Closed += (sender, args) =>
+            {
                 _logger.Info("Shutdown application!");
                 args.Handled = false;
             };
         }
 
-        public void SetFirstTab(int tabIndex)
+        public void SetFirstTab(string tabName)
         {
-            mainTab.SelectedItem = mainTab.MenuItems[tabIndex];
+            mainTab.SelectedItem = mainTab.MenuItems.FirstOrDefault(x => (x as NavigationViewItem)?.Tag.ToString() == tabName, mainTab.MenuItems.IndexOf(0));
         }
 
         private void OnNavigationViewSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -76,50 +88,6 @@ namespace AIPaste
                         break;
                 }
             }
-        }
-    }
-
-    public partial class IconClickedCommand : ICommand
-    {
-        public event EventHandler? CanExecuteChanged = null;
-        public bool CanExecute(object? parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object? parameter)
-        {
-            App.MainWindow?.Activate();
-        }
-    }
-
-    public partial class ExitClickedCommand : ICommand
-    {
-        public event EventHandler? CanExecuteChanged = null;
-        public bool CanExecute(object? parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object? parameter)
-        {
-            App.MainWindow?.RestoreDefaultClosingBehavior();
-            App.Current.Exit();
-        }
-    }
-
-    public partial class SettingsClickedCommand : ICommand
-    {
-        public event EventHandler? CanExecuteChanged = null;
-        public bool CanExecute(object? parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object? parameter)
-        {
-            App.MainWindow?.SetFirstTab(1);
-            App.MainWindow?.Activate();
         }
     }
 }
