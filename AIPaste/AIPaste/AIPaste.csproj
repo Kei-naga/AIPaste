@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>AIPaste</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="Google_GenerativeAI" Version="1.0.2" />
+    <PackageReference Include="H.NotifyIcon.WinUI" Version="2.2.0" />
     <PackageReference Include="LLamaSharp" Version="0.20.0" />
     <PackageReference Include="LLamaSharp.Backend.Cpu" Version="0.20.0" />
     <PackageReference Include="LLamaSharp.Backend.Cuda11" Version="0.20.0" />
@@ -37,7 +38,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Images\" />
     <Folder Include="Services\BackgroudServices\" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Content Include="Images\Red.ico">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
   </ItemGroup>
 
   <ItemGroup>

@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:tb="using:H.NotifyIcon"
     mc:Ignorable="d"
     Title="MainWindow">
     <Grid>
@@ -17,5 +18,23 @@
             </muxc:NavigationView.MenuItems>
             <Frame x:Name="contentFrame"/>
         </muxc:NavigationView>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <tb:TaskbarIcon 
+                ToolTipText="AIPaste"
+                IconSource="\Images\Red.ico"
+                LeftClickCommand="{x:Bind IconClicked}"
+                NoLeftClickDelay="True"
+                >
+                <tb:TaskbarIcon.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Exit" Command="{x:Bind ExitClicked}"/>
+                        <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Text="Settings" Command="{x:Bind SettingsClicked}"/>
+                    </MenuFlyout>
+                </tb:TaskbarIcon.ContextFlyout>
+            </tb:TaskbarIcon>
+
+        </StackPanel>
     </Grid>
 </Window>
