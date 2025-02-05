@@ -164,6 +164,11 @@ namespace AIPaste.ViewModels
                 _logger.Debug("No settings changed, not saving");
                 return;
             }
+            if (!IsValidSettings())
+            {
+                _logger.Debug("Invalid Settings");
+                return;
+            }
             _settingsChanged = false;
             _logger.Info("Saving new Settings");
             var localModelSettings = new LLMLocalModelSettings(
@@ -189,6 +194,29 @@ namespace AIPaste.ViewModels
                 _logger.Info("Despose Local LLM");
                 LocalLLMProvider.Dispose();
             }
+        }
+
+        private bool IsValidSettings()
+        {
+            ILLMModelSettings modelSettings;
+            if (ModelType == ModelType.LocalLLM)
+            {
+                modelSettings = new LLMLocalModelSettings(
+                    ModelPath: LLMModelPath,
+                    GpuEnable: GpuEnabled,
+                    GpuLayerCount: GpuLayerCount,
+                    ContextSize: _appSettings.LocalLLMSettings.ContextSize,
+                    AntiPrompts: _appSettings.LocalLLMSettings.AntiPrompts,
+                    MaxTokens: MaxTokens
+                );
+                return LocalLLMProvider.CheckSettingsIntegrity(modelSettings);
+            }
+            else if (ModelType == ModelType.Gemini)
+            {
+                modelSettings = new GeminiModelSettings(ApiKey);
+                return true;
+            }
+            return false;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

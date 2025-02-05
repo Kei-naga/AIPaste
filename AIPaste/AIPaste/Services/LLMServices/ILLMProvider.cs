@@ -12,9 +12,9 @@ namespace AIPaste.Services.LLMServices
     {
         string PresentResponse { get; }
         void SetSystemPrompt(string SystemPrompt);
-        // static abstract ILLMProvider Instance(LLMModelSettings modelSettings);
         void StartNewChat();
         void AddChatHistory(LlmRequestModel modelReq, string modelAns);
         IAsyncEnumerable<string> GeneratingText(LlmRequestModel req);
+        static abstract bool CheckSettingsIntegrity(ILLMModelSettings modelSettings);
     }
 }

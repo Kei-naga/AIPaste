@@ -46,15 +46,24 @@ namespace AIPaste.Services.LLMServices
         {
             if (_modelSettings == null || !modelSettings.Equals(_modelSettings))
             {
-                Dispose();
-                _modelSettings = modelSettings;
-                _logger.Debug($"Model settings changed to {modelSettings}");
-                Initialize();
+                try
+                {
+                    Dispose();
+                    _modelSettings = modelSettings;
+                    _logger.Debug($"Model settings changed to {modelSettings}");
+                    Initialize();
+                }
+                catch (Exception ex)
+                {
+                    _modelSettings = null;
+                    _logger.Error(ex, "Failed to initialize model");
+                    throw;
+                }
             }
 
         }
 
-        private void Initialize()
+        private static void Initialize()
         {
             lock (_lock)
             {
@@ -65,12 +74,6 @@ namespace AIPaste.Services.LLMServices
                         throw new InvalidOperationException("Model settings have not been provided.");
                     }
 
-                    _inferenceParams = new InferenceParams()
-                    {
-                        MaxTokens = _modelSettings.MaxTokens,
-                        AntiPrompts = _modelSettings.AntiPrompts,
-                        SamplingPipeline = new DefaultSamplingPipeline(),
-                    };
                     if (_context == null || _model == null)
                     {
                         _logger.Info("creating Model");
@@ -79,7 +82,6 @@ namespace AIPaste.Services.LLMServices
                             ContextSize = _modelSettings.ContextSize,
                             GpuLayerCount = _modelSettings.GpuLayerCount,
                         };
-
                         _model = LLamaWeights.LoadFromFile(parameters);
                         _context = _model.CreateContext(parameters);
                         _logger.Info("successfully created model");
@@ -106,12 +108,41 @@ namespace AIPaste.Services.LLMServices
             }
         }
 
+        public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings)
+        {
+            if (modelSettings is not LLMLocalModelSettings)
+            {
+                return false;
+            }
+            if (_modelSettings != null && _modelSettings.Equals(modelSettings))
+            {
+                return true;
+            }
+            _logger.Info("Despose Local LLM");
+            Dispose();
+            _modelSettings = (LLMLocalModelSettings)modelSettings;
+            _logger.Debug($"Model settings changed to {modelSettings}");
+            try { Initialize(); }
+            catch
+            {
+                _modelSettings = null;
+                return false;
+            }
+            return true;
+        }
+
         public void StartNewChat()
         {
-            if (_context == null)
+            if (_context == null || _modelSettings == null)
             {
-                throw new InvalidOperationException("Model has not been initialized. Please call Initialize() first.");
+                throw new InvalidOperationException("Model has not been initialized succesfully. Please start over.");
             }
+            _inferenceParams = new InferenceParams()
+            {
+                MaxTokens = _modelSettings.MaxTokens,
+                AntiPrompts = _modelSettings.AntiPrompts,
+                SamplingPipeline = new DefaultSamplingPipeline(),
+            };
             var executor = new InteractiveExecutor(_context);
             var chatHistory = new ChatHistory();
             if (!string.IsNullOrEmpty(SystemPrompt))
