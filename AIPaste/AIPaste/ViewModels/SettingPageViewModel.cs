@@ -214,6 +214,7 @@ namespace AIPaste.ViewModels
             else if (ModelType == ModelType.Gemini)
             {
                 modelSettings = new GeminiModelSettings(ApiKey);
+                // TODO: Implement GeminiProvider to check settings integrity
                 return true;
             }
             return false;
