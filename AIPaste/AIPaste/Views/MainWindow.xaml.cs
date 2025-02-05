@@ -28,25 +28,11 @@ namespace AIPaste
     /// </summary>
     public sealed partial class MainWindow : Window
     {
-        private readonly ICommand IconClicked;
-        private readonly ICommand ExitClicked;
-        private readonly ICommand SettingsClicked;
         private readonly Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         public MainWindow()
         {
             InitializeComponent();
-            IconClicked = new RelayCommand(_ => App.MainWindow?.Activate());
-            ExitClicked = new RelayCommand(_ =>
-            {
-                App.MainWindow?.RestoreDefaultClosingBehavior();
-                App.Current.Exit();
-            });
-            SettingsClicked = new RelayCommand(_ =>
-            {
-                App.MainWindow?.SetFirstTab("SettingsPage");
-                App.MainWindow?.Activate();
-            });
             Closed += OnWindowHideInsteadOfClose;
             SetFirstTab("AiPastePage");
         }
