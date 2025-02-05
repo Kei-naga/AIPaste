@@ -60,7 +60,7 @@ namespace AIPaste.Services.LLMServices
                     throw;
                 }
             }
-
+            _logger.Debug($"Sterted Local LLM");
         }
 
         private static void Initialize()
