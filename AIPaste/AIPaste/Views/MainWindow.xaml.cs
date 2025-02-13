@@ -35,6 +35,7 @@ namespace AIPaste
             InitializeComponent();
             Closed += OnWindowHideInsteadOfClose;
             SetFirstTab("AiPastePage");
+            AppWindow.Resize(new Windows.Graphics.SizeInt32(600,400));
         }
 
         private void OnWindowHideInsteadOfClose(object sender, WindowEventArgs args)

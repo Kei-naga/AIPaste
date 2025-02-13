@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:viewmodels="using:AIPaste.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:AiPastePageViewModel}"
     mc:Ignorable="d">
 
-    <Grid Background="#F8F9FA" Margin="10">
+    <Grid>
         <!-- 行定義 -->
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -18,15 +18,15 @@
 
         <!-- メインコンテンツ（スクロールビュー内にコピー文章と生成結果を縦並びで配置） -->
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="0,0,0,10" Spacing="20">
+            <StackPanel Margin="10,1,10,0" Spacing="20">
                 <!-- コピーした文章 -->
                 <StackPanel>
                     <!-- タイトル -->
                     <TextBlock Text="Copy" 
-                               FontSize="20" 
+                               FontSize="16" 
                                FontWeight="Bold" 
                                Foreground="#6C757D" 
-                               Margin="0,0,0,8"/>
+                               Margin="0,0,0,5"/>
                     <!-- グレーのタイトル -->
 
                     <!-- コピー内容 -->
@@ -34,7 +34,7 @@
                         <TextBlock x:Name="TargetTextBlock" 
                                    TextWrapping="Wrap" 
                                    VerticalAlignment="Top" 
-                                   FontSize="16" 
+                                   FontSize="14" 
                                    Foreground="#495057"
                                    Text="{x:Bind ViewModel.TargetText, Mode=OneWay}"/>
                     </Border>
@@ -44,10 +44,10 @@
                 <StackPanel>
                     <!-- タイトル -->
                     <TextBlock Text="Generated Result" 
-                               FontSize="20" 
+                               FontSize="16" 
                                FontWeight="Bold" 
                                Foreground="#6C757D" 
-                               Margin="0,20,0,8"/>
+                               Margin="0,0,0,5"/>
                     <!-- グレーのタイトル -->
 
                     <!-- 生成結果内容と決定ボタン -->
@@ -58,7 +58,7 @@
                                        TextWrapping="Wrap" 
                                        VerticalAlignment="Top"
                                        HorizontalAlignment="Left"
-                                       FontSize="16"
+                                       FontSize="14"
                                        Foreground="#495057"
                                        Margin="0,0,0,40"
                                        Text="{x:Bind ViewModel.OutputText, Mode=OneWay}"/>
@@ -79,7 +79,7 @@
         </ScrollViewer>
 
         <!-- 入力エリア（常に画面下部に固定） -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Margin="10,3,10,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <!-- 入力欄 -->

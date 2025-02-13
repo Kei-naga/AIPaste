@@ -11,13 +11,13 @@
     xmlns:Views="using:AIPaste.Views"
     mc:Ignorable="d"
     Title="MainWindow">
-    <Grid>
+    <Grid x:Name="RootGrid">
         <muxc:NavigationView x:Name="mainTab" PaneDisplayMode="Top" SelectionChanged="OnNavigationViewSelectionChanged">
             <muxc:NavigationView.MenuItems>
                 <muxc:NavigationViewItem Content="AIPaste" Tag="AiPastePage" />
                 <muxc:NavigationViewItem Content="Settings" Tag="SettingsPage" />
             </muxc:NavigationView.MenuItems>
-            <Frame x:Name="contentFrame"/>
+            <Frame x:Name="contentFrame" Background="#F8F9FA"/>
         </muxc:NavigationView>
 
         <Views:TrayView x:Name="TrayView"/>
