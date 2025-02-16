@@ -9,7 +9,7 @@ using NLog;
 
 namespace AIPaste.ViewModels
 {
-    public class SettingsPageViewModel : INotifyPropertyChanged
+    public partial class SettingsPageViewModel : INotifyPropertyChanged
     {
         private AppSettings _appSettings;
         private SettingsService _settingsService;
