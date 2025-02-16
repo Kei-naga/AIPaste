@@ -70,7 +70,7 @@ namespace AIPaste.ViewModels
             _llmProvider.AddChatHistory(modelReq,modelAns);
         }
 
-        private ILLMProvider GetLLMProvider(AppSettings appSettings)
+        private static ILLMProvider GetLLMProvider(AppSettings appSettings)
         {
             switch (appSettings.ModelType)
             {
