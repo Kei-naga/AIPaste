@@ -12,10 +12,9 @@
     mc:Ignorable="d"
     Title="MainWindow">
     <Grid x:Name="RootGrid">
-        <muxc:NavigationView x:Name="mainTab" PaneDisplayMode="Top" SelectionChanged="OnNavigationViewSelectionChanged">
+        <muxc:NavigationView x:Name="mainTab" PaneDisplayMode="Top" SelectionChanged="OnNavigationViewSelectionChanged" IsBackEnabled="False" IsBackButtonVisible="Collapsed">
             <muxc:NavigationView.MenuItems>
                 <muxc:NavigationViewItem Content="AIPaste" Tag="AiPastePage" />
-                <muxc:NavigationViewItem Content="Settings" Tag="SettingsPage" />
             </muxc:NavigationView.MenuItems>
             <Frame x:Name="contentFrame" Background="#F8F9FA"/>
         </muxc:NavigationView>

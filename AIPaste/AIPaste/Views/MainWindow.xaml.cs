@@ -64,17 +64,22 @@ namespace AIPaste
         {
             if (args.SelectedItemContainer != null)
             {
-                var selectedItemTag = args.SelectedItemContainer.Tag.ToString();
-                switch (selectedItemTag)
+                if (args.IsSettingsSelected)
+                {
+                    contentFrame.Navigate(typeof(SettingsPage));
+                }
+                switch (args.SelectedItemContainer.Tag.ToString())
                 {
                     case "AiPastePage":
                         contentFrame.Navigate(typeof(AiPastePage));
                         break;
-                    case "SettingsPage":
-                        contentFrame.Navigate(typeof(SettingsPage));
-                        break;
                 }
             }
+        }
+
+        private void NavigationView_Loaded(object sender, RoutedEventArgs e)
+        {
+            mainTab.SelectedItem = mainTab.MenuItems.FirstOrDefault(x => (x as NavigationViewItem)?.Tag.ToString() == "AiPastePage", mainTab.MenuItems.IndexOf(0));
         }
     }
 }
