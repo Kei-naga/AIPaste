@@ -138,9 +138,14 @@ namespace AIPaste.ViewModels
                     _modelType = value;
                     OnPropertyChanged(nameof(ModelType));
                     _settingsChanged = true;
+                    OnPropertyChanged(nameof(IsLocalLLMSelected));
+                    OnPropertyChanged(nameof(IsGeminiSelected));
                 }
             }
         }
+
+        public bool IsLocalLLMSelected => ModelType == ModelType.LocalLLM;
+        public bool IsGeminiSelected => ModelType == ModelType.Gemini;
 
         private string _apiKey = "";
         public string ApiKey

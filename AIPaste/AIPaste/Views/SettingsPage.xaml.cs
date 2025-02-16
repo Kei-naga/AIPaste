@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using AIPaste.ViewModels;
+using AIPaste.Models.Settings;
 
 namespace AIPaste.Views
 {
@@ -23,6 +24,10 @@ namespace AIPaste.Views
         {
             // Set the selected index of the combo box to the current model type
             ModelTypesCombo.SelectedIndex = (int)ViewModel.ModelType;
+        }
+        private void OnModelTypeSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ViewModel.ModelType = (ModelType)ModelTypesCombo.SelectedValue;
         }
     }
 }
