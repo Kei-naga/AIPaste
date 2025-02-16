@@ -25,9 +25,5 @@ namespace AIPaste.Views
             // Set the selected index of the combo box to the current model type
             ModelTypesCombo.SelectedIndex = (int)ViewModel.ModelType;
         }
-        private void OnModelTypeSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ViewModel.ModelType = (ModelType)ModelTypesCombo.SelectedValue;
-        }
     }
 }
