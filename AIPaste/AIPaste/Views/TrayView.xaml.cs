@@ -36,7 +36,7 @@ namespace AIPaste.Views
             });
             SettingsClicked = new RelayCommand(_ =>
             {
-                App.MainWindow?.SetFirstTab("SettingsPage");
+                App.MainWindow?.SetFirstTab("Settings");
                 App.MainWindow?.Activate();
             });
         }

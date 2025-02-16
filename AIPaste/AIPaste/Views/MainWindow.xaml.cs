@@ -57,6 +57,11 @@ namespace AIPaste
 
         public void SetFirstTab(string tabName)
         {
+            if (tabName == "Settings")
+            {
+                mainTab.SelectedItem = mainTab.SettingsItem;
+                return;
+            }
             mainTab.SelectedItem = mainTab.MenuItems.FirstOrDefault(x => (x as NavigationViewItem)?.Tag.ToString() == tabName, mainTab.MenuItems.IndexOf(0));
         }
 
@@ -75,11 +80,6 @@ namespace AIPaste
                         break;
                 }
             }
-        }
-
-        private void NavigationView_Loaded(object sender, RoutedEventArgs e)
-        {
-            mainTab.SelectedItem = mainTab.MenuItems.FirstOrDefault(x => (x as NavigationViewItem)?.Tag.ToString() == "AiPastePage", mainTab.MenuItems.IndexOf(0));
         }
     }
 }
