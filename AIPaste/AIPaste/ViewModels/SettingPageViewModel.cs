@@ -13,7 +13,7 @@ namespace AIPaste.ViewModels
     {
         private AppSettings _appSettings;
         private SettingsService _settingsService;
-        private Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public SettingsPageViewModel()
         {
