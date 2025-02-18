@@ -49,6 +49,9 @@ namespace AIPaste.Services.BackgroudServices
                 {
                     return true;
                 }
+                _logger.Debug("Failed to register hotkey, trying again");
+                _hotkeyId = GetHashCode();
+                attempts++;
             }
             return false;
         }
@@ -70,6 +73,7 @@ namespace AIPaste.Services.BackgroudServices
 
         public void Dispose()
         {
+            _logger.Info("Unregister hotkey");
             PInvoke.UnregisterHotKey(_hwnd, _hotkeyId);
             this.Close();
         }
