@@ -1,0 +1,77 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+using AIPaste.Models.KeyModels;
+using Microsoft.UI.Xaml;
+using Windows.Win32;
+
+namespace AIPaste.Services.BackgroudServices
+{
+    internal class HotkeyMessageDummyWindow : Window
+    {
+        private const uint WM_HOTKEY = 0x0312; // Hotkey message
+        private Windows.Win32.UI.WindowsAndMessaging.WNDPROC _origPrc;
+        private Windows.Win32.UI.WindowsAndMessaging.WNDPROC _hotKeyPrc;
+        private Windows.Win32.Foundation.HWND _hwnd;
+        private Action _onHotKeyPressed;
+        private int _hotkeyId;
+        private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+        public HotkeyMessageDummyWindow(Action action, KeyPattern keyPattern )
+        {
+            _hotkeyId = GetHashCode();
+            _onHotKeyPressed = action;
+            _hotKeyPrc = HotKeyPrc;
+            _hwnd = new Windows.Win32.Foundation.HWND(WinRT.Interop.WindowNative.GetWindowHandle(this).ToInt32());
+            if (!RegisterHotKey(keyPattern))
+            {
+                _logger.Error("Failed to register hotkey");
+            }
+            else
+            {
+                _logger.Info($"Hotkey registered: {keyPattern}");
+            }
+
+            var hotKeyPrcPointer = Marshal.GetFunctionPointerForDelegate(_hotKeyPrc);
+            _origPrc = Marshal.GetDelegateForFunctionPointer<Windows.Win32.UI.WindowsAndMessaging.WNDPROC>((IntPtr)PInvoke.SetWindowLongPtr(_hwnd, Windows.Win32.UI.WindowsAndMessaging.WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, hotKeyPrcPointer));
+        }
+
+        private bool RegisterHotKey(KeyPattern keyPattern)
+        {
+            int attempts = 0;
+            while (attempts < 3)
+            {
+                var success = PInvoke.RegisterHotKey(_hwnd, _hotkeyId, keyPattern.Modifiers, (uint)keyPattern.Key);
+                if (success)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private Windows.Win32.Foundation.LRESULT HotKeyPrc(Windows.Win32.Foundation.HWND hwnd,
+            uint uMsg,
+            Windows.Win32.Foundation.WPARAM wParam,
+            Windows.Win32.Foundation.LPARAM lParam)
+        {
+            if (uMsg == WM_HOTKEY)
+            {
+                _onHotKeyPressed.Invoke();
+
+                return (Windows.Win32.Foundation.LRESULT)IntPtr.Zero;
+            }
+
+            return PInvoke.CallWindowProc(_origPrc, hwnd, uMsg, wParam, lParam);
+        }
+
+        public void Dispose()
+        {
+            PInvoke.UnregisterHotKey(_hwnd, _hotkeyId);
+            this.Close();
+        }
+    }
+}
