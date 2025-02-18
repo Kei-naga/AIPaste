@@ -5,7 +5,8 @@
     xmlns:local="using:AIPaste.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:viewmodels="using:AIPaste.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:AiPastePageViewModel}"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Loaded="Page_Loaded">
 
     <Grid>
         <!-- 行定義 -->

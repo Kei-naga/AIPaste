@@ -28,7 +28,7 @@ namespace AIPaste.Views
         public TrayView()
         {
             InitializeComponent();
-            IconClicked = new RelayCommand(_ => App.MainWindow?.Activate());
+            IconClicked = new RelayCommand(_ => App.MainWindow?.ShowWindow());
             ExitClicked = new RelayCommand(_ =>
             {
                 App.MainWindow?.RestoreDefaultClosingBehavior();
@@ -37,7 +37,7 @@ namespace AIPaste.Views
             SettingsClicked = new RelayCommand(_ =>
             {
                 App.MainWindow?.SetFirstTab("Settings");
-                App.MainWindow?.Activate();
+                App.MainWindow?.ShowWindow();
             });
         }
     }

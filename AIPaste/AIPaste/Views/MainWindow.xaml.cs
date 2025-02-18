@@ -42,7 +42,7 @@ namespace AIPaste
 
             _hotKeyHandler = new(() =>
             {
-                this.Activate();
+                this.ShowWindow();
             });
             _hotKeyHandler.RegisterHotKey(new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C));
         }
@@ -53,6 +53,15 @@ namespace AIPaste
             args.Handled = true;
             this.Hide();
             this.SetFirstTab("AiPastePage");
+        }
+
+        public void ShowWindow()
+        {
+            if (contentFrame.Content is AiPastePage aiPastePage)
+            {
+                aiPastePage.FocusUserInputBox();
+            }
+            this.Show();
         }
 
         public void RestoreDefaultClosingBehavior()

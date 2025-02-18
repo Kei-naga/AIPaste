@@ -10,7 +10,7 @@
     xmlns:tb="using:H.NotifyIcon"
     xmlns:Views="using:AIPaste.Views"
     mc:Ignorable="d"
-    Title="MainWindow">
+    Title="AIPaste">
     <Grid x:Name="RootGrid">
         <muxc:NavigationView x:Name="mainTab" PaneDisplayMode="Top" SelectionChanged="OnNavigationViewSelectionChanged" IsBackEnabled="False" IsBackButtonVisible="Collapsed">
             <muxc:NavigationView.MenuItems>

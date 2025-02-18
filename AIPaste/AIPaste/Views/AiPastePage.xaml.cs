@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Controls;
 using Windows.Devices.Enumeration;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Input;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace AIPaste.Views
 {
@@ -51,5 +52,13 @@ namespace AIPaste.Views
             }
         }
 
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            UserInputBox.Focus(FocusState.Programmatic);
+        }
+        public void FocusUserInputBox()
+        {
+            UserInputBox.Focus(FocusState.Programmatic);
+        }
     }
 }
