@@ -171,6 +171,7 @@ namespace AIPaste.Services.LLMServices
             }
             _chatSession.AddUserMessage(modelReq.GetRequest());
             _chatSession.AddAssistantMessage(modelAns);
+            _logger.Debug($"Adding chat history: {modelReq.GetRequest()} -> {modelAns}");
         }
 
         public async IAsyncEnumerable<string> GeneratingText(LlmRequestModel req)

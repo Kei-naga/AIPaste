@@ -13,10 +13,10 @@ namespace AIPaste.Services.BackgroudServices
     internal class HotkeyMessageDummyWindow : Window
     {
         private const uint WM_HOTKEY = 0x0312; // Hotkey message
-        private Windows.Win32.UI.WindowsAndMessaging.WNDPROC _origPrc;
-        private Windows.Win32.UI.WindowsAndMessaging.WNDPROC _hotKeyPrc;
-        private Windows.Win32.Foundation.HWND _hwnd;
-        private Action _onHotKeyPressed;
+        private readonly Windows.Win32.UI.WindowsAndMessaging.WNDPROC _origPrc;
+        private readonly Windows.Win32.UI.WindowsAndMessaging.WNDPROC _hotKeyPrc;
+        private readonly Windows.Win32.Foundation.HWND _hwnd;
+        private readonly Action _onHotKeyPressed;
         private int _hotkeyId;
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 

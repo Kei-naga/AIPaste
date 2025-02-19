@@ -23,7 +23,7 @@
                 <!-- コピーした文章 -->
                 <StackPanel>
                     <!-- タイトル -->
-                    <TextBlock Text="Copy" 
+                    <TextBlock x:Uid="AIPastePage_ClipboardTitle"
                                FontSize="16" 
                                FontWeight="Bold" 
                                Foreground="#6C757D" 
@@ -44,7 +44,7 @@
                 <!-- 生成結果表示 -->
                 <StackPanel>
                     <!-- タイトル -->
-                    <TextBlock Text="Generated Result" 
+                    <TextBlock x:Uid="AIPastePage_GeneratedResultTitle" 
                                FontSize="16" 
                                FontWeight="Bold" 
                                Foreground="#6C757D" 
@@ -65,7 +65,7 @@
                                        Text="{x:Bind ViewModel.OutputText, Mode=OneWay}"/>
 
                             <!-- 決定ボタン -->
-                            <Button Content="決定"
+                            <Button x:Uid="AIPastePage_DeterminedButton"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
                                     Margin="0,10,10,0"
@@ -89,7 +89,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- ユーザー入力 -->
-            <TextBox x:Name="UserInputBox" Grid.Column="0" Margin="0,0,10,0" PlaceholderText="Enter your prompt here..." AcceptsReturn="True"
+            <TextBox x:Name="UserInputBox" Grid.Column="0" Margin="0,0,10,0" x:Uid="AIPastePage_PlaceHolderForPrompt" AcceptsReturn="True"
                      Background="#FFFFFF"
                      Foreground="#495057"
                      BorderBrush="#CED4DA"
@@ -97,7 +97,7 @@
                      PreviewKeyDown="UserInputBox_KeyDown"/>
 
             <!-- 実行ボタン -->
-            <Button x:Name="GenerateButton" Grid.Column="1" Content="Generate Text"
+            <Button x:Name="GenerateButton" Grid.Column="1" x:Uid="AIPastePage_GenaratedTextButton"
                     Background="#007BFF"
                     Foreground="#FFFFFF"
                     FontWeight="Bold"

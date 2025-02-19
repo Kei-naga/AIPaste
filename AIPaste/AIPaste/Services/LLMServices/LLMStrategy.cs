@@ -7,29 +7,33 @@ using LLama.Common;
 using LLama;
 using AIPaste.Models.Settings;
 using AIPaste.Models.LLMModels;
+using Windows.ApplicationModel.Resources;
 
 namespace AIPaste.Services.LLMServices
 {
-    internal class LLMStrategy()
+    internal class LLMStrategy
     {
+        private readonly ResourceLoader _resourceLoader = new ResourceLoader();
+
         public (LlmRequestModel, string) CreateModelPrompt()
         {
-            const string modelTargetText = "この部分なんだけどさあ、もっと前後関係わかるようにしといて、";
-            const string modelInput = "敬語にして";
+            var modelTargetText = _resourceLoader.GetString("/LLMResources/SampleTargetText1");
+            var modelInput = _resourceLoader.GetString("/LLMResources/SampleUserInstruction1");
             var modelPrompt = new LlmRequestModel(modelTargetText, modelInput);
-            string modelAns = "こちらの部分ですが、もう少し前後の関係が分かるようにしていただけますでしょうか。";
+            string modelAns = _resourceLoader.GetString("/LLMResources/SampleAns1");
             return (modelPrompt, modelAns);
         }
 
         public string CreateOptimizedReq(string targetText, string input)
         {
-            return "--- 対象テキスト ---" + Environment.NewLine 
-                + targetText + Environment.NewLine 
-                + "--- ユーザ指示 ---" + Environment.NewLine + input;
+            return _resourceLoader.GetString("/LLMResources/TargetTextFlagForOptimizingText") + Environment.NewLine
+                + targetText + Environment.NewLine
+                + _resourceLoader.GetString("/LLMResources/UserInstructionFlagForOptimizingText") + Environment.NewLine 
+                + input;
         }
         public string GetSystemPrompt()
         {
-            return "あなたは文章編集の専門家です。対象テキストとユーザ指示を与えるので、対象テキストをユーザ指示に厳密に従って、適切に修正してください。回答は理由等はなにも書かず、修正した文章のみを記載してください。また元の意味や意図が変わらないよう注意してください。";
+            return _resourceLoader.GetString("/LLMResources/SystemPrompt");
         }
     }
 

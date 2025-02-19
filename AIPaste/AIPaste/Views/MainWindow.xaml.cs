@@ -31,7 +31,7 @@ namespace AIPaste
     public sealed partial class MainWindow : Window
     {
         private readonly Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-        private HotKeyHandler _hotKeyHandler;
+        private readonly HotKeyHandler _hotKeyHandler;
 
         public MainWindow()
         {
