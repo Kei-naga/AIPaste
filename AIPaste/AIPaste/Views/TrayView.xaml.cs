@@ -32,7 +32,7 @@ namespace AIPaste.Views
             ExitClicked = new RelayCommand(_ =>
             {
                 App.MainWindow?.RestoreDefaultClosingBehavior();
-                App.Current.Exit();
+                App.MainWindow?.Close();
             });
             SettingsClicked = new RelayCommand(_ =>
             {

@@ -61,16 +61,16 @@ namespace AIPaste
             {
                 aiPastePage.FocusUserInputBox();
             }
-            this.Show();
+            this.Activate();
         }
 
         public void RestoreDefaultClosingBehavior()
         {
             Closed += (sender, args) =>
             {
-                _logger.Info("Shutdown application!");
                 _hotKeyHandler.Dispose();
                 args.Handled = false;
+                _logger.Info("Shutdown application!");
             };
         }
 
