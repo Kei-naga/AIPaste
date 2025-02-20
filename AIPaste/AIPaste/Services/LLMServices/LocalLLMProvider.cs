@@ -137,10 +137,12 @@ namespace AIPaste.Services.LLMServices
             {
                 throw new InvalidOperationException("Model has not been initialized succesfully. Please start over.");
             }
+            var userText = "User:";
+            var assistantText = "Assistant:";
             _inferenceParams = new InferenceParams()
             {
                 MaxTokens = _modelSettings.MaxTokens,
-                AntiPrompts = _modelSettings.AntiPrompts,
+                AntiPrompts = [userText],
                 SamplingPipeline = new DefaultSamplingPipeline(),
             };
             var executor = new InteractiveExecutor(_context);
@@ -150,6 +152,12 @@ namespace AIPaste.Services.LLMServices
                 chatHistory.AddMessage(AuthorRole.System, SystemPrompt);
             }
             _chatSession = new ChatSession(executor, chatHistory);
+            _chatSession.WithOutputTransform(
+                new LLamaTransforms.KeywordTextOutputStreamTransform(
+                    [userText, assistantText],
+                    redundancyLength: 8
+                )
+             );
         }
 
         public void SetSystemPrompt(string systemPrompt)
@@ -190,15 +198,7 @@ namespace AIPaste.Services.LLMServices
                     responseBuilder.Add(text);
                     yield return text;
                 }
-                PresentResponse = GetTrimmedResponse(responseBuilder);
-            }
-
-        private static string GetTrimmedResponse(List<string> responseBuilder)
-        {
-            string text = string.Join("", responseBuilder);
-            text = Regex.Replace(text, $"{Regex.Escape("assistant:")}\\s*", "");
-            text = text.Replace("�END", "");
-            return text;
+            PresentResponse = string.Join("", responseBuilder);
         }
     }
 }

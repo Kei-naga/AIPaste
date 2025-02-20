@@ -83,9 +83,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Google_GenerativeAI" Version="1.0.2" />
-    <PackageReference Include="LLamaSharp" Version="0.20.0" />
-    <PackageReference Include="LLamaSharp.Backend.Cpu" Version="0.20.0" />
-    <PackageReference Include="LLamaSharp.Backend.Cuda12" Version="0.20.0" />
+    <PackageReference Include="LLamaSharp" Version="0.21.0" />
+    <PackageReference Include="LLamaSharp.Backend.Cpu" Version="0.21.0" />
+    <PackageReference Include="LLamaSharp.Backend.Cuda12" Version="0.21.0" />
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
 </Project>

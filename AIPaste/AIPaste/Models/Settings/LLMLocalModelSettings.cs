@@ -9,12 +9,11 @@ using Windows.Storage;
 
 namespace AIPaste.Models.Settings
 {
-    internal class LLMLocalModelSettings(string ModelPath, bool GpuEnable, int GpuLayerCount, uint ContextSize, List<string> AntiPrompts, int MaxTokens): ILLMModelSettings
+    internal class LLMLocalModelSettings(string ModelPath, bool GpuEnable, int GpuLayerCount, uint ContextSize, int MaxTokens): ILLMModelSettings
     {
         public string ModelPath { get; set; } = ModelPath;
         public int GpuLayerCount { get; set; } = GpuLayerCount;
         public uint ContextSize { get; set; } = ContextSize;
-        public List<string> AntiPrompts { get; set; } = AntiPrompts;
         public int MaxTokens { get; set; } = MaxTokens;
         public bool GpuEnabled { get; set; } = GpuEnable;
 
@@ -25,7 +24,6 @@ namespace AIPaste.Models.Settings
                 GpuEnable: IsGpuAvailable(),
                 GpuLayerCount: 32,
                 ContextSize: 1024,
-                AntiPrompts: ["END"],
                 MaxTokens: 256
             );
         }
@@ -39,13 +37,12 @@ namespace AIPaste.Models.Settings
             return ModelPath == otherLocalSettings.ModelPath &&
                 GpuLayerCount == otherLocalSettings.GpuLayerCount &&
                 ContextSize == otherLocalSettings.ContextSize &&
-                AntiPrompts.SequenceEqual(otherLocalSettings.AntiPrompts) &&
                 MaxTokens == otherLocalSettings.MaxTokens;
         }
 
         public override string ToString()
         {
-            return $"ModelPath: {ModelPath}, GpuLayerCount: {GpuLayerCount}, ContextSize: {ContextSize}, AntiPrompts: {AntiPrompts}, MaxTokens: {MaxTokens}";
+            return $"ModelPath: {ModelPath}, GpuLayerCount: {GpuLayerCount}, ContextSize: {ContextSize}, MaxTokens: {MaxTokens}";
         }
 
         private static bool IsGpuAvailable() // cheking for only nvidia gpu

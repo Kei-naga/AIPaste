@@ -54,7 +54,6 @@ namespace AIPaste.Services.SettingsServices
             var gpuEnabled = (bool)_localLlmContainer.Values["GpuEnabled"];
             var gpuLayerCount = (int)_localLlmContainer.Values["GpuLayerCount"];
             var contextSize = (uint)_localLlmContainer.Values["ContextSize"];
-            var antiPrompts = new List<string>((string[])_localLlmContainer.Values["AntiPrompts"]);
             var maxTokens = (int)_localLlmContainer.Values["MaxTokens"];
 
             return new LLMLocalModelSettings(
@@ -62,7 +61,6 @@ namespace AIPaste.Services.SettingsServices
                     GpuEnable: gpuEnabled,
                     GpuLayerCount: gpuLayerCount,
                     ContextSize: contextSize,
-                    AntiPrompts: antiPrompts,
                     MaxTokens: maxTokens
                     );
         }
@@ -100,7 +98,6 @@ namespace AIPaste.Services.SettingsServices
             _localLlmContainer.Values["GpuEnabled"] = llmModelSettings.GpuEnabled;
             _localLlmContainer.Values["GpuLayerCount"] = llmModelSettings.GpuLayerCount;
             _localLlmContainer.Values["ContextSize"] = llmModelSettings.ContextSize;
-            _localLlmContainer.Values["AntiPrompts"] = llmModelSettings.AntiPrompts.ToArray();
             _localLlmContainer.Values["MaxTokens"] = llmModelSettings.MaxTokens;
         }
 

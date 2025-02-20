@@ -181,7 +181,6 @@ namespace AIPaste.ViewModels
                 GpuEnable: GpuEnabled,
                 GpuLayerCount: GpuLayerCount,
                 ContextSize: _appSettings.LocalLLMSettings.ContextSize,
-                AntiPrompts: _appSettings.LocalLLMSettings.AntiPrompts,
                 MaxTokens: MaxTokens
             );
             var geminiModelSettings = new GeminiModelSettings(ApiKey);
@@ -211,7 +210,6 @@ namespace AIPaste.ViewModels
                     GpuEnable: GpuEnabled,
                     GpuLayerCount: GpuLayerCount,
                     ContextSize: _appSettings.LocalLLMSettings.ContextSize,
-                    AntiPrompts: _appSettings.LocalLLMSettings.AntiPrompts,
                     MaxTokens: MaxTokens
                 );
                 return LocalLLMProvider.CheckSettingsIntegrity(modelSettings);
