@@ -61,7 +61,16 @@ namespace AIPaste
             {
                 aiPastePage.FocusUserInputBox();
             }
-            this.Activate();
+
+            if (this.Visible == true)
+            {
+                // TODO: Implement window moving to the front
+                _logger.Debug("Window is already visible");
+            }
+            else
+            {
+                this.Activate();
+            }
         }
 
         public void RestoreDefaultClosingBehavior()
