@@ -69,32 +69,10 @@ namespace AIPaste.Services.LLMServices
             _logger.Debug($"Added to chat history: {modelReq} -> {modelAns}");
         }
 
-        public static async Task<bool> CheckSettingsIntegrityAsync(ILLMModelSettings modelSettings)
-        {
-            if (modelSettings is not GeminiModelSettings geminiModelSettings)
-            {
-                return false;
-            }
-            var service = new ModelInfoService(geminiModelSettings.ApiKey);
-            service.Client.Timeout = TimeSpan.FromSeconds(5);
-            try
-            {
-                var models = await service.GetModelsAsync();
-                if (!models.Any(m => m.Name == geminiModelSettings.ModelName))
-                {
-                    return false;
-                }
-            }
-            catch
-            {
-                return false;
-            }
-            return true;
-        }
-
         public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings)
         {
-            return CheckSettingsIntegrityAsync(modelSettings).GetAwaiter().GetResult();
+            // TODO: Implement
+            return true;
         }
 
         private Part[] CreateParts(string text)
