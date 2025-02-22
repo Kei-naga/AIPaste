@@ -36,8 +36,9 @@
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.props" />
   <PropertyGroup>
     <ProjectGuid>39fee910-8a72-47d9-a1c1-7618d22d522d</ProjectGuid>
+	<TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
     <TargetPlatformVersion>10.0.26100.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.20348.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <AssetTargetFallback>net8.0-windows$(TargetPlatformVersion);$(AssetTargetFallback)</AssetTargetFallback>
     <DefaultLanguage>ja-JP</DefaultLanguage>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
@@ -80,13 +81,6 @@
       <SkipGetTargetFrameworkProperties>True</SkipGetTargetFrameworkProperties>
       <PublishProfile>Properties\PublishProfiles\win-$(Platform).pubxml</PublishProfile>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Google_GenerativeAI" Version="1.0.2" />
-    <PackageReference Include="H.NotifyIcon.WinUI" Version="2.2.0" />
-    <PackageReference Include="LLamaSharp" Version="0.21.0" />
-    <PackageReference Include="LLamaSharp.Backend.Cpu" Version="0.21.0" />
-    <PackageReference Include="LLamaSharp.Backend.Cuda12" Version="0.21.0" />
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
 </Project>
