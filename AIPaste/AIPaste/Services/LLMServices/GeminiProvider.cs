@@ -38,6 +38,11 @@ namespace AIPaste.Services.LLMServices
         public GeminiProvider(GeminiModelSettings modelSettings)
         {
             _modelSettings = modelSettings;
+            if (String.IsNullOrEmpty(_modelSettings.ApiKey))
+            {
+                _logger.Error("API Key is not set. Please set the API Key in the settings.");
+                _modelSettings.ApiKey = "dummy";
+            }
             _model = new GenerativeModel(_modelSettings.ApiKey, GoogleAIModels.Gemini2Flash);
             _logger.Debug($"Started Gemini");
         }
