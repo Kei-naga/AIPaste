@@ -94,7 +94,6 @@ namespace AIPaste.Services.LLMServices
             {
                 // Remove trailing newlines because I don't know why but the response has them on the end
                 string responseText = response.Text()?.TrimEnd('\r', '\n') ?? "";
-                _logger.Debug($"Received response: {responseText}");
                 yield return responseText;
                 responseBuilder.Add(responseText);
             }
