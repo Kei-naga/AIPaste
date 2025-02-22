@@ -46,7 +46,6 @@ namespace AIPaste.ViewModels
 
         private void RegisterHotKey()
         {
-            _logger.Info("Registering hotkey");
             if (_hotKeyHandler != null)
             {
                 UnRegisterHotKey();
@@ -57,7 +56,6 @@ namespace AIPaste.ViewModels
 
         public void UnRegisterHotKey()
         {
-            _logger.Info("Unregistering hotkey");
             _hotKeyHandler?.Dispose();
             _hotKeyHandler = null;
         }
