@@ -146,18 +146,25 @@ namespace AIPaste.Services.LLMServices
                 SamplingPipeline = new DefaultSamplingPipeline(),
             };
             var executor = new InteractiveExecutor(_context);
+            ChatHistory chatHistory = GetInitialHistory();
+
+            _chatSession = new ChatSession(executor, chatHistory);
+            _chatSession.WithOutputTransform(
+                new LLamaTransforms.KeywordTextOutputStreamTransform(
+                    [userText, assistantText, "assistant:"],
+                    redundancyLength: 8
+                )
+             );
+        }
+
+        private ChatHistory GetInitialHistory()
+        {
             var chatHistory = new ChatHistory();
             if (!string.IsNullOrEmpty(SystemPrompt))
             {
                 chatHistory.AddMessage(AuthorRole.System, SystemPrompt);
             }
-            _chatSession = new ChatSession(executor, chatHistory);
-            _chatSession.WithOutputTransform(
-                new LLamaTransforms.KeywordTextOutputStreamTransform(
-                    [userText, assistantText],
-                    redundancyLength: 8
-                )
-             );
+            return chatHistory;
         }
 
         public void SetSystemPrompt(string systemPrompt)
