@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.1.240916" />
-    <PackageReference Include="Google_GenerativeAI" Version="1.0.2" />
+    <PackageReference Include="Google_GenerativeAI" Version="2.1.5" />
     <PackageReference Include="H.NotifyIcon.WinUI" Version="2.2.0" />
     <PackageReference Include="LLamaSharp" Version="0.21.0" />
     <PackageReference Include="LLamaSharp.Backend.Cpu" Version="0.21.0" />

@@ -7,13 +7,10 @@ using System.Threading.Tasks;
 using AIPaste.Models.LLMModels;
 using AIPaste.Models.Settings;
 using GenerativeAI;
-using GenerativeAI.Methods;
-using GenerativeAI.Models;
-using GenerativeAI.Services;
 using GenerativeAI.Types;
 using NLog;
+using Windows.Media.Protection.PlayReady;
 using static System.Net.Mime.MediaTypeNames;
-using static LLama.Common.ChatHistory;
 
 namespace AIPaste.Services.LLMServices
 {
@@ -41,7 +38,7 @@ namespace AIPaste.Services.LLMServices
         public GeminiProvider(GeminiModelSettings modelSettings)
         {
             _modelSettings = modelSettings;
-            _model = new GenerativeModel(_modelSettings.ApiKey);
+            _model = new GenerativeModel(_modelSettings.ApiKey, GoogleAIModels.Gemini2Flash);
             _logger.Debug($"Started Gemini");
         }
 
@@ -53,7 +50,8 @@ namespace AIPaste.Services.LLMServices
 
         public void StartNewChat()
         {
-            _chatSession = _model.StartChat(new StartChatParams());
+            var content = new Content();
+            _chatSession = _model.StartChat();
             _logger.Info("Started new chat session.");
         }
 
@@ -88,34 +86,17 @@ namespace AIPaste.Services.LLMServices
                 throw new InvalidOperationException("Chat session has not been started. Please call StartNewChat() first.");
             }
 
-            var responseChunks = new List<string>();
-            var tcs = new TaskCompletionSource();
-
-            void Handler(string text)
-            {
-                responseChunks.Add(text);
-                tcs.SetResult();
-            }
-
             var responseBuilder = new List<string>();
-            var timeout = TimeSpan.FromSeconds(1);
 
-            var task = _model.StreamContentAsync(req.GetRequest(), Handler);
-            while (!task.IsCompleted)
+            var request = new GenerateContentRequest();
+            request.AddText(req.GetRequest());
+            await foreach (var response in _model.StreamContentAsync(request))
             {
-                var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(timeout));
-                if (completedTask == tcs.Task)
-                {
-                    tcs = new TaskCompletionSource();
-                    yield return string.Join("", responseChunks);
-
-                    responseBuilder.AddRange(responseChunks);
-                    responseChunks.Clear();
-                }
-                else
-                {
-                    _logger.Debug("Streaming timed out.");
-                }
+                // Remove trailing newlines because I don't know why but the response has them on the end
+                string responseText = response.Text()?.TrimEnd('\r', '\n') ?? "";
+                _logger.Debug($"Received response: {responseText}");
+                yield return responseText;
+                responseBuilder.Add(responseText);
             }
 
             PresentResponse = OptimizeResponse(responseBuilder);
