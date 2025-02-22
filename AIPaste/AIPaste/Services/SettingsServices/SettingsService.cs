@@ -15,14 +15,14 @@ namespace AIPaste.Services.SettingsServices
 {
     internal class SettingsService
     {
-        private Windows.Storage.ApplicationDataContainer _mainContainer;
-        private Windows.Storage.ApplicationDataContainer _localLlmContainer;
-        private Windows.Storage.ApplicationDataContainer _geminiContainer;
-        private Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly ApplicationDataContainer _mainContainer;
+        private readonly ApplicationDataContainer _localLlmContainer;
+        private readonly ApplicationDataContainer _geminiContainer;
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public SettingsService()
         {
-            ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
             _mainContainer = localSettings.CreateContainer("MainContainer", ApplicationDataCreateDisposition.Always);
             _localLlmContainer = _mainContainer.CreateContainer("LocalLLMContainer", ApplicationDataCreateDisposition.Always);
             _geminiContainer = _mainContainer.CreateContainer("GeminiContainer", ApplicationDataCreateDisposition.Always);
@@ -78,10 +78,11 @@ namespace AIPaste.Services.SettingsServices
 
         private KeySettings LoadKeySettings()
         {
+            var isHotkeyEnabled = (bool)_mainContainer.Values["IsHotkeyEnabled"];
             var modifiers = (HOT_KEY_MODIFIERS)Enum.ToObject(typeof(HOT_KEY_MODIFIERS), (int)_mainContainer.Values["Modifers"]);
             var hotkey = (VirtualKey)Enum.ToObject(typeof(VirtualKey), (int)_mainContainer.Values["Hotkey"]);
             var keyPattern = new KeyPattern(modifiers, hotkey);
-            return new KeySettings(keyPattern);
+            return new KeySettings(isHotkeyEnabled, keyPattern);
         }
 
         public void SaveSettings(AppSettings appSettings)
@@ -116,6 +117,7 @@ namespace AIPaste.Services.SettingsServices
         private void SaveKeySettings(KeySettings keySettings)
         {
             _logger.Debug($"Saving Key Settings: {keySettings}");
+            _mainContainer.Values["IsHotkeyEnabled"] = keySettings.IsHotkeyEnabled;
             _mainContainer.Values["Hotkey"] = (int)keySettings.KeyPattern.Key;
             _mainContainer.Values["Modifers"] = (int)keySettings.KeyPattern.Modifiers;
         }
@@ -128,6 +130,5 @@ namespace AIPaste.Services.SettingsServices
             SaveSettings(defaultAppSettings);
             return defaultAppSettings;
         }
-
     }
 }

@@ -180,4 +180,13 @@
   <data name="Settings_UsingGpu.Header" xml:space="preserve">
     <value>Using GPU</value>
   </data>
+  <data name="Settings_HotkeyEnable.Header" xml:space="preserve">
+    <value>ホットキーの有効化</value>
+  </data>
+  <data name="Settings_HotkeyEnable.OffContent" xml:space="preserve">
+    <value>off</value>
+  </data>
+  <data name="Settings_HotkeyEnable.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
 </root>

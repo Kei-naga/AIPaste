@@ -25,6 +25,7 @@ namespace AIPaste.ViewModels
             GpuLayerCount = _appSettings.LocalLLMSettings.GpuLayerCount;
             MaxTokens = _appSettings.LocalLLMSettings.MaxTokens;
             GpuEnabled = _appSettings.LocalLLMSettings.GpuEnabled;
+            IsHotkeyEnabled = _appSettings.KeySettings.IsHotkeyEnabled;
             KeyPatternText = _appSettings.KeySettings.KeyPattern.ToString(); // TODO: Implement
             AutoStart = _appSettings.AutoStart;
             ModelType = _appSettings.ModelType;
@@ -93,6 +94,21 @@ namespace AIPaste.ViewModels
                 {
                     _gpuEnabled = value;
                     OnPropertyChanged(nameof(GpuEnabled));
+                    _settingsChanged = true;
+                }
+            }
+        }
+
+        private bool _isHotkeyEnabled = true;
+        public bool IsHotkeyEnabled
+        {
+            get => _isHotkeyEnabled;
+            set
+            {
+                if (_isHotkeyEnabled != value)
+                {
+                    _isHotkeyEnabled = value;
+                    OnPropertyChanged(nameof(IsHotkeyEnabled));
                     _settingsChanged = true;
                 }
             }
@@ -261,7 +277,7 @@ namespace AIPaste.ViewModels
             );
             var geminiModelSettings = new GeminiModelSettings(ApiKey);
             var keyPattern = KeyPattern.GetKeyPatternFromString(Key, GetModifiers());
-            var keySettings = new KeySettings(keyPattern);
+            var keySettings = new KeySettings(IsHotkeyEnabled, keyPattern);
             var newSettings = new AppSettings(
                 AutoStart,
                 ModelType,
@@ -275,6 +291,7 @@ namespace AIPaste.ViewModels
                 _logger.Info("Despose Local LLM");
                 LocalLLMProvider.Dispose();
             }
+            App.MainWindow?.ViewModel.UpdateSettings(newSettings);
         }
 
         private string[] GetModifiers()

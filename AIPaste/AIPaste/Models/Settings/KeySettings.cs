@@ -10,19 +10,20 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace AIPaste.Models.Settings
 {
-    internal struct KeySettings(KeyPattern KeyPattern)
+    internal struct KeySettings(bool IsHotkeyEnabled, KeyPattern KeyPattern)
     {
+        public bool IsHotkeyEnabled = IsHotkeyEnabled;
         public KeyPattern KeyPattern = KeyPattern;
 
         public static KeySettings GetDefaultSettings()
         {
             var defaultKeyPattern = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
-            return new KeySettings(defaultKeyPattern);
+            return new KeySettings(true, defaultKeyPattern);
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
-            return KeyPattern.ToString();
+            return $"IsHotkeyEnabled:{IsHotkeyEnabled}, HotKey:{KeyPattern}";
         }
     }
 }

@@ -18,6 +18,8 @@
         </Grid.RowDefinitions>
         <ScrollViewer Grid.Row="0">
             <StackPanel>
+                <ToggleSwitch x:Uid="Settings_HotkeyEnable" IsOn="{x:Bind ViewModel.IsHotkeyEnabled, Mode=TwoWay}" Margin="0,0,0,10"/>
+                
                 <TextBox x:Uid="Settings_KeyPattern" Text="{x:Bind ViewModel.KeyPatternText, Mode=TwoWay}" Margin="0,0,0,10"/>
 
                 <ToggleSwitch x:Uid="Settings_AutoStart" IsOn="{x:Bind ViewModel.AutoStart, Mode=TwoWay}" Margin="0,0,0,10"/>

@@ -1,26 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Windows.Input;
-using AIPaste.Common;
 using AIPaste.Models.Common;
-using AIPaste.Models.KeyModels;
-using AIPaste.Models.Settings;
-using AIPaste.Services.BackgroudServices;
+using AIPaste.ViewModels;
 using AIPaste.Views;
 using H.NotifyIcon;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using NLog;
-using Windows.System;
-using Windows.Win32.UI.Input.KeyboardAndMouse;
+
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -33,22 +19,17 @@ namespace AIPaste
     public sealed partial class MainWindow : Window
     {
         private readonly Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-        private readonly HotKeyHandler _hotKeyHandler;
+        public MainWindowViewModel ViewModel;
 
         public MainWindow()
         {
             InitializeComponent();
+            ViewModel = new MainWindowViewModel(OnHotKeyPressed);
             AiPastePageItem.Tag = TabName.AiPastePage.ToString();
 
             Closed += OnWindowHideInsteadOfClose;
             SetFirstTab(TabName.AiPastePage);
             AppWindow.Resize(new Windows.Graphics.SizeInt32(600,400));
-
-            _hotKeyHandler = new(() =>
-            {
-                OnHotKeyPressed();
-            });
-            _hotKeyHandler.RegisterHotKey(KeySettings.GetDefaultSettings().KeyPattern);
         }
 
         private void OnWindowHideInsteadOfClose(object sender, WindowEventArgs args)
@@ -87,7 +68,7 @@ namespace AIPaste
         {
             Closed += (sender, args) =>
             {
-                _hotKeyHandler.Dispose();
+                ViewModel.UnRegisterHotKey();
                 args.Handled = false;
                 _logger.Info("Shutdown application!");
             };
