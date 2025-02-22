@@ -1,4 +1,5 @@
-﻿using AIPaste.Models.Settings;
+﻿using AIPaste.Models.KeyModels;
+using AIPaste.Models.Settings;
 using ManagedCuda;
 using NLog;
 using System;
@@ -7,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
+using Windows.System;
 
 namespace AIPaste.Services.SettingsServices
 {
@@ -43,7 +46,7 @@ namespace AIPaste.Services.SettingsServices
             }
             catch(Exception e)
             {
-                _logger.Debug(e, "Failed to load settings, resetting settings");
+                _logger.Info(e, "Failed to load settings, resetting settings");
                 return ResetSettings();
             }
         }
@@ -75,9 +78,10 @@ namespace AIPaste.Services.SettingsServices
 
         private KeySettings LoadKeySettings()
         {
-            return new KeySettings(
-                    KeyPattern: (string)_mainContainer.Values["KeyPattern"]
-                    );
+            var modifiers = (HOT_KEY_MODIFIERS)Enum.ToObject(typeof(HOT_KEY_MODIFIERS), (int)_mainContainer.Values["Modifers"]);
+            var hotkey = (VirtualKey)Enum.ToObject(typeof(VirtualKey), (int)_mainContainer.Values["Hotkey"]);
+            var keyPattern = new KeyPattern(modifiers, hotkey);
+            return new KeySettings(keyPattern);
         }
 
         public void SaveSettings(AppSettings appSettings)
@@ -112,7 +116,8 @@ namespace AIPaste.Services.SettingsServices
         private void SaveKeySettings(KeySettings keySettings)
         {
             _logger.Debug($"Saving Key Settings: {keySettings}");
-            _mainContainer.Values["KeyPattern"] = keySettings.KeyPattern;
+            _mainContainer.Values["Hotkey"] = (int)keySettings.KeyPattern.Key;
+            _mainContainer.Values["Modifers"] = (int)keySettings.KeyPattern.Modifiers;
         }
 
         public AppSettings ResetSettings()

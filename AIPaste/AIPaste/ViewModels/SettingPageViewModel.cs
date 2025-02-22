@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using AIPaste.Models.Settings;
+using AIPaste.Models.KeyModels;
 using AIPaste.Services.LLMServices;
 using AIPaste.Services.SettingsServices;
 using NLog;
@@ -24,7 +25,7 @@ namespace AIPaste.ViewModels
             GpuLayerCount = _appSettings.LocalLLMSettings.GpuLayerCount;
             MaxTokens = _appSettings.LocalLLMSettings.MaxTokens;
             GpuEnabled = _appSettings.LocalLLMSettings.GpuEnabled;
-            KeyPattern = _appSettings.KeySettings.KeyPattern;
+            KeyPatternText = _appSettings.KeySettings.KeyPattern.ToString(); // TODO: Implement
             AutoStart = _appSettings.AutoStart;
             ModelType = _appSettings.ModelType;
             ApiKey = _appSettings.GeminiSettings.ApiKey;
@@ -97,16 +98,91 @@ namespace AIPaste.ViewModels
             }
         }
 
-        private string _keyPattern = "Ctrl+Shift+V";
-        public string KeyPattern
+        private string _keyPatternText = "Ctrl+Shift+V";
+        public string KeyPatternText
         {
-            get => _keyPattern;
+            get => _keyPatternText;
             set
             {
-                if (_keyPattern != value)
+                if (_keyPatternText != value)
                 {
-                    _keyPattern = value;
+                    _keyPatternText = value;
                     OnPropertyChanged(nameof(KeyPattern));
+                    _settingsChanged = true;
+                }
+            }
+        }
+
+        private string _key = "C";
+        public string Key
+        {
+            get => _key;
+            set
+            {
+                if (_key != value)
+                {
+                    _key = value;
+                    OnPropertyChanged(nameof(Key));
+                    _settingsChanged = true;
+                }
+            }
+        }
+
+        private bool _ctrlModifier = true;
+        public bool CtrlModifier
+        {
+            get => _ctrlModifier;
+            set
+            {
+                if (_ctrlModifier != value)
+                {
+                    _ctrlModifier = value;
+                    OnPropertyChanged(nameof(CtrlModifier));
+                    _settingsChanged = true;
+                }
+            }
+        }
+        
+        private bool _altModifier = true;
+        public bool AltModifier
+        {
+            get => _altModifier;
+            set
+            {
+                if (_altModifier != value)
+                {
+                    _altModifier = value;
+                    OnPropertyChanged(nameof(AltModifier));
+                    _settingsChanged = true;
+                }
+            }
+        }
+
+        private bool _shiftModifier = false;
+        public bool ShiftModifier
+        {
+            get => _shiftModifier;
+            set
+            {
+                if (_shiftModifier != value)
+                {
+                    _shiftModifier = value;
+                    OnPropertyChanged(nameof(ShiftModifier));
+                    _settingsChanged = true;
+                }
+            }
+        }
+
+        private bool _winModifier = false;
+        public bool WinModifier
+        {
+            get => _winModifier;
+            set
+            {
+                if (_winModifier != value)
+                {
+                    _winModifier = value;
+                    OnPropertyChanged(nameof(WinModifier));
                     _settingsChanged = true;
                 }
             }
@@ -184,7 +260,8 @@ namespace AIPaste.ViewModels
                 MaxTokens: MaxTokens
             );
             var geminiModelSettings = new GeminiModelSettings(ApiKey);
-            var keySettings = new KeySettings(KeyPattern);
+            var keyPattern = KeyPattern.GetKeyPatternFromString(Key, GetModifiers());
+            var keySettings = new KeySettings(keyPattern);
             var newSettings = new AppSettings(
                 AutoStart,
                 ModelType,
@@ -198,6 +275,16 @@ namespace AIPaste.ViewModels
                 _logger.Info("Despose Local LLM");
                 LocalLLMProvider.Dispose();
             }
+        }
+
+        private string[] GetModifiers()
+        {
+            List<string> modifiers = new List<string>();
+            if (CtrlModifier) modifiers.Add("Ctrl");
+            if (AltModifier) modifiers.Add("Alt");
+            if (ShiftModifier) modifiers.Add("Shift");
+            if (WinModifier) modifiers.Add("Win");
+            return [.. modifiers];
         }
 
         private bool IsValidSettings()

@@ -7,6 +7,7 @@ using System.Windows.Input;
 using AIPaste.Common;
 using AIPaste.Models.Common;
 using AIPaste.Models.KeyModels;
+using AIPaste.Models.Settings;
 using AIPaste.Services.BackgroudServices;
 using AIPaste.Views;
 using H.NotifyIcon;
@@ -47,7 +48,7 @@ namespace AIPaste
             {
                 OnHotKeyPressed();
             });
-            _hotKeyHandler.RegisterHotKey(new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C));
+            _hotKeyHandler.RegisterHotKey(KeySettings.GetDefaultSettings().KeyPattern);
         }
 
         private void OnWindowHideInsteadOfClose(object sender, WindowEventArgs args)
