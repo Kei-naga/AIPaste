@@ -2,3 +2,4 @@
 UnregisterHotKey
 SetWindowLongPtr
 CallWindowProc
+SetForegroundWindow

@@ -14,6 +14,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System.Windows.Input;
 using AIPaste.Common;
+using AIPaste.Models.Common;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -36,7 +37,7 @@ namespace AIPaste.Views
             });
             SettingsClicked = new RelayCommand(_ =>
             {
-                App.MainWindow?.SetFirstTab("Settings");
+                App.MainWindow?.SetFirstTab(TabName.Settings);
                 App.MainWindow?.ShowWindow();
             });
         }

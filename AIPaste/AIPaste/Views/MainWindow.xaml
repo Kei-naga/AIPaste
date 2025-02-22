@@ -14,7 +14,7 @@
     <Grid x:Name="RootGrid">
         <muxc:NavigationView x:Name="mainTab" PaneDisplayMode="Top" SelectionChanged="OnNavigationViewSelectionChanged" IsBackEnabled="False" IsBackButtonVisible="Collapsed">
             <muxc:NavigationView.MenuItems>
-                <muxc:NavigationViewItem x:Uid="MainPage_AIPaseteTitle" Tag="AiPastePage" />
+                <muxc:NavigationViewItem x:Uid="MainPage_AIPaseteTitle" x:Name="AiPastePageItem" />
             </muxc:NavigationView.MenuItems>
             <Frame x:Name="contentFrame" Background="#F8F9FA"/>
         </muxc:NavigationView>

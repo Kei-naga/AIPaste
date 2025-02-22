@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows.Input;
 using AIPaste.Common;
+using AIPaste.Models.Common;
 using AIPaste.Models.KeyModels;
 using AIPaste.Services.BackgroudServices;
 using AIPaste.Views;
@@ -36,13 +37,15 @@ namespace AIPaste
         public MainWindow()
         {
             InitializeComponent();
+            AiPastePageItem.Tag = TabName.AiPastePage.ToString();
+
             Closed += OnWindowHideInsteadOfClose;
-            SetFirstTab("AiPastePage");
+            SetFirstTab(TabName.AiPastePage);
             AppWindow.Resize(new Windows.Graphics.SizeInt32(600,400));
 
             _hotKeyHandler = new(() =>
             {
-                this.ShowWindow();
+                OnHotKeyPressed();
             });
             _hotKeyHandler.RegisterHotKey(new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C));
         }
@@ -52,7 +55,13 @@ namespace AIPaste
             _logger.Info("Close Window");
             args.Handled = true;
             this.Hide();
-            this.SetFirstTab("AiPastePage");
+            this.SetFirstTab(TabName.AiPastePage);
+        }
+
+        private void OnHotKeyPressed()
+        {
+            SetFirstTab(TabName.AiPastePage);
+            this.ShowWindow();
         }
 
         public void ShowWindow()
@@ -64,8 +73,8 @@ namespace AIPaste
 
             if (this.Visible == true)
             {
-                // TODO: Implement window moving to the front
-                _logger.Debug("Window is already visible");
+                var hwnd = new Windows.Win32.Foundation.HWND(WinRT.Interop.WindowNative.GetWindowHandle(this));
+                Windows.Win32.PInvoke.SetForegroundWindow(hwnd);
             }
             else
             {
@@ -83,14 +92,16 @@ namespace AIPaste
             };
         }
 
-        public void SetFirstTab(string tabName)
+        public void SetFirstTab(TabName tabName)
         {
-            if (tabName == "Settings")
+            if (tabName == TabName.Settings)
             {
                 mainTab.SelectedItem = mainTab.SettingsItem;
                 return;
             }
-            mainTab.SelectedItem = mainTab.MenuItems.FirstOrDefault(x => (x as NavigationViewItem)?.Tag.ToString() == tabName, mainTab.MenuItems.IndexOf(0));
+            mainTab.SelectedItem = mainTab.MenuItems.FirstOrDefault(
+                x => (x as NavigationViewItem)?.Tag.ToString() == tabName.ToString(), mainTab.MenuItems.IndexOf(0)
+            );
         }
 
         private void OnNavigationViewSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -103,7 +114,7 @@ namespace AIPaste
                 }
                 switch (args.SelectedItemContainer.Tag.ToString())
                 {
-                    case "AiPastePage":
+                    case nameof(TabName.AiPastePage):
                         contentFrame.Navigate(typeof(AiPastePage));
                         break;
                 }
