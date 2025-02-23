@@ -189,4 +189,16 @@
   <data name="Settings_HotkeyEnable.OnContent" xml:space="preserve">
     <value>On</value>
   </data>
+  <data name="Settings_HotkeyAlt.Content" xml:space="preserve">
+    <value>Alt</value>
+  </data>
+  <data name="Settings_HotkeyCtrl.Content" xml:space="preserve">
+    <value>Ctrl</value>
+  </data>
+  <data name="Settings_HotkeyShift.Content" xml:space="preserve">
+    <value>Shift</value>
+  </data>
+  <data name="Settings_HotkeyWin.Content" xml:space="preserve">
+    <value>Win</value>
+  </data>
 </root>
