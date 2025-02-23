@@ -9,6 +9,7 @@ using AIPaste.Services.SettingsServices;
 using NLog;
 using Windows.System;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
+using AIPaste.Services.StartupServices;
 
 namespace AIPaste.ViewModels
 {
@@ -200,7 +201,7 @@ namespace AIPaste.ViewModels
             }
         }
 
-        private bool _autoStart = true;
+        private bool _autoStart = false;
         public bool AutoStart
         {
             get => _autoStart;
@@ -282,10 +283,7 @@ namespace AIPaste.ViewModels
                 localModelSettings,
                 geminiModelSettings
             );
-            if (!_settingsService.SettingsUpdate(App.MainWindow, newSettings))
-            {
-                return false;
-            }
+            newSettings = _settingsService.SettingsUpdate(App.MainWindow, newSettings);
             _settingsService.SaveSettings(newSettings);
             return true;
         }

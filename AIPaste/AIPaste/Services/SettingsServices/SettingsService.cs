@@ -133,30 +133,36 @@ namespace AIPaste.Services.SettingsServices
             return defaultAppSettings;
         }
 
-        public bool SettingsUpdate(MainWindow? mainWindow, AppSettings newSettings)
+        public AppSettings SettingsUpdate(MainWindow? mainWindow, AppSettings newSettings)
         {
-            var success = true;
             if (newSettings.ModelType != ModelType.LocalLLM)
             {
                 _logger.Info("Despose Local LLM");
                 LocalLLMProvider.Dispose();
             }
-            if (newSettings.AutoStart) 
-            {
-                if (!StartupManager.IsAutoStartupMode() && !StartupManager.SetAutoStartupMode())
-                {
-                    success = false; 
-                }
-            }
-            else
-            {
-                StartupManager.UnsetAutoStartupMode();
-            }
+
             if (!mainWindow?.ViewModel.UpdateSettings(newSettings) ?? false)
             {
-                success = false;
+                newSettings.KeySettings = new KeySettings(false, newSettings.KeySettings.KeyPattern);
             }
-            return success;
+
+            try { AutoStartToggleChanged(newSettings.AutoStart); }
+            catch (Exception e)
+            {
+                _logger.Warn(e);
+                newSettings.AutoStart = false;
+            }
+            return newSettings;
+        }
+
+        private async void AutoStartToggleChanged(bool changedStatus)
+        {
+            await StartupManager.ToggleStartupAsync(changedStatus);
+            var actualState = await StartupManager.IsAutoStartupMode();
+            if (changedStatus != actualState)
+            {
+                throw new Exception("Failed to set AutoStart");
+            }
         }
     }
 }
