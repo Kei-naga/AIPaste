@@ -184,7 +184,7 @@
     <value>ホットキーの有効化</value>
   </data>
   <data name="Settings_HotkeyEnable.OffContent" xml:space="preserve">
-    <value>off</value>
+    <value>Off</value>
   </data>
   <data name="Settings_HotkeyEnable.OnContent" xml:space="preserve">
     <value>On</value>
