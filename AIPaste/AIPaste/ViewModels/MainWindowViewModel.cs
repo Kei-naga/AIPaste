@@ -12,7 +12,7 @@ namespace AIPaste.ViewModels
 {
     public class MainWindowViewModel
     {
-        private AppSettings _appSettings { get; set; }
+        private AppSettings _appSettings;
         private HotKeyHandler? _hotKeyHandler;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly Action _action;
@@ -21,37 +21,43 @@ namespace AIPaste.ViewModels
             var settingsService = new SettingsService();
             _appSettings = settingsService.LoadSettings();
             _action = action;
-            if (IsHotKeyEnabled())
+            // TODO: ここらへんの処理は切り出して別クラスにしたい。ホットキー用のシングルトンクラスを作って、そこに処理を移す
+            if (IsHotKeyEnabled() && !RegisterHotKey())
             {
-                RegisterHotKey();
+                var keySettings = _appSettings.KeySettings;
+                keySettings.IsHotkeyEnabled = false;
+                _appSettings.KeySettings = keySettings;
+                settingsService.SaveSettings(_appSettings);
             }
         }
 
-        internal void UpdateSettings(AppSettings appSettings)
+        internal bool UpdateSettings(AppSettings appSettings)
         {
             _appSettings = appSettings;
             if (IsHotKeyEnabled())
             {
-                RegisterHotKey();
+                return RegisterHotKey();
             }
             else
             {
                 UnRegisterHotKey();
+                return true;
             }
         }
 
-        private bool IsHotKeyEnabled(){
+        private bool IsHotKeyEnabled()
+        {
             return _appSettings.KeySettings.IsHotkeyEnabled;
         }
 
-        private void RegisterHotKey()
+        private bool RegisterHotKey()
         {
             if (_hotKeyHandler != null)
             {
                 UnRegisterHotKey();
             }
             _hotKeyHandler = new HotKeyHandler(_action);
-            _hotKeyHandler.RegisterHotKey(KeySettings.GetDefaultSettings().KeyPattern);
+            return _hotKeyHandler.RegisterHotKey(KeySettings.GetDefaultSettings().KeyPattern);
         }
 
         public void UnRegisterHotKey()

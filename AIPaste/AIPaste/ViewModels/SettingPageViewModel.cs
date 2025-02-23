@@ -7,6 +7,7 @@ using AIPaste.Models.KeyModels;
 using AIPaste.Services.LLMServices;
 using AIPaste.Services.SettingsServices;
 using NLog;
+using Windows.Management.Deployment;
 
 namespace AIPaste.ViewModels
 {
@@ -254,17 +255,17 @@ namespace AIPaste.ViewModels
             }
         }
 
-        public void SaveSettings()
+        public bool SaveSettings()
         {
             if (!_settingsChanged)
             {
                 _logger.Debug("No settings changed, not saving");
-                return;
+                return true;
             }
             if (!IsValidSettings())
             {
                 _logger.Debug("Invalid Settings");
-                return;
+                return false;
             }
             _settingsChanged = false;
             _logger.Info("Saving new Settings");
@@ -286,12 +287,17 @@ namespace AIPaste.ViewModels
                 geminiModelSettings
             );
             _settingsService.SaveSettings(newSettings);
+            return UpdateSettings(newSettings);
+        }
+
+        private bool UpdateSettings(AppSettings newSettings)
+        {
             if (ModelType != ModelType.LocalLLM)
             {
                 _logger.Info("Despose Local LLM");
                 LocalLLMProvider.Dispose();
             }
-            App.MainWindow?.ViewModel.UpdateSettings(newSettings);
+            return App.MainWindow?.ViewModel.UpdateSettings(newSettings) ?? false;
         }
 
         private string[] GetModifiers()
