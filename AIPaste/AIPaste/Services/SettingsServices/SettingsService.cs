@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.System;
+using AIPaste.Services.LLMServices;
+using AIPaste.Services.StartupServices;
 
 namespace AIPaste.Services.SettingsServices
 {
@@ -129,6 +131,32 @@ namespace AIPaste.Services.SettingsServices
             _mainContainer.Values.Clear();
             SaveSettings(defaultAppSettings);
             return defaultAppSettings;
+        }
+
+        public bool SettingsUpdate(MainWindow? mainWindow, AppSettings newSettings)
+        {
+            var success = true;
+            if (newSettings.ModelType != ModelType.LocalLLM)
+            {
+                _logger.Info("Despose Local LLM");
+                LocalLLMProvider.Dispose();
+            }
+            if (newSettings.AutoStart) 
+            {
+                if (!StartupManager.IsAutoStartupMode() && !StartupManager.SetAutoStartupMode())
+                {
+                    success = false; 
+                }
+            }
+            else
+            {
+                StartupManager.UnsetAutoStartupMode();
+            }
+            if (!mainWindow?.ViewModel.UpdateSettings(newSettings) ?? false)
+            {
+                success = false;
+            }
+            return success;
         }
     }
 }

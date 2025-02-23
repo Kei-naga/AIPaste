@@ -151,9 +151,9 @@ namespace AIPaste.ViewModels
                     _ctrlModifier = value;
                         OnPropertyChanged(nameof(CtrlModifier));
                         _settingsChanged = true;
-                    }
                 }
             }
+        }
         
         private bool _altModifier = true;
         public bool AltModifier
@@ -166,9 +166,9 @@ namespace AIPaste.ViewModels
                     _altModifier = value;
                         OnPropertyChanged(nameof(AltModifier));
                         _settingsChanged = true;
-                    }
                 }
             }
+        }
 
         private bool _shiftModifier = false;
         public bool ShiftModifier
@@ -181,9 +181,9 @@ namespace AIPaste.ViewModels
                     _shiftModifier = value;
                         OnPropertyChanged(nameof(ShiftModifier));
                         _settingsChanged = true;
-                    }
                 }
             }
+        }
 
         private bool _winModifier = false;
         public bool WinModifier
@@ -196,9 +196,9 @@ namespace AIPaste.ViewModels
                     _winModifier = value;
                         OnPropertyChanged(nameof(WinModifier));
                         _settingsChanged = true;
-                    }
                 }
             }
+        }
 
         private bool _autoStart = true;
         public bool AutoStart
@@ -282,22 +282,12 @@ namespace AIPaste.ViewModels
                 localModelSettings,
                 geminiModelSettings
             );
-            if (!UpdateSettings(newSettings))
+            if (!_settingsService.SettingsUpdate(App.MainWindow, newSettings))
             {
                 return false;
             }
             _settingsService.SaveSettings(newSettings);
             return true;
-        }
-
-        private bool UpdateSettings(AppSettings newSettings)
-        {
-            if (ModelType != ModelType.LocalLLM)
-            {
-                _logger.Info("Despose Local LLM");
-                LocalLLMProvider.Dispose();
-            }
-            return App.MainWindow?.ViewModel.UpdateSettings(newSettings) ?? false;
         }
 
         private bool IsValidSettings()
