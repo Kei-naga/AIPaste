@@ -57,7 +57,7 @@ namespace AIPaste.ViewModels
                 UnRegisterHotKey();
             }
             _hotKeyHandler = new HotKeyHandler(_action);
-            return _hotKeyHandler.RegisterHotKey(KeySettings.GetDefaultSettings().KeyPattern);
+            return _hotKeyHandler.RegisterHotKey(_appSettings.KeySettings.KeyPattern);
         }
 
         public void UnRegisterHotKey()

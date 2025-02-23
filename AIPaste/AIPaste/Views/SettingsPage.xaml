@@ -19,8 +19,20 @@
         <ScrollViewer Grid.Row="0">
             <StackPanel>
                 <ToggleSwitch x:Uid="Settings_HotkeyEnable" IsOn="{x:Bind ViewModel.IsHotkeyEnabled, Mode=TwoWay}" Margin="0,0,0,10"/>
-                
-                <TextBox x:Uid="Settings_KeyPattern" Text="{x:Bind ViewModel.KeyPatternText, Mode=TwoWay}" Margin="0,0,0,10"/>
+                <ContentControl IsEnabled="{x:Bind ViewModel.IsHotkeyEnabled, Mode=OneWay}" Margin="0,0,0,10">
+                    <StackPanel Orientation="Horizontal">
+                        <ToggleButton x:Uid="Settings_HotkeyCtrl" Content="Ctrl" Name="HotkeyCtrl" IsChecked="{x:Bind ViewModel.CtrlModifier, Mode=TwoWay}" Margin="0,0,10,0" Unchecked="HotkeyModifiersToggle_UnChecked"/>
+                        <ToggleButton x:Uid="Settings_HotkeyAlt" Content="Alt" Name="HotkeyAlt" IsChecked="{x:Bind ViewModel.AltModifier, Mode=TwoWay}" Margin="0,0,10,0" Unchecked="HotkeyModifiersToggle_UnChecked"/>
+                        <ToggleButton x:Uid="Settings_HotkeyShift" Content="Shift" Name="HotkeyShift" IsChecked="{x:Bind ViewModel.ShiftModifier, Mode=TwoWay}" Margin="0,0,10,0" Unchecked="HotkeyModifiersToggle_UnChecked"/>
+                        <ToggleButton x:Uid="Settings_HotkeyWin" Content="Win" Name="HotkeyWin" IsChecked="{x:Bind ViewModel.WinModifier, Mode=TwoWay}" Margin="0,0,10,0" Unchecked="HotkeyModifiersToggle_UnChecked"/>
+                        <ComboBox x:Uid="Settings_HotkeyKey" Name="HotkeyKey"
+                                  ItemsSource="{x:Bind ViewModel.VirtualKeys}"
+                                  DisplayMemberPath="Item1"
+                                  SelectedValuePath="Item2"
+                                  SelectedValue="{x:Bind ViewModel.Key, Mode=TwoWay}"
+                                  Margin="0,0,10,0" />
+                    </StackPanel>
+                </ContentControl>
 
                 <ToggleSwitch x:Uid="Settings_AutoStart" IsOn="{x:Bind ViewModel.AutoStart, Mode=TwoWay}" Margin="0,0,0,10"/>
 

@@ -14,29 +14,29 @@ namespace AIPaste.Models.KeyModels
         public HOT_KEY_MODIFIERS Modifiers { get; set; } = modifiers;
         public VirtualKey Key { get; set; } = key;
 
-        private string AnalyzeModifier()
+        public string[] AnalyzeModifier()
         {
-            StringBuilder sb = new StringBuilder();
+            string[] modifiers = [];
             if (Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_ALT))
             {
-                sb.Append("Alt+");
+                modifiers.Append("Alt");
             }
             if (Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_CONTROL))
             {
-                sb.Append("Ctrl+");
+                modifiers.Append("Ctrl");
             }
             if (Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_SHIFT))
             {
-                sb.Append("Shift+");
+                modifiers.Append("Shift");
             }
             if (Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_WIN))
             {
-                sb.Append("Win+");
+                modifiers.Append("Win");
             }
-            return sb.ToString();
+            return modifiers;
         }
 
-        public static KeyPattern GetKeyPatternFromString(string key, string[] modifiers)
+        public static HOT_KEY_MODIFIERS GetKeyModifierFromString(string[] modifiers)
         {
             HOT_KEY_MODIFIERS modifier = 0;
             foreach (var mod in modifiers)
@@ -57,7 +57,29 @@ namespace AIPaste.Models.KeyModels
                         break;
                 }
             }
-            return new KeyPattern(modifier, (VirtualKey)Enum.Parse(typeof(VirtualKey), key));
+            return modifier;
+        }
+
+        public static HOT_KEY_MODIFIERS GetModifiers(bool ctrl, bool alt, bool shift, bool win)
+        {
+            HOT_KEY_MODIFIERS modifier = 0;
+            if (ctrl)
+            {
+                modifier |= HOT_KEY_MODIFIERS.MOD_CONTROL;
+            }
+            if (alt)
+            {
+                modifier |= HOT_KEY_MODIFIERS.MOD_ALT;
+            }
+            if (shift)
+            {
+                modifier |= HOT_KEY_MODIFIERS.MOD_SHIFT;
+            }
+            if (win)
+            {
+                modifier |= HOT_KEY_MODIFIERS.MOD_WIN;
+            }
+            return modifier;
         }
 
         public override string ToString()

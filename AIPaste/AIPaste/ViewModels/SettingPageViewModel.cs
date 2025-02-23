@@ -7,7 +7,8 @@ using AIPaste.Models.KeyModels;
 using AIPaste.Services.LLMServices;
 using AIPaste.Services.SettingsServices;
 using NLog;
-using Windows.Management.Deployment;
+using Windows.System;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace AIPaste.ViewModels
 {
@@ -27,7 +28,11 @@ namespace AIPaste.ViewModels
             MaxTokens = _appSettings.LocalLLMSettings.MaxTokens;
             GpuEnabled = _appSettings.LocalLLMSettings.GpuEnabled;
             IsHotkeyEnabled = _appSettings.KeySettings.IsHotkeyEnabled;
-            KeyPatternText = _appSettings.KeySettings.KeyPattern.ToString(); // TODO: Implement
+            Key = _appSettings.KeySettings.KeyPattern.Key;
+            CtrlModifier = _appSettings.KeySettings.KeyPattern.Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_CONTROL);
+            AltModifier = _appSettings.KeySettings.KeyPattern.Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_ALT);
+            ShiftModifier = _appSettings.KeySettings.KeyPattern.Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_SHIFT);
+            WinModifier = _appSettings.KeySettings.KeyPattern.Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_WIN);
             AutoStart = _appSettings.AutoStart;
             ModelType = _appSettings.ModelType;
             ApiKey = _appSettings.GeminiSettings.ApiKey;
@@ -36,6 +41,11 @@ namespace AIPaste.ViewModels
         public List<Tuple<string, ModelType>> ModelTypes = Enum.GetValues(typeof(ModelType))
                 .Cast<ModelType>()
                 .Select(mt => new Tuple<string, ModelType>(mt.ToString(), mt))
+                .ToList();
+
+        public List<Tuple<string, VirtualKey>> VirtualKeys = Enum.GetValues(typeof(VirtualKey))
+                .Cast<VirtualKey>()
+                .Select(vk => new Tuple<string, VirtualKey>(vk.ToString(), vk))
                 .ToList();
 
         private bool _settingsChanged = false;
@@ -115,23 +125,8 @@ namespace AIPaste.ViewModels
             }
         }
 
-        private string _keyPatternText = "Ctrl+Shift+V";
-        public string KeyPatternText
-        {
-            get => _keyPatternText;
-            set
-            {
-                if (_keyPatternText != value)
-                {
-                    _keyPatternText = value;
-                    OnPropertyChanged(nameof(KeyPattern));
-                    _settingsChanged = true;
-                }
-            }
-        }
-
-        private string _key = "C";
-        public string Key
+        private VirtualKey _key = VirtualKey.C;
+        public VirtualKey Key
         {
             get => _key;
             set
@@ -154,11 +149,11 @@ namespace AIPaste.ViewModels
                 if (_ctrlModifier != value)
                 {
                     _ctrlModifier = value;
-                    OnPropertyChanged(nameof(CtrlModifier));
-                    _settingsChanged = true;
+                        OnPropertyChanged(nameof(CtrlModifier));
+                        _settingsChanged = true;
+                    }
                 }
             }
-        }
         
         private bool _altModifier = true;
         public bool AltModifier
@@ -169,11 +164,11 @@ namespace AIPaste.ViewModels
                 if (_altModifier != value)
                 {
                     _altModifier = value;
-                    OnPropertyChanged(nameof(AltModifier));
-                    _settingsChanged = true;
+                        OnPropertyChanged(nameof(AltModifier));
+                        _settingsChanged = true;
+                    }
                 }
             }
-        }
 
         private bool _shiftModifier = false;
         public bool ShiftModifier
@@ -184,11 +179,11 @@ namespace AIPaste.ViewModels
                 if (_shiftModifier != value)
                 {
                     _shiftModifier = value;
-                    OnPropertyChanged(nameof(ShiftModifier));
-                    _settingsChanged = true;
+                        OnPropertyChanged(nameof(ShiftModifier));
+                        _settingsChanged = true;
+                    }
                 }
             }
-        }
 
         private bool _winModifier = false;
         public bool WinModifier
@@ -199,11 +194,11 @@ namespace AIPaste.ViewModels
                 if (_winModifier != value)
                 {
                     _winModifier = value;
-                    OnPropertyChanged(nameof(WinModifier));
-                    _settingsChanged = true;
+                        OnPropertyChanged(nameof(WinModifier));
+                        _settingsChanged = true;
+                    }
                 }
             }
-        }
 
         private bool _autoStart = true;
         public bool AutoStart
@@ -277,7 +272,8 @@ namespace AIPaste.ViewModels
                 MaxTokens: MaxTokens
             );
             var geminiModelSettings = new GeminiModelSettings(ApiKey);
-            var keyPattern = KeyPattern.GetKeyPatternFromString(Key, GetModifiers());
+            var modifier = KeyPattern.GetModifiers(CtrlModifier, AltModifier, ShiftModifier, WinModifier);
+            var keyPattern = new KeyPattern(modifier, Key);
             var keySettings = new KeySettings(IsHotkeyEnabled, keyPattern);
             var newSettings = new AppSettings(
                 AutoStart,
@@ -286,8 +282,12 @@ namespace AIPaste.ViewModels
                 localModelSettings,
                 geminiModelSettings
             );
+            if (!UpdateSettings(newSettings))
+            {
+                return false;
+            }
             _settingsService.SaveSettings(newSettings);
-            return UpdateSettings(newSettings);
+            return true;
         }
 
         private bool UpdateSettings(AppSettings newSettings)
@@ -298,16 +298,6 @@ namespace AIPaste.ViewModels
                 LocalLLMProvider.Dispose();
             }
             return App.MainWindow?.ViewModel.UpdateSettings(newSettings) ?? false;
-        }
-
-        private string[] GetModifiers()
-        {
-            List<string> modifiers = new List<string>();
-            if (CtrlModifier) modifiers.Add("Ctrl");
-            if (AltModifier) modifiers.Add("Alt");
-            if (ShiftModifier) modifiers.Add("Shift");
-            if (WinModifier) modifiers.Add("Win");
-            return [.. modifiers];
         }
 
         private bool IsValidSettings()
