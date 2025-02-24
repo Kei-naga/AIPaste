@@ -20,7 +20,10 @@ namespace AIPaste.Views
         {
             if (!ViewModel.SaveSettings())
             {
-                App.MainWindow?.SendDialog("Warning", "保存に失敗しました。設定を修正前に戻します。設定を見直してください。");
+                var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
+                App.MainWindow?.SendDialog(
+                    resourceLoader.GetString("Settings_DialogWarning"),
+                    resourceLoader.GetString("Settings_DialogFailedSave"));
             }
         }
 

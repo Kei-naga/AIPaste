@@ -201,4 +201,16 @@
   <data name="Settings_HotkeyEnable.OnContent" xml:space="preserve">
     <value>On</value>
   </data>
+  <data name="Settings_DialogInvalidSettings" xml:space="preserve">
+    <value>設定値が入力されていないか無効です。設定を入力してください。</value>
+  </data>
+  <data name="Settings_DialogWarning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="Settings_DialogCloseButton" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Settings_DialogFailedSave" xml:space="preserve">
+    <value>Failed to save. Reverting to the settings before correction. Please review the settings.</value>
+  </data>
 </root>

@@ -201,4 +201,16 @@
   <data name="Settings_HotkeyWin.Content" xml:space="preserve">
     <value>Win</value>
   </data>
+  <data name="Settings_DialogInvalidSettings" xml:space="preserve">
+    <value>The setting value has not been entered or is invalid. Please enter a setting.</value>
+  </data>
+  <data name="Settings_DialogWarning" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="Settings_DialogCloseButton" xml:space="preserve">
+    <value>閉じる</value>
+  </data>
+  <data name="Settings_DialogFailedSave" xml:space="preserve">
+    <value>保存に失敗したため、設定を修正前に戻しました。設定を見直してください。</value>
+  </data>
 </root>

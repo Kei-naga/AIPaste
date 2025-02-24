@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Resources;
 using AIPaste.Models.Common;
 using AIPaste.ViewModels;
 using AIPaste.Views;
@@ -8,8 +9,10 @@ using H.NotifyIcon;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.Windows.ApplicationModel.Resources;
 using NLog;
 using Windows.Foundation.Metadata;
+using Windows.ApplicationModel.Resources;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -116,7 +119,11 @@ namespace AIPaste
                 {
                     _logger.Error(ex, "Failed to load Page " + args.SelectedItemContainer.Tag.ToString());
                     contentFrame.Navigate(typeof(SettingsPage));
-                    SendDialog("Warning", "設定値が入力されてないまたは不正な値です。設定を入力してください。");
+                    var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
+                    SendDialog(
+                        resourceLoader.GetString("Settings_DialogWarning"), 
+                        resourceLoader.GetString("Settings_DialogInvalidSettings")
+                    );
                 }
             }
         }
@@ -126,17 +133,21 @@ namespace AIPaste
             e.Handled = true;
             _logger.Error("Failed to load Page " + e.SourcePageType.FullName);
             contentFrame.Navigate(typeof(SettingsPage));
-
-            SendDialog("Warning", "設定値が入力されてないまたは不正な値です。設定を入力してください。");
+            var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
+            SendDialog(
+                resourceLoader.GetString("Settings_DialogWarning"), 
+                resourceLoader.GetString("Settings_DialogInvalidSettings")
+            );
         }
 
         public async void SendDialog(string title, string content)
         {
+            var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
             var dialog = new ContentDialog
             {
                 Title = title,
                 Content = content,
-                CloseButtonText = "OK"
+                CloseButtonText = resourceLoader.GetString("Settings_DialogCloseButton")
             };
             while (RootGrid.XamlRoot == null)
             {
