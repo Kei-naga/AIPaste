@@ -75,6 +75,15 @@ namespace AIPaste.Services.LLMServices
         public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings)
         {
             // TODO: Implement
+            if (modelSettings is not GeminiModelSettings)
+            {
+                return false;
+            }
+            var geminiSettings = (GeminiModelSettings)modelSettings;
+            if (string.IsNullOrEmpty(geminiSettings.ApiKey))
+            {
+                return false;
+            }
             return true;
         }
 

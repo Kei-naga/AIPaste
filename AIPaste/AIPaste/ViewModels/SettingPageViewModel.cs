@@ -320,7 +320,7 @@ namespace AIPaste.ViewModels
             {
                 modelSettings = new GeminiModelSettings(ApiKey);
                 // TODO: Implement GeminiProvider to check settings integrity
-                return true;
+                return GeminiProvider.CheckSettingsIntegrity(modelSettings);
             }
             return false;
         }

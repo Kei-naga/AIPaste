@@ -18,7 +18,7 @@ namespace AIPaste.Models.Settings
         public static KeySettings GetDefaultSettings()
         {
             var defaultKeyPattern = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
-            var defaultIsHotkeyEnabled = false;
+            var defaultIsHotkeyEnabled = true;
             return new KeySettings(defaultIsHotkeyEnabled, defaultKeyPattern);
         }
 
