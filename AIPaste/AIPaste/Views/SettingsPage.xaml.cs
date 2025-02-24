@@ -18,7 +18,10 @@ namespace AIPaste.Views
 
         private void OnSaveButtonClicked(object sender, RoutedEventArgs e)
         {
-            ViewModel.SaveSettings();
+            if (!ViewModel.SaveSettings())
+            {
+                App.MainWindow?.SendDialog("Warning", "保存に失敗しました。設定を修正前に戻します。設定を見直してください。");
+            }
         }
 
         private void ModelTypesLoaded(object sender, RoutedEventArgs e)

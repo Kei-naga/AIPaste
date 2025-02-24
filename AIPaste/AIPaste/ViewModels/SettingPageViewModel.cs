@@ -24,6 +24,15 @@ namespace AIPaste.ViewModels
             _settingsService = new SettingsService();
             _appSettings = _settingsService.LoadSettings();
 
+            UpdateSettings();
+        }
+
+        private void UpdateSettings(AppSettings? newSettings = null)
+        {
+            if (newSettings != null)
+            {
+                _appSettings = newSettings;
+            }
             LLMModelPath = _appSettings.LocalLLMSettings.ModelPath;
             GpuLayerCount = _appSettings.LocalLLMSettings.GpuLayerCount;
             MaxTokens = _appSettings.LocalLLMSettings.MaxTokens;
@@ -261,6 +270,7 @@ namespace AIPaste.ViewModels
             if (!IsValidSettings())
             {
                 _logger.Debug("Invalid Settings");
+                UpdateSettings();
                 return false;
             }
             _settingsChanged = false;
@@ -283,7 +293,11 @@ namespace AIPaste.ViewModels
                 localModelSettings,
                 geminiModelSettings
             );
-            newSettings = _settingsService.SettingsUpdate(App.MainWindow, newSettings);
+            var modifiedSettings = _settingsService.SettingsUpdate(App.MainWindow, newSettings);
+            if (!newSettings.Equals(modifiedSettings)){
+                UpdateSettings(modifiedSettings);
+                return false;
+            }
             _settingsService.SaveSettings(newSettings);
             return true;
         }

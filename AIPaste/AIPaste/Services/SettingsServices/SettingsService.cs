@@ -133,6 +133,7 @@ namespace AIPaste.Services.SettingsServices
             return defaultAppSettings;
         }
 
+        // TODO: ストレージに保存するとかの処理とここらへんの更新処理は分けたい
         public AppSettings SettingsUpdate(MainWindow? mainWindow, AppSettings newSettings)
         {
             if (newSettings.ModelType != ModelType.LocalLLM)
@@ -141,6 +142,7 @@ namespace AIPaste.Services.SettingsServices
                 LocalLLMProvider.Dispose();
             }
 
+            // TODO: ここらへんの更新処理はもう少しスマートに書けるかも
             if (!mainWindow?.ViewModel.UpdateSettings(newSettings) ?? false)
             {
                 newSettings.KeySettings = new KeySettings(false, newSettings.KeySettings.KeyPattern);
@@ -155,7 +157,7 @@ namespace AIPaste.Services.SettingsServices
             return newSettings;
         }
 
-        private async void AutoStartToggleChanged(bool changedStatus)
+        private static async void AutoStartToggleChanged(bool changedStatus)
         {
             await StartupManager.ToggleStartupAsync(changedStatus);
             var actualState = await StartupManager.IsAutoStartupMode();

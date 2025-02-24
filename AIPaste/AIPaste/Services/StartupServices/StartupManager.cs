@@ -13,29 +13,22 @@ namespace AIPaste.Services.StartupServices
 
         public static async Task ToggleStartupAsync(bool enable)
         {
-            try
+            var startupTask = await StartupTask.GetAsync(TASK_ID);
+            if (enable)
             {
-                var startupTask = await StartupTask.GetAsync(TASK_ID);
-                if (enable)
+                if (startupTask.State == StartupTaskState.Disabled)
                 {
-                    if (startupTask.State == StartupTaskState.Disabled)
-                    {
-                        _logger.Info("auto start activating...");
-                        await startupTask.RequestEnableAsync();
-                    }
-                }
-                else
-                {
-                    if (startupTask.State == StartupTaskState.Enabled)
-                    {
-                        _logger.Info("auto start deactivating...");
-                        startupTask.Disable();
-                    }
+                    _logger.Info("auto start activating...");
+                    await startupTask.RequestEnableAsync();
                 }
             }
-            catch (Exception ex)
+            else
             {
-                _logger.Error(ex, "Failed to set auto start mode");
+                if (startupTask.State == StartupTaskState.Enabled)
+                {
+                    _logger.Info("auto start deactivating...");
+                    startupTask.Disable();
+                }
             }
         }
 

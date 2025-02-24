@@ -20,7 +20,7 @@ namespace AIPaste.Models.Settings
         public static ILLMModelSettings GetDefaultSettings()
         {
             return new LLMLocalModelSettings(
-                ModelPath: @"C:\Users\keita\llama\Llama-3-ELYZA-JP-8B-GGUF\Llama-3-ELYZA-JP-8B-q4_k_m.gguf",
+                ModelPath: @"",
                 GpuEnable: IsGpuAvailable(),
                 GpuLayerCount: 32,
                 ContextSize: 1024,

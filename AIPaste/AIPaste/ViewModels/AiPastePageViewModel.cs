@@ -11,6 +11,8 @@ using System.Diagnostics.CodeAnalysis;
 using AIPaste.Services.SettingsServices;
 using NLog;
 using AIPaste.Models.LLMModels;
+using Microsoft.UI.Xaml.Controls;
+using AIPaste.Views;
 
 namespace AIPaste.ViewModels
 {

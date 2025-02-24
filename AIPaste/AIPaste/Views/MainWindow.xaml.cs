@@ -1,11 +1,15 @@
+using System;
 using System.Linq;
+using System.Reflection.Metadata;
 using AIPaste.Models.Common;
 using AIPaste.ViewModels;
 using AIPaste.Views;
 using H.NotifyIcon;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 using NLog;
+using Windows.Foundation.Metadata;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -28,8 +32,13 @@ namespace AIPaste
             AiPastePageItem.Tag = TabName.AiPastePage.ToString();
 
             Closed += OnWindowHideInsteadOfClose;
-            SetFirstTab(TabName.AiPastePage);
             AppWindow.Resize(new Windows.Graphics.SizeInt32(600,400));
+        }
+
+        private void MainTab_Loaded(object sender, RoutedEventArgs e)
+        {
+            contentFrame.Navigated += On_Navigated;
+            SetFirstTab(TabName.AiPastePage);
         }
 
         private void OnWindowHideInsteadOfClose(object sender, WindowEventArgs args)
@@ -90,16 +99,64 @@ namespace AIPaste
         {
             if (args.SelectedItemContainer != null)
             {
-                if (args.IsSettingsSelected)
+                try
                 {
+                    if (args.IsSettingsSelected)
+                    {
+                        contentFrame.Navigate(typeof(SettingsPage));
+                    }
+                    switch (args.SelectedItemContainer.Tag.ToString())
+                    {
+                        case nameof(TabName.AiPastePage):
+                            contentFrame.Navigate(typeof(AiPastePage));
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Failed to load Page " + args.SelectedItemContainer.Tag.ToString());
                     contentFrame.Navigate(typeof(SettingsPage));
+                    SendDialog("Warning", "設定値が入力されてないまたは不正な値です。設定を入力してください。");
                 }
-                switch (args.SelectedItemContainer.Tag.ToString())
-                {
-                    case nameof(TabName.AiPastePage):
-                        contentFrame.Navigate(typeof(AiPastePage));
-                        break;
-                }
+            }
+        }
+
+        private void NavigationFailed(object sender, NavigationFailedEventArgs e)
+        {
+            e.Handled = true;
+            _logger.Error("Failed to load Page " + e.SourcePageType.FullName);
+            contentFrame.Navigate(typeof(SettingsPage));
+
+            SendDialog("Warning", "設定値が入力されてないまたは不正な値です。設定を入力してください。");
+        }
+
+        public async void SendDialog(string title, string content)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = title,
+                Content = content,
+                CloseButtonText = "OK"
+            };
+            while (RootGrid.XamlRoot == null)
+            {
+                await System.Threading.Tasks.Task.Delay(100);
+            }
+            dialog.XamlRoot = RootGrid.XamlRoot;
+            ContentDialogResult result = await dialog.ShowAsync();
+        }
+
+        private void On_Navigated(object sender, NavigationEventArgs e)
+        {
+            if (contentFrame.SourcePageType == typeof(SettingsPage))
+            {
+                mainTab.SelectedItem = (NavigationViewItem)mainTab.SettingsItem;
+            }
+            else if (contentFrame.SourcePageType != null)
+            {
+                mainTab.SelectedItem = mainTab.MenuItems
+                            .OfType<NavigationViewItem>()
+                            .First(i => i.Tag.Equals(contentFrame.SourcePageType.Name?.ToString()));
             }
         }
     }

@@ -56,7 +56,7 @@ namespace AIPaste.Services.LLMServices
                 catch (Exception ex)
                 {
                     _modelSettings = null;
-                    _logger.Error(ex, "Failed to initialize model");
+                    _logger.Error("Failed to initialize local LLM model", ex);
                     throw;
                 }
             }
@@ -89,7 +89,7 @@ namespace AIPaste.Services.LLMServices
                 }
                 catch (Exception ex)
                 {
-                    throw new InvalidOperationException("Model initialization failed. Please check the model path and parameters.", ex);
+                    throw new InvalidOperationException("Model initialization failed. Please check the model path and parameters.");
                 }
             }
         }

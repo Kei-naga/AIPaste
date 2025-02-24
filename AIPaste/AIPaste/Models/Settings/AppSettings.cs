@@ -26,6 +26,15 @@ namespace AIPaste.Models.Settings
         {
             return $"ModelSettings:  AutoStart: {AutoStart}, ModelType: {ModelType}";
         }
+
+        public bool Equals(AppSettings otherSettings)
+        {
+            return AutoStart == otherSettings.AutoStart &&
+                ModelType == otherSettings.ModelType &&
+                KeySettings.Equals(otherSettings.KeySettings) &&
+                LocalLLMSettings.Equals(otherSettings.LocalLLMSettings) &&
+                GeminiSettings.Equals(otherSettings.GeminiSettings);
+        }
     }
 
 

@@ -84,7 +84,12 @@ namespace AIPaste.Models.KeyModels
 
         public override string ToString()
         {
-            return $"{AnalyzeModifier()}+{Key}";
+            return $"{string.Join("+", AnalyzeModifier())}+{Key}";
+        }
+
+        public bool Equals(KeyPattern otherPattern)
+        {
+            return Modifiers == otherPattern.Modifiers && Key == otherPattern.Key;
         }
     }
 }

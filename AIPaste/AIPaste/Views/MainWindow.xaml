@@ -12,11 +12,15 @@
     mc:Ignorable="d"
     Title="AIPaste">
     <Grid x:Name="RootGrid">
-        <muxc:NavigationView x:Name="mainTab" PaneDisplayMode="Top" SelectionChanged="OnNavigationViewSelectionChanged" IsBackEnabled="False" IsBackButtonVisible="Collapsed">
+        <muxc:NavigationView x:Name="mainTab" 
+                             Loaded="MainTab_Loaded"
+                             PaneDisplayMode="Top" 
+                             SelectionChanged="OnNavigationViewSelectionChanged" 
+                             IsBackEnabled="False" IsBackButtonVisible="Collapsed">
             <muxc:NavigationView.MenuItems>
                 <muxc:NavigationViewItem x:Uid="MainPage_AIPaseteTitle" x:Name="AiPastePageItem" />
             </muxc:NavigationView.MenuItems>
-            <Frame x:Name="contentFrame" Background="#F8F9FA"/>
+            <Frame x:Name="contentFrame" Background="#F8F9FA" NavigationFailed="NavigationFailed"/>
         </muxc:NavigationView>
 
         <Views:TrayView x:Name="TrayView"/>
