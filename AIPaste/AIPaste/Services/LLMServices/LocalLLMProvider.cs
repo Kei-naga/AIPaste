@@ -89,7 +89,7 @@ namespace AIPaste.Services.LLMServices
                 }
                 catch (Exception ex)
                 {
-                    throw new InvalidOperationException("Model initialization failed. Please check the model path and parameters.");
+                    throw new InvalidOperationException("Model initialization failed. Please check the model path and parameters.", ex);
                 }
             }
         }

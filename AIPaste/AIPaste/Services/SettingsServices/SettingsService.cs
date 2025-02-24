@@ -21,6 +21,19 @@ namespace AIPaste.Services.SettingsServices
         private readonly ApplicationDataContainer _localLlmContainer;
         private readonly ApplicationDataContainer _geminiContainer;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private const string AUTO_START_KEY = "AutoStart";
+        private const string MODEL_TYPE_KEY = "ModelType";
+        private const string MODEL_PATH_KEY = "ModelPath";
+        private const string GPU_ENABLED_KEY = "GpuEnabled";
+        private const string GPU_LAYER_COUNT_KEY = "GpuLayer";
+        private const string CONTEXT_SIZE_KEY = "ContextSize";
+        private const string MAX_TOKENS_KEY = "MaxTokens";
+        private const string API_KEY_KEY = "ApiKey";
+        private const string MODEL_NAME_KEY = "ModelName";
+        private const string LOCATION_KEY = "Location";
+        private const string IS_HOTKEY_ENABLED_KEY = "IsHotkeyEnabled";
+        private const string MODIFERS_KEY = "Modifers";
+        private const string HOTKEY_KEY = "Hotkey";
 
         public SettingsService()
         {
@@ -38,8 +51,8 @@ namespace AIPaste.Services.SettingsServices
                 var llmModelSettings = LoadLocalLLMModelSettings();
                 var geminiModelSettings = LoadGeminiModelSettings();
                 var keySettings = LoadKeySettings();
-                var AutoStart = (bool)_mainContainer.Values["AutoStart"];
-                var modelType = (ModelType)_mainContainer.Values["ModelType"];
+                var AutoStart = (bool)_mainContainer.Values[AUTO_START_KEY];
+                var modelType = (ModelType)_mainContainer.Values[MODEL_TYPE_KEY];
                 var appSettings = new AppSettings(AutoStart, modelType, keySettings, llmModelSettings, geminiModelSettings);
                 _logger.Debug($"Loaded settimgs: {appSettings}");
                 _logger.Debug($"Local LLM Settings: {llmModelSettings}");
@@ -55,11 +68,11 @@ namespace AIPaste.Services.SettingsServices
 
         private LLMLocalModelSettings LoadLocalLLMModelSettings()
         {
-            var modelPath = (string)_localLlmContainer.Values["ModelPath"];
-            var gpuEnabled = (bool)_localLlmContainer.Values["GpuEnabled"];
-            var gpuLayerCount = (int)_localLlmContainer.Values["GpuLayerCount"];
-            var contextSize = (uint)_localLlmContainer.Values["ContextSize"];
-            var maxTokens = (int)_localLlmContainer.Values["MaxTokens"];
+            var modelPath = (string)_localLlmContainer.Values[MODEL_PATH_KEY];
+            var gpuEnabled = (bool)_localLlmContainer.Values[GPU_ENABLED_KEY];
+            var gpuLayerCount = (int)_localLlmContainer.Values[GPU_LAYER_COUNT_KEY];
+            var contextSize = (uint)_localLlmContainer.Values[CONTEXT_SIZE_KEY];
+            var maxTokens = (int)_localLlmContainer.Values[MAX_TOKENS_KEY];
 
             return new LLMLocalModelSettings(
                     ModelPath: modelPath,
@@ -72,17 +85,17 @@ namespace AIPaste.Services.SettingsServices
 
         private GeminiModelSettings LoadGeminiModelSettings()
         {
-            var apiKey = (string)_geminiContainer.Values["ApiKey"];
-            var modelName = (string)_geminiContainer.Values["ModelName"];
-            var location = (string)_geminiContainer.Values["Location"];
+            var apiKey = (string)_geminiContainer.Values[API_KEY_KEY];
+            var modelName = (string)_geminiContainer.Values[MODEL_NAME_KEY];
+            var location = (string)_geminiContainer.Values[LOCATION_KEY];
             return new GeminiModelSettings(apiKey, modelName, location);
         }
 
         private KeySettings LoadKeySettings()
         {
-            var isHotkeyEnabled = (bool)_mainContainer.Values["IsHotkeyEnabled"];
-            var modifiers = (HOT_KEY_MODIFIERS)Enum.ToObject(typeof(HOT_KEY_MODIFIERS), (int)_mainContainer.Values["Modifers"]);
-            var hotkey = (VirtualKey)Enum.ToObject(typeof(VirtualKey), (int)_mainContainer.Values["Hotkey"]);
+            var isHotkeyEnabled = (bool)_mainContainer.Values[IS_HOTKEY_ENABLED_KEY];
+            var modifiers = (HOT_KEY_MODIFIERS)Enum.ToObject(typeof(HOT_KEY_MODIFIERS), (int)_mainContainer.Values[MODIFERS_KEY]);
+            var hotkey = (VirtualKey)Enum.ToObject(typeof(VirtualKey), (int)_mainContainer.Values[HOTKEY_KEY]);
             var keyPattern = new KeyPattern(modifiers, hotkey);
             return new KeySettings(isHotkeyEnabled, keyPattern);
         }
@@ -90,8 +103,8 @@ namespace AIPaste.Services.SettingsServices
         public void SaveSettings(AppSettings appSettings)
         {
             _logger.Info("Saving settings");
-            _mainContainer.Values["AutoStart"] = appSettings.AutoStart;
-            _mainContainer.Values["ModelType"] = (int)appSettings.ModelType;
+            _mainContainer.Values[AUTO_START_KEY] = appSettings.AutoStart;
+            _mainContainer.Values[MODEL_TYPE_KEY] = (int)appSettings.ModelType;
             SaveKeySettings(appSettings.KeySettings);
             SaveLocalLLMModelSettings(appSettings.LocalLLMSettings);
             SaveGeminiModelSettings(appSettings.GeminiSettings);
@@ -101,27 +114,27 @@ namespace AIPaste.Services.SettingsServices
         private void SaveLocalLLMModelSettings(LLMLocalModelSettings llmModelSettings)
         {
             _logger.Debug($"Saving Local LLM Settings: {llmModelSettings}");
-            _localLlmContainer.Values["ModelPath"] = llmModelSettings.ModelPath;
-            _localLlmContainer.Values["GpuEnabled"] = llmModelSettings.GpuEnabled;
-            _localLlmContainer.Values["GpuLayerCount"] = llmModelSettings.GpuLayerCount;
-            _localLlmContainer.Values["ContextSize"] = llmModelSettings.ContextSize;
-            _localLlmContainer.Values["MaxTokens"] = llmModelSettings.MaxTokens;
+            _localLlmContainer.Values[MODEL_PATH_KEY] = llmModelSettings.ModelPath;
+            _localLlmContainer.Values[GPU_ENABLED_KEY] = llmModelSettings.GpuEnabled;
+            _localLlmContainer.Values[GPU_LAYER_COUNT_KEY] = llmModelSettings.GpuLayerCount;
+            _localLlmContainer.Values[CONTEXT_SIZE_KEY] = llmModelSettings.ContextSize;
+            _localLlmContainer.Values[MAX_TOKENS_KEY] = llmModelSettings.MaxTokens;
         }
 
         private void SaveGeminiModelSettings(GeminiModelSettings geminiModelSettings)
         {
             _logger.Debug($"Saving Gemini Settings: {geminiModelSettings}");
-            _geminiContainer.Values["ApiKey"] = geminiModelSettings.ApiKey;
-            _geminiContainer.Values["ModelName"] = geminiModelSettings.ModelName;
-            _geminiContainer.Values["Location"] = geminiModelSettings.Location;
+            _geminiContainer.Values[API_KEY_KEY] = geminiModelSettings.ApiKey;
+            _geminiContainer.Values[MODEL_NAME_KEY] = geminiModelSettings.ModelName;
+            _geminiContainer.Values[LOCATION_KEY] = geminiModelSettings.Location;
         }
 
         private void SaveKeySettings(KeySettings keySettings)
         {
             _logger.Debug($"Saving Key Settings: {keySettings}");
-            _mainContainer.Values["IsHotkeyEnabled"] = keySettings.IsHotkeyEnabled;
-            _mainContainer.Values["Hotkey"] = (int)keySettings.KeyPattern.Key;
-            _mainContainer.Values["Modifers"] = (int)keySettings.KeyPattern.Modifiers;
+            _mainContainer.Values[IS_HOTKEY_ENABLED_KEY] = keySettings.IsHotkeyEnabled;
+            _mainContainer.Values[HOTKEY_KEY] = (int)keySettings.KeyPattern.Key;
+            _mainContainer.Values[MODIFERS_KEY] = (int)keySettings.KeyPattern.Modifiers;
         }
 
         public AppSettings ResetSettings()
