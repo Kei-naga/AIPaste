@@ -40,9 +40,9 @@
                     ItemsSource="{x:Bind ViewModel.ModelTypes}"
                     DisplayMemberPath="Item1"
                     SelectedValuePath="Item2"
-                    SelectedValue="{x:Bind ViewModel.ModelType, Mode=TwoWay}" 
+                    SelectedValue="{x:Bind ViewModel.ModelTypeName, Mode=TwoWay}" 
                     Margin="0,0,0,10"
-                    Loaded="ModelTypesLoaded"/>
+                    Loaded="ModelTypesLoaded" />
 
                 <StackPanel x:Name="LocalLLMSettingsPanel" Visibility="{x:Bind ViewModel.IsLocalLLMSelected, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
                     <TextBox x:Uid="Settings_LocalModelPath" Text="{x:Bind ViewModel.LLMModelPath, Mode=TwoWay}" Margin="0,0,0,10"/>

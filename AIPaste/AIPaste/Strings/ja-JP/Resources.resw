@@ -202,7 +202,7 @@
     <value>Win</value>
   </data>
   <data name="Settings_DialogInvalidSettings" xml:space="preserve">
-    <value>The setting value has not been entered or is invalid. Please enter a setting.</value>
+    <value>設定値が入力されていないか無効です。設定を入力してください。</value>
   </data>
   <data name="Settings_DialogWarning" xml:space="preserve">
     <value>警告</value>

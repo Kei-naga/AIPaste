@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using AIPaste.ViewModels;
 using AIPaste.Models.Settings;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Data;
 
 namespace AIPaste.Views
 {
@@ -20,17 +21,19 @@ namespace AIPaste.Views
         {
             if (!ViewModel.SaveSettings())
             {
-                var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
+                var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse();
                 App.MainWindow?.SendDialog(
                     resourceLoader.GetString("Settings_DialogWarning"),
                     resourceLoader.GetString("Settings_DialogFailedSave"));
+
+                // Manually updates the display of the model types combo box because, for some reason, it does not update automatically.
+                ModelTypesCombo.SelectedIndex = (int)ViewModel.ModelTypeName;
             }
         }
 
         private void ModelTypesLoaded(object sender, RoutedEventArgs e)
         {
-            // Set the selected index of the combo box to the current model type
-            ModelTypesCombo.SelectedIndex = (int)ViewModel.ModelType;
+            ModelTypesCombo.SelectedIndex = (int)ViewModel.ModelTypeName;
         }
 
         private void HotkeyModifiersToggle_UnChecked(object sender, RoutedEventArgs e)

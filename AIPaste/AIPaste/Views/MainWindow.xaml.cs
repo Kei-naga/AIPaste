@@ -119,7 +119,7 @@ namespace AIPaste
                 {
                     _logger.Error(ex, "Failed to load Page " + args.SelectedItemContainer.Tag.ToString());
                     contentFrame.Navigate(typeof(SettingsPage));
-                    var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
+                    var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse();
                     SendDialog(
                         resourceLoader.GetString("Settings_DialogWarning"), 
                         resourceLoader.GetString("Settings_DialogInvalidSettings")
@@ -133,7 +133,7 @@ namespace AIPaste
             e.Handled = true;
             _logger.Error("Failed to load Page " + e.SourcePageType.FullName);
             contentFrame.Navigate(typeof(SettingsPage));
-            var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
+            var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse();
             SendDialog(
                 resourceLoader.GetString("Settings_DialogWarning"), 
                 resourceLoader.GetString("Settings_DialogInvalidSettings")
@@ -142,7 +142,7 @@ namespace AIPaste
 
         public async void SendDialog(string title, string content)
         {
-            var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
+            var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse();
             var dialog = new ContentDialog
             {
                 Title = title,

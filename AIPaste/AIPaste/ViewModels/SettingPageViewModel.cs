@@ -23,7 +23,7 @@ namespace AIPaste.ViewModels
         {
             _settingsService = new SettingsService();
             _appSettings = _settingsService.LoadSettings();
-
+            
             UpdateSettings();
         }
 
@@ -44,7 +44,7 @@ namespace AIPaste.ViewModels
             ShiftModifier = _appSettings.KeySettings.KeyPattern.Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_SHIFT);
             WinModifier = _appSettings.KeySettings.KeyPattern.Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_WIN);
             AutoStart = _appSettings.AutoStart;
-            ModelType = _appSettings.ModelType;
+            ModelTypeName = _appSettings.ModelType;
             ApiKey = _appSettings.GeminiSettings.ApiKey;
         }
 
@@ -225,15 +225,15 @@ namespace AIPaste.ViewModels
             }
         }
 
-        private ModelType _modelType = ModelType.LocalLLM;
-        public ModelType ModelType
+        private ModelType _modelTypeName = ModelType.LocalLLM;
+        public ModelType ModelTypeName
         {
-            get => _modelType;
+            get => _modelTypeName;
             set
             {
-                if (_modelType != value)
+                if (_modelTypeName != value)
                 {
-                    _modelType = value;
+                    _modelTypeName = value;
                     OnPropertyChanged(nameof(ModelType));
                     _settingsChanged = true;
                     OnPropertyChanged(nameof(IsLocalLLMSelected));
@@ -242,8 +242,8 @@ namespace AIPaste.ViewModels
             }
         }
 
-        public bool IsLocalLLMSelected => ModelType == ModelType.LocalLLM;
-        public bool IsGeminiSelected => ModelType == ModelType.Gemini;
+        public bool IsLocalLLMSelected => ModelTypeName == ModelType.LocalLLM;
+        public bool IsGeminiSelected => ModelTypeName == ModelType.Gemini;
 
         private string _apiKey = "";
         public string ApiKey
@@ -288,7 +288,7 @@ namespace AIPaste.ViewModels
             var keySettings = new KeySettings(IsHotkeyEnabled, keyPattern);
             var newSettings = new AppSettings(
                 AutoStart,
-                ModelType,
+                ModelTypeName,
                 keySettings,
                 localModelSettings,
                 geminiModelSettings
@@ -305,7 +305,7 @@ namespace AIPaste.ViewModels
         private bool IsValidSettings()
         {
             ILLMModelSettings modelSettings;
-            if (ModelType == ModelType.LocalLLM)
+            if (ModelTypeName == ModelType.LocalLLM)
             {
                 modelSettings = new LLMLocalModelSettings(
                     ModelPath: LLMModelPath,
@@ -316,7 +316,7 @@ namespace AIPaste.ViewModels
                 );
                 return LocalLLMProvider.CheckSettingsIntegrity(modelSettings);
             }
-            else if (ModelType == ModelType.Gemini)
+            else if (ModelTypeName == ModelType.Gemini)
             {
                 modelSettings = new GeminiModelSettings(ApiKey);
                 // TODO: Implement GeminiProvider to check settings integrity
