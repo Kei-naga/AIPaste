@@ -1,7 +1,5 @@
 using System;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Resources;
 using AIPaste.Models.Common;
 using AIPaste.ViewModels;
 using AIPaste.Views;
@@ -9,10 +7,7 @@ using H.NotifyIcon;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using Microsoft.Windows.ApplicationModel.Resources;
 using NLog;
-using Windows.Foundation.Metadata;
-using Windows.ApplicationModel.Resources;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -54,26 +49,37 @@ namespace AIPaste
 
         private void OnHotKeyPressed()
         {
-            SetFirstTab(TabName.AiPastePage);
-            this.ShowWindow();
+            this.ShowWindow(TabName.AiPastePage);
         }
 
-        public void ShowWindow()
+        public void ShowWindow(TabName tabName)
         {
-            if (contentFrame.Content is AiPastePage aiPastePage)
+            if (contentFrame.SourcePageType.Name?.ToString() != tabName.ToString())
             {
-                aiPastePage.FocusUserInputBox();
+                if (tabName == TabName.Settings)
+                {
+                    contentFrame.Navigate(typeof(SettingsPage));
+                }
+                else if (tabName == TabName.AiPastePage)
+                {
+                    contentFrame.Navigate(typeof(AiPastePage));
+                }
             }
 
             if (this.Visible == true)
             {
-                var hwnd = new Windows.Win32.Foundation.HWND(WinRT.Interop.WindowNative.GetWindowHandle(this));
-                Windows.Win32.PInvoke.SetForegroundWindow(hwnd);
+                SetForegroundWindow();
             }
             else
             {
                 this.Activate();
             }
+        }
+
+        private void SetForegroundWindow()
+        {
+            var hwnd = new Windows.Win32.Foundation.HWND(WinRT.Interop.WindowNative.GetWindowHandle(this));
+            Windows.Win32.PInvoke.SetForegroundWindow(hwnd);
         }
 
         public void RestoreDefaultClosingBehavior()
@@ -86,7 +92,7 @@ namespace AIPaste
             };
         }
 
-        public void SetFirstTab(TabName tabName)
+        private void SetFirstTab(TabName tabName)
         {
             if (tabName == TabName.Settings)
             {
