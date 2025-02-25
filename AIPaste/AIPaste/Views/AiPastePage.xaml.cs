@@ -9,6 +9,7 @@ namespace AIPaste.Views
     public sealed partial class AiPastePage : Page
     {
         public AiPastePageViewModel ViewModel;
+        private Window? _window;
 
         public AiPastePage()
         {
@@ -27,11 +28,13 @@ namespace AIPaste.Views
             UserInputBox.Text = "";
             await ViewModel.GeneratingText(userInput);
             UserInputBox.IsEnabled = true;
+            UserInputBox.Focus(FocusState.Programmatic);
         }
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.ChangeTargetText();
+            UserInputBox.Focus(FocusState.Programmatic);
         }
 
         private void UserInputBox_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -46,11 +49,30 @@ namespace AIPaste.Views
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            _window = App.MainWindow;
+            if (_window != null)
+            {
+                _window.Activated += OnWindowActivated;
+            }
             UserInputBox.Focus(FocusState.Programmatic);
         }
-        public void FocusUserInputBox()
+
+        // TODO : マウスでactivateされると一瞬文字にfocusがいくため、治す
+        private void OnWindowActivated(object sender, WindowActivatedEventArgs e)
         {
-            UserInputBox.Focus(FocusState.Programmatic);
+            if (e.WindowActivationState == WindowActivationState.CodeActivated)
+            {
+                UserInputBox.Focus(FocusState.Programmatic);
+            }
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (_window != null)
+            {
+                _window.Activated -= OnWindowActivated;
+                _window = null;
+            }
         }
     }
 }

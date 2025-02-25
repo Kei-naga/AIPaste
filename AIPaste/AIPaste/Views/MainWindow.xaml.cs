@@ -70,10 +70,7 @@ namespace AIPaste
             {
                 SetForegroundWindow();
             }
-            else
-            {
-                this.Activate();
-            }
+            Activate();
         }
 
         private void SetForegroundWindow()
