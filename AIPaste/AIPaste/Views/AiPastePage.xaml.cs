@@ -1,16 +1,8 @@
-using System;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
-using AIPaste.Services;
 using AIPaste.ViewModels;
-using System.ComponentModel;
-using WinRT;
 using Microsoft.UI.Xaml.Controls;
-using Windows.Devices.Enumeration;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Input;
-using Microsoft.UI.Xaml.Navigation;
 
 namespace AIPaste.Views
 {

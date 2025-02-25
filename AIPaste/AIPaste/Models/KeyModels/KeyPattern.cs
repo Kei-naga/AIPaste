@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.System;
-using Windows.Globalization;
 
 namespace AIPaste.Models.KeyModels
 {

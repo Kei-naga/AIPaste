@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using AIPaste.Models.LLMModels;
 using AIPaste.Models.Settings;
 using GenerativeAI;
 using GenerativeAI.Types;
 using NLog;
-using Windows.Media.Protection.PlayReady;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AIPaste.Services.LLMServices
 {

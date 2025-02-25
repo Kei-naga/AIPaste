@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using LLama.Common;
 using LLama;
-using Microsoft.UI.Content;
-using ManagedCuda;
-using LLama.Abstractions;
-using static System.Collections.Specialized.BitVector32;
 using LLama.Sampling;
-using System.Text.RegularExpressions;
 using AIPaste.Models.Settings;
 using NLog;
 using AIPaste.Models.LLMModels;

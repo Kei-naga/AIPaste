@@ -1,9 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using AIPaste.ViewModels;
-using AIPaste.Models.Settings;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 
 namespace AIPaste.Views
 {

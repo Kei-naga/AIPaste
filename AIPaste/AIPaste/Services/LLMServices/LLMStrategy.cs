@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LLama.Common;
-using LLama;
-using AIPaste.Models.Settings;
 using AIPaste.Models.LLMModels;
 using Windows.ApplicationModel.Resources;
 

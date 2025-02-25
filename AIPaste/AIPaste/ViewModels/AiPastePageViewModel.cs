@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using AIPaste.Models.Settings;
 using AIPaste.Services.LLMServices;
 using AIPaste.Services.ClipboardOperator;
-using System.Diagnostics.CodeAnalysis;
 using AIPaste.Services.SettingsServices;
 using NLog;
 using AIPaste.Models.LLMModels;
-using Microsoft.UI.Xaml.Controls;
-using AIPaste.Views;
 
 namespace AIPaste.ViewModels
 {
@@ -68,6 +62,7 @@ namespace AIPaste.ViewModels
             _llmStrategy = new LLMStrategy();
             _llmProvider.SetSystemPrompt(_llmStrategy.GetSystemPrompt());
             _llmProvider.StartNewChat();
+            // TODO: ここらへんのchatHistoryの処理は切り出してそれ用のクラスで共通利用できるようにしたい
             (LlmRequestModel modelReq, string modelAns) = _llmStrategy.CreateModelPrompt();
             _llmProvider.AddChatHistory(modelReq,modelAns);
         }

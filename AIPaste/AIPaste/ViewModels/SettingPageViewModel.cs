@@ -9,7 +9,6 @@ using AIPaste.Services.SettingsServices;
 using NLog;
 using Windows.System;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-using AIPaste.Services.StartupServices;
 
 namespace AIPaste.ViewModels
 {

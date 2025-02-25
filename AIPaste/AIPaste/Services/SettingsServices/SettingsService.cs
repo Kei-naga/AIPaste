@@ -1,12 +1,7 @@
 ﻿using AIPaste.Models.KeyModels;
 using AIPaste.Models.Settings;
-using ManagedCuda;
 using NLog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.System;

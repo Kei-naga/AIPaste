@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AIPaste.Models.KeyModels;
-using Windows.Storage;
+﻿using AIPaste.Models.KeyModels;
 using Windows.System;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 

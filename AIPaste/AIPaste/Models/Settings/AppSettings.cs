@@ -1,7 +1,4 @@
-﻿using System;
-using ManagedCuda;
-
-namespace AIPaste.Models.Settings
+﻿namespace AIPaste.Models.Settings
 {
     internal class AppSettings(bool autoStartSetting, ModelType modelType, KeySettings keySettings, LLMLocalModelSettings llmLocalModelSettings, GeminiModelSettings geminiModelSettings)
     {
