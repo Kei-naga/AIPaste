@@ -6,17 +6,12 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace AIPaste.Services.BackgroudServices
 {
-    internal partial class HotKeyHandler : IDisposable
+    internal partial class HotKeyManager(Action action) : IDisposable
     {
         private HotkeyMessageDummyWindow? _DummuyWindow;
-        public KeyPattern KeyPattern;
-        private Action _onHotKeyPressed;
+        public KeyPattern KeyPattern = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
+        private Action _onHotKeyPressed = action;
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        public HotKeyHandler(Action action)
-        {
-            _onHotKeyPressed = action;
-            KeyPattern = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C); // Default hotkey
-        }
 
         public bool RegisterHotKey(KeyPattern keyPattern)
         {

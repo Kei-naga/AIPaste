@@ -9,6 +9,7 @@ using AIPaste.Services.SettingsServices;
 using NLog;
 using Windows.System;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
+using AIPaste.Services.StartupServices;
 
 namespace AIPaste.ViewModels
 {
@@ -20,7 +21,7 @@ namespace AIPaste.ViewModels
 
         public SettingsPageViewModel()
         {
-            _settingsService = new SettingsService();
+            _settingsService = SettingsService.Instance;
             _appSettings = _settingsService.LoadSettings();
             
             UpdateSettings();
@@ -292,7 +293,7 @@ namespace AIPaste.ViewModels
                 localModelSettings,
                 geminiModelSettings
             );
-            var modifiedSettings = _settingsService.SettingsUpdate(App.MainWindow, newSettings);
+            var modifiedSettings = SettingsUpdate(newSettings);
             if (!newSettings.Equals(modifiedSettings)){
                 UpdateSettings(modifiedSettings);
                 return false;
@@ -322,6 +323,39 @@ namespace AIPaste.ViewModels
                 return GeminiProvider.CheckSettingsIntegrity(modelSettings);
             }
             return false;
+        }
+
+        private AppSettings SettingsUpdate(AppSettings newSettings)
+        {
+            if (newSettings.ModelType != ModelType.LocalLLM)
+            {
+                _logger.Info("Despose Local LLM");
+                LocalLLMProvider.Dispose();
+            }
+
+            // TODO: ここらへんの更新処理はもう少しスマートに書けるかも
+            if (!App.MainWindow?.ViewModel.UpdateSettings(newSettings) ?? false)
+            {
+                newSettings.KeySettings = new KeySettings(false, newSettings.KeySettings.KeyPattern);
+            }
+
+            try { AutoStartToggleChanged(newSettings.AutoStart); }
+            catch (Exception e)
+            {
+                _logger.Warn(e);
+                newSettings.AutoStart = false;
+            }
+            return newSettings;
+        }
+
+        private static async void AutoStartToggleChanged(bool changedStatus)
+        {
+            await StartupManager.ToggleStartupAsync(changedStatus);
+            var actualState = await StartupManager.IsAutoStartupMode();
+            if (changedStatus != actualState)
+            {
+                throw new Exception("Failed to set AutoStart");
+            }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

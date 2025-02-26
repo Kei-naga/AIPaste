@@ -54,7 +54,7 @@ namespace AIPaste.ViewModels
         public AiPastePageViewModel()
         {
             _logger.Debug("AiPastePageViewModel created");
-            var settingsService = new SettingsService();
+            var settingsService = SettingsService.Instance;
             var appSettings = settingsService.LoadSettings();
             ClipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
