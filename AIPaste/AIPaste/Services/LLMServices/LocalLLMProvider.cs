@@ -6,12 +6,13 @@ using LLama.Sampling;
 using AIPaste.Models.Settings;
 using NLog;
 using AIPaste.Models.LLMModels;
+using System.Text;
 
 namespace AIPaste.Services.LLMServices
 {
-    internal class LocalLLMProvider : ILLMProvider
+    internal partial class LocalLLMProvider : ILLMProvider
     {
-        static private Logger _logger = LogManager.GetCurrentClassLogger();
+        static private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         static private readonly object _lock = new();
         static private LLamaWeights? _model = null;
         static private LLamaContext? _context = null;
@@ -51,7 +52,7 @@ namespace AIPaste.Services.LLMServices
                     throw;
                 }
             }
-            _logger.Debug($"Sterted Local LLM");
+            _logger.Debug("Started Local LLM");
         }
 
         private static void Initialize()
@@ -67,7 +68,7 @@ namespace AIPaste.Services.LLMServices
 
                     if (_context == null || _model == null)
                     {
-                        _logger.Info("creating Model");
+                        _logger.Info("Creating Model");
                         var parameters = new ModelParams(_modelSettings.ModelPath)
                         {
                             ContextSize = _modelSettings.ContextSize,
@@ -75,7 +76,7 @@ namespace AIPaste.Services.LLMServices
                         };
                         _model = LLamaWeights.LoadFromFile(parameters);
                         _context = _model.CreateContext(parameters);
-                        _logger.Info("successfully created model");
+                        _logger.Info("Successfully created model");
                     }
                 }
                 catch (Exception ex)
@@ -95,7 +96,7 @@ namespace AIPaste.Services.LLMServices
                 _context = null;
                 _modelSettings = default;
 
-                _logger.Info("disposed Model");
+                _logger.Info("Disposed Model");
             }
         }
 
@@ -109,7 +110,7 @@ namespace AIPaste.Services.LLMServices
             {
                 return true;
             }
-            _logger.Info("Despose Local LLM");
+            _logger.Info("Dispose Local LLM");
             Dispose();
             _modelSettings = (LLMLocalModelSettings)modelSettings;
             _logger.Debug($"Model settings changed to {modelSettings}");
@@ -126,7 +127,7 @@ namespace AIPaste.Services.LLMServices
         {
             if (_context == null || _modelSettings == null)
             {
-                throw new InvalidOperationException("Model has not been initialized succesfully. Please start over.");
+                throw new InvalidOperationException("Model has not been initialized successfully. Please start over.");
             }
             var userText = "User:";
             var assistantText = "Assistant:";
@@ -134,6 +135,7 @@ namespace AIPaste.Services.LLMServices
             {
                 MaxTokens = _modelSettings.MaxTokens,
                 AntiPrompts = [userText],
+                TokensKeep = (int)_modelSettings.ContextSize - _modelSettings.MaxTokens,
                 SamplingPipeline = new DefaultSamplingPipeline(),
             };
             var executor = new InteractiveExecutor(_context);
@@ -142,7 +144,7 @@ namespace AIPaste.Services.LLMServices
             _chatSession = new ChatSession(executor, chatHistory);
             _chatSession.WithOutputTransform(
                 new LLamaTransforms.KeywordTextOutputStreamTransform(
-                    [userText, assistantText, "assistant:"],
+                    new[] { userText, assistantText, "assistant:" },
                     redundancyLength: 8
                 )
              );
@@ -188,15 +190,15 @@ namespace AIPaste.Services.LLMServices
                 throw new InvalidOperationException("Chat session has not been started. Please call StartNewChat() first.");
             }
 
-            var responseBuilder = new List<string>();
-                await foreach (var text in _chatSession.ChatAsync(
-                    new ChatHistory.Message(AuthorRole.User, req.GetRequest()),
-                    _inferenceParams))
-                {
-                    responseBuilder.Add(text);
-                    yield return text;
-                }
-            PresentResponse = string.Join("", responseBuilder);
+            var responseBuilder = new StringBuilder();
+            await foreach (var text in _chatSession.ChatAsync(
+                new ChatHistory.Message(AuthorRole.User, req.GetRequest()),
+                _inferenceParams))
+            {
+                responseBuilder.Append(text);
+                yield return text;
+            }
+            PresentResponse = responseBuilder.ToString();
         }
     }
 }
