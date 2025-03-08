@@ -32,5 +32,15 @@ namespace AIPaste.Services.LLMServices
         public PromptExecutionSettings GetPromptExecutionSettings() {
             return new GeminiPromptExecutionSettings();
         }
+
+        public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings)
+        {
+            if (modelSettings is GeminiModelSettings)
+            {
+                var settings = modelSettings as GeminiModelSettings;
+                return !string.IsNullOrEmpty(settings?.ApiKey) && !string.IsNullOrEmpty(settings.ModelName);
+            }
+            return false;
+        }
     }
 }

@@ -66,6 +66,19 @@ namespace AIPaste.Services.LLMServices
         }
 
 
-        public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings) { return true; }
+        public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings) { 
+            if (modelSettings is GeminiModelSettings geminiModelSettings)
+            {
+                return GeminiStrategy.CheckSettingsIntegrity(geminiModelSettings);
+            }
+            else if (modelSettings is LLMLocalModelSettings localModelSettings)
+            {
+                return LocalLlmStrategy.CheckSettingsIntegrity(localModelSettings);
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }
