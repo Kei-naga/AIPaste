@@ -267,9 +267,9 @@ namespace AIPaste.ViewModels
                 _logger.Debug("No settings changed, not saving");
                 return true;
             }
-            if (!IsValidSettings())
+            if (!IsValidLlmSettings())
             {
-                _logger.Debug("Invalid Settings");
+                _logger.Debug("Invalid llm Settings");
                 UpdateSettings();
                 return false;
             }
@@ -302,7 +302,7 @@ namespace AIPaste.ViewModels
             return true;
         }
 
-        private bool IsValidSettings()
+        private bool IsValidLlmSettings()
         {
             ILLMModelSettings modelSettings;
             if (ModelTypeName == ModelType.LocalLLM)
@@ -314,13 +314,13 @@ namespace AIPaste.ViewModels
                     ContextSize: _appSettings.LocalLLMSettings.ContextSize,
                     MaxTokens: MaxTokens
                 );
-                return LocalLLMProvider.CheckSettingsIntegrity(modelSettings);
+                return LlmTextCorrector.CheckSettingsIntegrity(modelSettings);
             }
             else if (ModelTypeName == ModelType.Gemini)
             {
                 modelSettings = new GeminiModelSettings(ApiKey);
                 // TODO: Implement GeminiProvider to check settings integrity
-                return GeminiProvider.CheckSettingsIntegrity(modelSettings);
+                return LlmTextCorrector.CheckSettingsIntegrity(modelSettings);
             }
             return false;
         }
@@ -330,7 +330,7 @@ namespace AIPaste.ViewModels
             if (newSettings.ModelType != ModelType.LocalLLM)
             {
                 _logger.Info("Despose Local LLM");
-                LocalLLMProvider.Dispose();
+                LocalLlmStrategy.Dispose();
             }
 
             // TODO: ここらへんの更新処理はもう少しスマートに書けるかも

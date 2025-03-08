@@ -12,9 +12,8 @@ namespace AIPaste.ViewModels
 {
     public partial class AiPastePageViewModel : INotifyPropertyChanged
     {
-        private readonly LLMStrategy _llmStrategy;
         private readonly ClipboardOperator _clipboardOperator = new();
-        private readonly ILLMProvider _llmProvider;
+        private readonly LlmTextCorrector _llmTextCorrector;
         private Logger _logger = LogManager.GetCurrentClassLogger();
 
         private string _targetText = "";
@@ -58,39 +57,20 @@ namespace AIPaste.ViewModels
             var appSettings = settingsService.LoadSettings();
             ClipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
-            _llmProvider = GetLLMProvider(appSettings);
-            _llmStrategy = new LLMStrategy();
-            _llmProvider.SetSystemPrompt(_llmStrategy.GetSystemPrompt());
-            _llmProvider.StartNewChat();
-            // TODO: ここらへんのchatHistoryの処理は切り出してそれ用のクラスで共通利用できるようにしたい
-            (LlmRequestModel modelReq, string modelAns) = _llmStrategy.CreateModelPrompt();
-            _llmProvider.AddChatHistory(modelReq,modelAns);
-        }
-
-        private static ILLMProvider GetLLMProvider(AppSettings appSettings)
-        {
-            switch (appSettings.ModelType)
-            {
-                case ModelType.LocalLLM:
-                    return new LocalLLMProvider(appSettings.LocalLLMSettings);
-                case ModelType.Gemini:
-                    return new GeminiProvider(appSettings.GeminiSettings);
-                default:
-                    throw new InvalidOperationException("Invalid model type");
-            }
+            _llmTextCorrector = new LlmTextCorrector(appSettings);
         }
 
         public async Task GeneratingText(string userInput)
         {
+            var requestModel = new LlmRequestModel(TargetText, userInput);
             OutputText = "";
-            var optimizedUserInput = new LlmRequestModel(TargetText, userInput);
             try
             {
-                await foreach (var chunk in _llmProvider.GeneratingText(optimizedUserInput))
+                await foreach (var chunk in _llmTextCorrector.GeneratingText(requestModel))
                 {
                     OutputText += chunk;
                 }
-                if (!CheckResponse(_llmProvider.PresentResponse))
+                if (!CheckResponse(_llmTextCorrector.PresentResponse))
                 {
                     throw new InvalidOperationException("LLM generated an empty string");
                 }
@@ -99,7 +79,7 @@ namespace AIPaste.ViewModels
             {
                 OutputText = "不適切な文章が生成されました。";
             }
-            OutputText = _llmProvider.PresentResponse;
+            OutputText = _llmTextCorrector.PresentResponse;
         }
 
         private static bool CheckResponse(string response)

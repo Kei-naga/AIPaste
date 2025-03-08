@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.ApplicationModel.Resources;
 
 namespace AIPaste.Models.LLMModels
 {
@@ -6,16 +7,17 @@ namespace AIPaste.Models.LLMModels
     {
         public string TargetText { get; set; } = targetText;
         public string UserInput { get; set; } = userInput;
-        public string GetRequest()
+        private readonly ResourceLoader _resourceLoader = new();
+        public string ToOptimizedRequest()
         {
-            return "--- 対象テキスト ---" + Environment.NewLine
+            return _resourceLoader.GetString("/LLMResources/TargetTextFlagForOptimizingText") + Environment.NewLine
                 + TargetText + Environment.NewLine
-                + "--- ユーザ指示 ---" + Environment.NewLine
+                + _resourceLoader.GetString("/LLMResources/UserInstructionFlagForOptimizingText") + Environment.NewLine
                 + UserInput;
         }
         public override string ToString()
         {
-            return GetRequest();
+            return ToOptimizedRequest();
         }
     }
 }
