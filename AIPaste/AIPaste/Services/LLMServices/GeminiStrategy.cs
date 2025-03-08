@@ -1,9 +1,5 @@
 ﻿using AIPaste.Models.Settings;
-using GenerativeAI.Types;
-using Microsoft.Extensions.AI;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
 
 
