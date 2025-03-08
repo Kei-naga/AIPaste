@@ -3,7 +3,7 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.Google;
 
 
-// using Microsoft.SemanticKernel.Connectors.OpenAI;
+// using Microsoft.SemanticKernel.Connectors.Google;
 #pragma warning disable SKEXP0010
 #pragma warning disable SKEXP0050
 #pragma warning disable SKEXP0070
