@@ -8,21 +8,20 @@ using Microsoft.SemanticKernel;
 using LLama.Common;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
+using ManagedCuda;
 
 
 namespace AIPaste.Services.LLMServices
 {
     internal class LocalLlmStrategy : ILlmStrategy
     {
-        private static LLMLocalModelSettings? _modelSettings;
-        private static LLamaWeights? _localmodel;
-        private static ModelParams? _parameters;
+        private LocalLlmSingleton _llmInstance;
 
         public LocalLlmStrategy(LLMLocalModelSettings modelSettings)
         {
             try
             {
-                InitializeModel(modelSettings);
+                _llmInstance = LocalLlmSingleton.GetInstance(modelSettings);
             }
             catch (Exception ex)
             {
@@ -31,54 +30,34 @@ namespace AIPaste.Services.LLMServices
             }
         }
 
-        private static void InitializeModel(LLMLocalModelSettings modelSettings)
-        {
-            if (_modelSettings == null || !modelSettings.Equals(_modelSettings))
-            {
-                _modelSettings = modelSettings;
-                _parameters = new ModelParams(_modelSettings.ModelPath)
-                {
-                    ContextSize = _modelSettings.ContextSize,
-                    GpuLayerCount = _modelSettings.GpuLayerCount
-                };
-                _localmodel?.Dispose();
-                _localmodel = LLamaWeights.LoadFromFile(_parameters);
-            }
-        }
-
         public IKernelBuilder GetKernelBuilder()
         {
             var builder = Kernel.CreateBuilder();
-            if (_localmodel == null || _parameters == null)
-            {
-                throw new InvalidOperationException("Local model is not loaded");
-            }
-            var ex = new StatelessExecutor(_localmodel, _parameters);
+            var ex = new StatelessExecutor(_llmInstance.Localmodel, _llmInstance.Parameters);
             builder.Services.AddKeyedSingleton<IChatCompletionService>("local-llama", new LLamaSharpChatCompletion(ex));
             return builder;
         }
+
         public PromptExecutionSettings GetPromptExecutionSettings()
         {
             return new LLamaSharpPromptExecutionSettings()
             {
-                MaxTokens = _modelSettings?.MaxTokens,
+                MaxTokens = _llmInstance.ModelSettings.MaxTokens,
             };
         }
+
         public static void Dispose()
         {
-            _localmodel?.Dispose();
-            _localmodel = null;
-            _modelSettings = null;
-            _parameters = null;
+            LocalLlmSingleton.Dispose();
         }
 
         public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings)
         {
-            if (modelSettings is LLMLocalModelSettings)
+            if (modelSettings is LLMLocalModelSettings localModelSettings)
             {
                 try
                 {
-                    InitializeModel((LLMLocalModelSettings)modelSettings);
+                    LocalLlmSingleton.GetInstance(localModelSettings);
                     return true;
                 }
                 catch
