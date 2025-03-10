@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using AIPaste.Models.LLMModels;
+using NLog;
 
 namespace AIPaste.Services.LLMServices
 {
@@ -20,6 +21,7 @@ namespace AIPaste.Services.LLMServices
         private readonly ILlmStrategy _llmStrategy;
 
         private readonly ResourceLoader _resourceLoader = new();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public LlmTextCorrector(AppSettings appSettings)
         {
@@ -48,6 +50,7 @@ namespace AIPaste.Services.LLMServices
         public async IAsyncEnumerable<string> GeneratingText(LlmRequestModel requestModel)
         {
             _chatHistory.AddUserMessage(requestModel.ToOptimizedRequest());
+            TruncateChatHistoryByTokenLimit();
             var responseBuilder = new StringBuilder();
             var results = _chatCompletionService.GetStreamingChatMessageContentsAsync
                 (
@@ -63,6 +66,16 @@ namespace AIPaste.Services.LLMServices
             }
             _chatHistory.AddAssistantMessage(responseBuilder.ToString());
             PresentResponse = responseBuilder.ToString();
+        }
+
+        private void TruncateChatHistoryByTokenLimit()
+        {
+            int contextSize = _llmStrategy.GetTokenCount(_chatHistory);
+            while (contextSize > _llmStrategy.ModelSettings.MaxContextSize)
+            {
+                _chatHistory.RemoveAt(0);
+                contextSize = _llmStrategy.GetTokenCount(_chatHistory);
+            }
         }
 
 

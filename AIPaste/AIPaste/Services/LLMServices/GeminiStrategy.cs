@@ -1,5 +1,6 @@
 ﻿using AIPaste.Models.Settings;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
 
 
@@ -13,6 +14,7 @@ namespace AIPaste.Services.LLMServices
     internal class GeminiStrategy : ILlmStrategy
     {
         private readonly GeminiModelSettings _modelSettings;
+        public ILLMModelSettings ModelSettings => _modelSettings;
         public GeminiStrategy(GeminiModelSettings modelSettings)
         {
             _modelSettings = modelSettings;
@@ -37,6 +39,12 @@ namespace AIPaste.Services.LLMServices
                 return !string.IsNullOrEmpty(settings?.ApiKey) && !string.IsNullOrEmpty(settings.ModelName);
             }
             return false;
+        }
+
+        public int GetTokenCount(ChatHistory chatHistory)
+        {
+            // TODO: Implement this method
+            return 0;
         }
     }
 }

@@ -279,7 +279,7 @@ namespace AIPaste.ViewModels
                 ModelPath: LLMModelPath,
                 GpuEnable: GpuEnabled,
                 GpuLayerCount: GpuLayerCount,
-                ContextSize: _appSettings.LocalLLMSettings.ContextSize,
+                MaxContextSize: _appSettings.LocalLLMSettings.MaxContextSize,
                 MaxTokens: MaxTokens
             );
             var geminiModelSettings = new GeminiModelSettings(ApiKey);
@@ -311,7 +311,7 @@ namespace AIPaste.ViewModels
                     ModelPath: LLMModelPath,
                     GpuEnable: GpuEnabled,
                     GpuLayerCount: GpuLayerCount,
-                    ContextSize: _appSettings.LocalLLMSettings.ContextSize,
+                    MaxContextSize: _appSettings.LocalLLMSettings.MaxContextSize,
                     MaxTokens: MaxTokens
                 );
                 return LlmTextCorrector.CheckSettingsIntegrity(modelSettings);

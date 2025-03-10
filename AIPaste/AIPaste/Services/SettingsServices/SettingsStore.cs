@@ -19,7 +19,7 @@ namespace AIPaste.Services.SettingsServices
         private const string MODEL_PATH_KEY = "ModelPath";
         private const string GPU_ENABLED_KEY = "GpuEnabled";
         private const string GPU_LAYER_COUNT_KEY = "GpuLayer";
-        private const string CONTEXT_SIZE_KEY = "ContextSize";
+        private const string CONTEXT_SIZE_KEY = "MaxContextSize";
         private const string MAX_TOKENS_KEY = "MaxTokens";
         private const string API_KEY_KEY = "ApiKey";
         private const string MODEL_NAME_KEY = "ModelName";
@@ -71,7 +71,7 @@ namespace AIPaste.Services.SettingsServices
                     ModelPath: modelPath,
                     GpuEnable: gpuEnabled,
                     GpuLayerCount: gpuLayerCount,
-                    ContextSize: contextSize,
+                    MaxContextSize: contextSize,
                     MaxTokens: maxTokens
                     );
         }
@@ -81,7 +81,8 @@ namespace AIPaste.Services.SettingsServices
             var apiKey = (string)_geminiContainer.Values[API_KEY_KEY];
             var modelName = (string)_geminiContainer.Values[MODEL_NAME_KEY];
             var location = (string)_geminiContainer.Values[LOCATION_KEY];
-            return new GeminiModelSettings(apiKey, modelName, location);
+            var maxContextsize = (uint)_localLlmContainer.Values[CONTEXT_SIZE_KEY];
+            return new GeminiModelSettings(apiKey, modelName, location, maxContextsize);
         }
 
         private KeySettings LoadKeySettings()
@@ -110,7 +111,7 @@ namespace AIPaste.Services.SettingsServices
             _localLlmContainer.Values[MODEL_PATH_KEY] = llmModelSettings.ModelPath;
             _localLlmContainer.Values[GPU_ENABLED_KEY] = llmModelSettings.GpuEnabled;
             _localLlmContainer.Values[GPU_LAYER_COUNT_KEY] = llmModelSettings.GpuLayerCount;
-            _localLlmContainer.Values[CONTEXT_SIZE_KEY] = llmModelSettings.ContextSize;
+            _localLlmContainer.Values[CONTEXT_SIZE_KEY] = llmModelSettings.MaxContextSize;
             _localLlmContainer.Values[MAX_TOKENS_KEY] = llmModelSettings.MaxTokens;
         }
 
@@ -120,6 +121,7 @@ namespace AIPaste.Services.SettingsServices
             _geminiContainer.Values[API_KEY_KEY] = geminiModelSettings.ApiKey;
             _geminiContainer.Values[MODEL_NAME_KEY] = geminiModelSettings.ModelName;
             _geminiContainer.Values[LOCATION_KEY] = geminiModelSettings.Location;
+            _geminiContainer.Values[CONTEXT_SIZE_KEY] = geminiModelSettings.MaxContextSize;
         }
 
         private void SaveKeySettings(KeySettings keySettings)

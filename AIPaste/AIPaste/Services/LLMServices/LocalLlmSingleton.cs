@@ -18,7 +18,7 @@ namespace AIPaste.Services.LLMServices
             ModelSettings = modelSettings;
             Parameters = new ModelParams(ModelSettings.ModelPath)
             {
-                ContextSize = ModelSettings.ContextSize,
+                ContextSize = ModelSettings.MaxContextSize,
                 GpuLayerCount = ModelSettings.GpuLayerCount
             };
             Localmodel = LLamaWeights.LoadFromFile(Parameters);

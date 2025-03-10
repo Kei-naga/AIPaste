@@ -11,5 +11,6 @@ namespace AIPaste.Models.Settings
         }
         public bool Equals(ILLMModelSettings otherSettings);
         public string ToString();
+        public uint MaxContextSize { get; set; }
     }
 }

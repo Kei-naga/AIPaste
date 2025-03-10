@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AIPaste.Models.Settings;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace AIPaste.Services.LLMServices
 {
@@ -13,5 +14,7 @@ namespace AIPaste.Services.LLMServices
         PromptExecutionSettings GetPromptExecutionSettings();
         IKernelBuilder GetKernelBuilder();
         static abstract bool CheckSettingsIntegrity(ILLMModelSettings modelSettings);
+        int GetTokenCount(ChatHistory chatHistory);
+        ILLMModelSettings ModelSettings { get;}
     }
 }
