@@ -20,7 +20,7 @@ namespace AIPaste.Services.LLMServices
         private readonly PromptExecutionSettings _promptExecutionSettings;
         private readonly ILlmStrategy _llmStrategy;
 
-        private readonly ResourceLoader _resourceLoader = new();
+        private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForViewIndependentUse();
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public LlmTextCorrector(AppSettings appSettings)

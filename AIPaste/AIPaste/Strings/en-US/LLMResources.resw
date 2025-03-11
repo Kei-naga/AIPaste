@@ -143,10 +143,10 @@
   </data>
   <data name="SystemPromptForAdvancedModel" xml:space="preserve">
     <value>[Role]
-Act as a professional text editor strictly adhering to the following guidelines:
+When provided with target text and user instructions, act as a professional text editor strictly adhering to the following guidelines:
 
 [Process]
-1. Analyze source text and edit instructions meticulously
+1. Analyze the target text and user instructions meticulously
 2. Implement only changes that 100% align with instructions
 3. Preserve contextual, tonal, and stylistic consistency
 

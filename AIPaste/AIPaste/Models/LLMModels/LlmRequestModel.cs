@@ -7,7 +7,7 @@ namespace AIPaste.Models.LLMModels
     {
         public string TargetText { get; set; } = targetText;
         public string UserInput { get; set; } = userInput;
-        private readonly ResourceLoader _resourceLoader = new();
+        private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForViewIndependentUse();
         public string ToOptimizedRequest()
         {
             return _resourceLoader.GetString("/LLMResources/TargetTextFlagForOptimizingText") + Environment.NewLine

@@ -2,12 +2,16 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using AIPaste.ViewModels;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using Windows.ApplicationModel.Resources;
+using NLog;
 
 namespace AIPaste.Views
 {
     public sealed partial class SettingsPage : Page
     {
         public SettingsPageViewModel ViewModel;
+        private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForViewIndependentUse();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public SettingsPage()
         {
@@ -17,15 +21,21 @@ namespace AIPaste.Views
 
         private void OnSaveButtonClicked(object sender, RoutedEventArgs e)
         {
-            if (!ViewModel.SaveSettings())
+            try
             {
-                var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse();
-                App.MainWindow?.SendDialog(
-                    resourceLoader.GetString("Settings_DialogWarning"),
-                    resourceLoader.GetString("Settings_DialogFailedSave"));
+                if (!ViewModel.SaveSettings())
+                {
+                    App.MainWindow?.SendDialog(
+                        _resourceLoader.GetString("Settings_DialogWarning"),
+                        _resourceLoader.GetString("Settings_DialogFailedSave"));
 
-                // Manually updates the display of the model types combo box because, for some reason, it does not update automatically.
-                ModelTypesCombo.SelectedIndex = (int)ViewModel.ModelTypeName;
+                    // Manually updates the display of the model types combo box because, for some reason, it does not update automatically.
+                    ModelTypesCombo.SelectedIndex = (int)ViewModel.ModelTypeName;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                _logger.Error(ex, "Failed to save settings");
             }
         }
 

@@ -16,7 +16,7 @@ namespace AIPaste.ViewModels
         private readonly ClipboardOperator _clipboardOperator = new();
         private readonly LlmTextCorrector _llmTextCorrector;
         private Logger _logger = LogManager.GetCurrentClassLogger();
-        private readonly ResourceLoader _resourceLoader = new();
+        private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForViewIndependentUse();
 
         private string _targetText = "";
         public string TargetText
@@ -77,9 +77,10 @@ namespace AIPaste.ViewModels
                     throw new InvalidOperationException("LLM generated an empty string");
                 }
             }
-            catch
+            catch(Exception ex)
             {
                 OutputText = _resourceLoader.GetString("AIPastePage_InappropriateOutput");
+                _logger.Warn(ex, "Missing GeneratingText");
             }
             OutputText = _llmTextCorrector.PresentResponse;
         }

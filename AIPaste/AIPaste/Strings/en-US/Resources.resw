@@ -214,6 +214,6 @@
     <value>Failed to save. Reverting to the settings before correction. Please review the settings.</value>
   </data>
   <data name="AIPastePage_InappropriateOutput" xml:space="preserve">
-    <value>An inappropriate sentence was generated.</value>
+    <value />
   </data>
 </root>
