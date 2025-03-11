@@ -1,7 +1,11 @@
-﻿using AIPaste.Models.Settings;
+﻿using System;
+using System.Threading.Tasks;
+using AIPaste.Models.Settings;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
+using Microsoft.SemanticKernel.Services;
+using Microsoft.UI.Composition.Interactions;
 
 
 // using Microsoft.SemanticKernel.Connectors.Google;
@@ -33,12 +37,37 @@ namespace AIPaste.Services.LLMServices
 
         public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings)
         {
-            if (modelSettings is GeminiModelSettings)
+            if (modelSettings is GeminiModelSettings settings)
             {
-                var settings = modelSettings as GeminiModelSettings;
-                return !string.IsNullOrEmpty(settings?.ApiKey) && !string.IsNullOrEmpty(settings.ModelName);
+                if (string.IsNullOrEmpty(settings.ApiKey) || string.IsNullOrEmpty(settings.ModelName))
+                {
+                    return false;
+                }
+                return Task.Run(() => 
+                    {
+                        return CheckConnection(settings.ApiKey, settings.ModelName);
+                    }).GetAwaiter().GetResult();
             }
             return false;
+        }
+
+        private static async Task<bool> CheckConnection(string apiKey, string modeName)
+        {
+            var testHistory = new ChatHistory();
+            testHistory.AddSystemMessage("you are my assistant");
+            testHistory.AddUserMessage("Hello!");
+            var testKernel = Kernel.CreateBuilder().AddGoogleAIGeminiChatCompletion(modeName, apiKey).Build();
+            var geminiChatCompletion = testKernel.GetRequiredService<IChatCompletionService>();
+            try
+            {
+                Task testTask = geminiChatCompletion.GetChatMessageContentAsync(testHistory, kernel: testKernel);
+                await testTask;
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
 
         public int GetTokenCount(ChatHistory chatHistory)
