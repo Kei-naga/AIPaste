@@ -117,15 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="SampleAns1" xml:space="preserve">
-    <value>こちらの部分ですが、もう少し前後の関係が分かるようにしていただけますでしょうか。</value>
-  </data>
-  <data name="SampleTargetText1" xml:space="preserve">
-    <value>この部分なんだけどさあ、もっと前後関係わかるようにしといて、</value>
-  </data>
-  <data name="SampleUserInstruction1" xml:space="preserve">
-    <value>敬語にして</value>
-  </data>
   <data name="SystemPrompt" xml:space="preserve">
     <value>あなたは文章編集の専門家です。対象テキストとユーザ指示を与えるので、対象テキストをユーザ指示に厳密に従って、適切に修正してください。回答は理由等はなにも書かず、修正したテキストのみを平文で出力してください。また元の意味や意図が変わらないよう注意してください。</value>
   </data>

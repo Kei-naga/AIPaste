@@ -169,7 +169,7 @@
     <value>On</value>
   </data>
   <data name="AIPastePage_PlaceHolderForPrompt.PlaceholderText" xml:space="preserve">
-    <value>Enter your instruction here...</value>
+    <value>指示を入力してください</value>
   </data>
   <data name="Settings_SavingButton.Content" xml:space="preserve">
     <value>保存</value>
@@ -212,5 +212,8 @@
   </data>
   <data name="Settings_DialogFailedSave" xml:space="preserve">
     <value>保存に失敗したため、設定を修正前に戻しました。設定を見直してください。</value>
+  </data>
+  <data name="AIPastePage_InappropriateOutput" xml:space="preserve">
+    <value>不適切な文章が生成されました。</value>
   </data>
 </root>

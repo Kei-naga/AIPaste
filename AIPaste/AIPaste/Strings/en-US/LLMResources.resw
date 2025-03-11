@@ -117,15 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="SampleAns1" xml:space="preserve">
-    <value>Regarding this section, would you be so kind as to make the context a bit clearer?</value>
-  </data>
-  <data name="SampleTargetText1" xml:space="preserve">
-    <value>This part, you know, make it so the context is clearer, okay?</value>
-  </data>
-  <data name="SampleUserInstruction1" xml:space="preserve">
-    <value>Please make it polite.</value>
-  </data>
   <data name="Settings_HotkeyAlt.Content" xml:space="preserve">
     <value>Alt</value>
   </data>

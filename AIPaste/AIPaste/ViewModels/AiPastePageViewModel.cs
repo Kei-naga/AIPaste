@@ -7,6 +7,7 @@ using AIPaste.Services.ClipboardOperator;
 using AIPaste.Services.SettingsServices;
 using NLog;
 using AIPaste.Models.LLMModels;
+using Windows.ApplicationModel.Resources;
 
 namespace AIPaste.ViewModels
 {
@@ -15,6 +16,7 @@ namespace AIPaste.ViewModels
         private readonly ClipboardOperator _clipboardOperator = new();
         private readonly LlmTextCorrector _llmTextCorrector;
         private Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly ResourceLoader _resourceLoader = new();
 
         private string _targetText = "";
         public string TargetText
@@ -77,7 +79,7 @@ namespace AIPaste.ViewModels
             }
             catch
             {
-                OutputText = "不適切な文章が生成されました。";
+                OutputText = _resourceLoader.GetString("AIPastePage_InappropriateOutput");
             }
             OutputText = _llmTextCorrector.PresentResponse;
         }
