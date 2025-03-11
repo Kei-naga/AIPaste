@@ -16,7 +16,8 @@ namespace AIPaste.Services.LLMServices
         private ModelType _modelType;
         private readonly Kernel _kernel;
         private readonly IChatCompletionService _chatCompletionService;
-        private Microsoft.SemanticKernel.ChatCompletion.ChatHistory _chatHistory;
+        private readonly Microsoft.SemanticKernel.ChatCompletion.ChatHistory _chatHistory;
+        public ChatHistory ChatHistory { get { return _chatHistory; } }
         private readonly PromptExecutionSettings _promptExecutionSettings;
         private readonly ILlmStrategy _llmStrategy;
 
