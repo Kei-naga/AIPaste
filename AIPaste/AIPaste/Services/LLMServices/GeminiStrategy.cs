@@ -1,12 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AIPaste.Models.Settings;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
-using Microsoft.SemanticKernel.Services;
-using Microsoft.UI.Composition.Interactions;
-
 
 // using Microsoft.SemanticKernel.Connectors.Google;
 #pragma warning disable SKEXP0010
