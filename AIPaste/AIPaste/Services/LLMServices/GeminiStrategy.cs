@@ -5,8 +5,6 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
 
 // using Microsoft.SemanticKernel.Connectors.Google;
-#pragma warning disable SKEXP0010
-#pragma warning disable SKEXP0050
 #pragma warning disable SKEXP0070
 
 namespace AIPaste.Services.LLMServices
