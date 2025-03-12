@@ -6,13 +6,14 @@ using AIPaste.Models.LLMModels;
 using Windows.ApplicationModel.Resources;
 using AIPaste.Models.ClipboardOperate;
 using AIPaste.Models.SettingsServices;
+using AIPaste.Models.DataModels;
 
 namespace AIPaste.ViewModels
 {
     public partial class AiPastePageViewModel : INotifyPropertyChanged
     {
-        private readonly ClipboardOperator _clipboardOperator;
-        private readonly LlmTextCorrector _llmTextCorrector;
+        private readonly IClipboardOperator _clipboardOperator;
+        private readonly ILlmTextCorrector _llmTextCorrector;
         private Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForViewIndependentUse();
 

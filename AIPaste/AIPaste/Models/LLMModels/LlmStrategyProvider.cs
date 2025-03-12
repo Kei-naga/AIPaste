@@ -6,7 +6,7 @@ using LLamaSharp.SemanticKernel.ChatCompletion;
 
 namespace AIPaste.Models.LLMModels
 {
-    internal class LlmStrategyProvider
+    internal class LlmStrategyProvider : ILlmStrategyProvider
     {
         private readonly AppSettings _appSettings;
         public LlmStrategyProvider(AppSettings appSettings) {
@@ -37,5 +37,10 @@ namespace AIPaste.Models.LLMModels
                 throw new Exception("not find model type"); 
             }
         }
+    }
+
+    internal interface ILlmStrategyProvider
+    {
+        ILlmStrategy GetLlmStrategy();
     }
 }
