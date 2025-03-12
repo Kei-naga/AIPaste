@@ -1,7 +1,7 @@
 ﻿using System;
 using AIPaste.Models.Settings;
+using AIPaste.Models.Settings.SettingsServices;
 using AIPaste.Services.BackgroudServices;
-using AIPaste.Services.SettingsServices;
 using Microsoft.UI.Xaml;
 using NLog;
 

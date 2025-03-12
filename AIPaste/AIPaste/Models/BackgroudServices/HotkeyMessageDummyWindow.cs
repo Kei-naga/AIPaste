@@ -4,7 +4,7 @@ using AIPaste.Models.KeyModels;
 using Microsoft.UI.Xaml;
 using Windows.Win32;
 
-namespace AIPaste.Services.BackgroudServices
+namespace AIPaste.Models.BackgroudServices
 {
     internal class HotkeyMessageDummyWindow : Window
     {
@@ -34,7 +34,7 @@ namespace AIPaste.Services.BackgroudServices
                 {
                     _logger.Info($"Hotkey registered: {keyPattern}");
                     var hotKeyPrcPointer = Marshal.GetFunctionPointerForDelegate(_hotKeyPrc);
-                    _origPrc = Marshal.GetDelegateForFunctionPointer<Windows.Win32.UI.WindowsAndMessaging.WNDPROC>((IntPtr)PInvoke.SetWindowLongPtr(_hwnd, Windows.Win32.UI.WindowsAndMessaging.WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, hotKeyPrcPointer));
+                    _origPrc = Marshal.GetDelegateForFunctionPointer<Windows.Win32.UI.WindowsAndMessaging.WNDPROC>(PInvoke.SetWindowLongPtr(_hwnd, Windows.Win32.UI.WindowsAndMessaging.WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, hotKeyPrcPointer));
                     return true;
                 }
                 _logger.Debug("Failed to register hotkey, trying again");
@@ -54,7 +54,7 @@ namespace AIPaste.Services.BackgroudServices
             {
                 _onHotKeyPressed.Invoke();
 
-                return (Windows.Win32.Foundation.LRESULT)IntPtr.Zero;
+                return (Windows.Win32.Foundation.LRESULT)nint.Zero;
             }
 
             return PInvoke.CallWindowProc(_origPrc, hwnd, uMsg, wParam, lParam);
@@ -64,7 +64,7 @@ namespace AIPaste.Services.BackgroudServices
         {
             _logger.Info("Unregister hotkey");
             PInvoke.UnregisterHotKey(_hwnd, _hotkeyId);
-            this.Close();
+            Close();
         }
     }
 }

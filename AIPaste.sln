@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIPaste", "AIPaste\AIPaste\AIPaste.csproj", "{DA2B337B-C6FD-4A23-B061-D3E817CA1BD9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIPasteTests", "AIPaste\AIPasteTests\AIPasteTests.csproj", "{6816AB19-122E-489B-9051-8216CDC96E9D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -28,6 +30,18 @@ Global
 		{DA2B337B-C6FD-4A23-B061-D3E817CA1BD9}.Release|x64.Build.0 = Release|x64
 		{DA2B337B-C6FD-4A23-B061-D3E817CA1BD9}.Release|x86.ActiveCfg = Release|x86
 		{DA2B337B-C6FD-4A23-B061-D3E817CA1BD9}.Release|x86.Build.0 = Release|x86
+		{6816AB19-122E-489B-9051-8216CDC96E9D}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{6816AB19-122E-489B-9051-8216CDC96E9D}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{6816AB19-122E-489B-9051-8216CDC96E9D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6816AB19-122E-489B-9051-8216CDC96E9D}.Debug|x64.Build.0 = Debug|Any CPU
+		{6816AB19-122E-489B-9051-8216CDC96E9D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6816AB19-122E-489B-9051-8216CDC96E9D}.Debug|x86.Build.0 = Debug|Any CPU
+		{6816AB19-122E-489B-9051-8216CDC96E9D}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{6816AB19-122E-489B-9051-8216CDC96E9D}.Release|ARM64.Build.0 = Release|Any CPU
+		{6816AB19-122E-489B-9051-8216CDC96E9D}.Release|x64.ActiveCfg = Release|Any CPU
+		{6816AB19-122E-489B-9051-8216CDC96E9D}.Release|x64.Build.0 = Release|Any CPU
+		{6816AB19-122E-489B-9051-8216CDC96E9D}.Release|x86.ActiveCfg = Release|Any CPU
+		{6816AB19-122E-489B-9051-8216CDC96E9D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

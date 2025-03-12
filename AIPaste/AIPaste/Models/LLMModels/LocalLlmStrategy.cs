@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System.Text;
 
 
-namespace AIPaste.Services.LLMServices
+namespace AIPaste.Models.LLMModels
 {
     internal class LocalLlmStrategy : ILlmStrategy
     {
@@ -49,7 +49,7 @@ namespace AIPaste.Services.LLMServices
             var builder = Kernel.CreateBuilder();
             var ex = new StatelessExecutor(_llmInstance.Localmodel, _llmInstance.Parameters);
             builder.Services.AddKeyedSingleton<IChatCompletionService>(
-                "local-llama", 
+                "local-llama",
                 new LLamaSharpChatCompletion(
                     model: ex,
                     defaultRequestSettings: _promptExecutionSettings,
@@ -92,7 +92,7 @@ namespace AIPaste.Services.LLMServices
         public int GetTokenCount(Microsoft.SemanticKernel.ChatCompletion.ChatHistory chatHistory)
         {
             string text = _historyTransform.HistoryToText(chatHistory.ToLLamaSharpChatHistory());
-            int tokenCount = _llmInstance.Localmodel.Tokenize(text,true,false, _llmInstance.Parameters.Encoding).Length;
+            int tokenCount = _llmInstance.Localmodel.Tokenize(text, true, false, _llmInstance.Parameters.Encoding).Length;
             return tokenCount;
         }
     }

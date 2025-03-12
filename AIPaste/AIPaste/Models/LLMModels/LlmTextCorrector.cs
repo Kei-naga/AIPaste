@@ -5,18 +5,17 @@ using Windows.ApplicationModel.Resources;
 using System.Text;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using AIPaste.Models.LLMModels;
 using NLog;
 
-namespace AIPaste.Services.LLMServices
+namespace AIPaste.Models.LLMModels
 {
-    internal class LlmTextCorrector
+    internal class LlmTextCorrector : ILlmTextCorrector
     {
-        public string PresentResponse = "";
+        public string PresentResponse { get; set; } = string.Empty;
         private ModelType _modelType;
         private readonly Kernel _kernel;
         private readonly IChatCompletionService _chatCompletionService;
-        private readonly Microsoft.SemanticKernel.ChatCompletion.ChatHistory _chatHistory;
+        private readonly ChatHistory _chatHistory;
         public ChatHistory ChatHistory { get { return _chatHistory; } }
         private readonly PromptExecutionSettings _promptExecutionSettings;
         private readonly ILlmStrategy _llmStrategy;
@@ -40,15 +39,16 @@ namespace AIPaste.Services.LLMServices
             var builder = _llmStrategy.GetKernelBuilder();
             _kernel = builder.Build();
             _chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
-            _chatHistory = new Microsoft.SemanticKernel.ChatCompletion.ChatHistory(_resourceLoader.GetString("/LLMResources/SystemPrompt"));
+            _chatHistory = new ChatHistory(_resourceLoader.GetString("/LLMResources/SystemPrompt"));
         }
 
-        public void ResetChat() {
+        public void ResetChat()
+        {
             _chatHistory.Clear();
             _chatHistory.AddSystemMessage(_resourceLoader.GetString("/LLMResources/SystemPrompt"));
         }
 
-        public async IAsyncEnumerable<string> GeneratingText(LlmRequestModel requestModel)
+        public async IAsyncEnumerable<string> GeneratingText(LlmRequest requestModel)
         {
             _chatHistory.AddUserMessage(requestModel.ToOptimizedRequest());
             TruncateChatHistoryByTokenLimit();
@@ -80,7 +80,8 @@ namespace AIPaste.Services.LLMServices
         }
 
 
-        public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings) { 
+        public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings)
+        {
             if (modelSettings is GeminiModelSettings geminiModelSettings)
             {
                 return GeminiStrategy.CheckSettingsIntegrity(geminiModelSettings);

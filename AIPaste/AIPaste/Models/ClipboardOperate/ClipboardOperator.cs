@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using NLog;
 using Windows.ApplicationModel.DataTransfer;
 
-namespace AIPaste.Services.ClipboardOperator
+namespace AIPaste.Models.ClipboardOperate
 {
-    public class ClipboardOperator
+    public class ClipboardOperator : IClipboardOperator
     {
         private Logger _logger = LogManager.GetCurrentClassLogger();
 

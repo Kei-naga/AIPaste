@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using NLog;
 using Windows.ApplicationModel;
 
-namespace AIPaste.Services.StartupServices
+namespace AIPaste.Models.StartupServices
 {
     internal class StartupManager
     {

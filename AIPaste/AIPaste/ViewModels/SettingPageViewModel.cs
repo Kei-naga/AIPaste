@@ -4,12 +4,12 @@ using System.ComponentModel;
 using System.Linq;
 using AIPaste.Models.Settings;
 using AIPaste.Models.KeyModels;
-using AIPaste.Services.LLMServices;
-using AIPaste.Services.SettingsServices;
 using NLog;
 using Windows.System;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-using AIPaste.Services.StartupServices;
+using AIPaste.Models.LLMModels;
+using AIPaste.Models.StartupServices;
+using AIPaste.Models.Settings.SettingsServices;
 
 namespace AIPaste.ViewModels
 {

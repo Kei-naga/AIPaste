@@ -2,12 +2,11 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
 using AIPaste.Models.Settings;
-using AIPaste.Services.LLMServices;
-using AIPaste.Services.ClipboardOperator;
-using AIPaste.Services.SettingsServices;
 using NLog;
 using AIPaste.Models.LLMModels;
 using Windows.ApplicationModel.Resources;
+using AIPaste.Models.ClipboardOperate;
+using AIPaste.Models.Settings.SettingsServices;
 
 namespace AIPaste.ViewModels
 {
@@ -55,8 +54,7 @@ namespace AIPaste.ViewModels
         public AiPastePageViewModel()
         {
             _logger.Debug("AiPastePageViewModel created");
-            var settingsService = SettingsService.Instance;
-            var appSettings = settingsService.LoadSettings();
+            var appSettings = SettingsService.Instance.LoadSettings();
             ClipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
             _llmTextCorrector = new LlmTextCorrector(appSettings);
@@ -64,7 +62,7 @@ namespace AIPaste.ViewModels
 
         public async Task GeneratingText(string userInput)
         {
-            var requestModel = new LlmRequestModel(TargetText, userInput);
+            var requestModel = new LlmRequest(TargetText, userInput);
             OutputText = "";
             try
             {

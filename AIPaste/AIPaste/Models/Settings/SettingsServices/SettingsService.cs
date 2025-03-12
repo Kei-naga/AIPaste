@@ -1,16 +1,8 @@
-﻿using AIPaste.Models.KeyModels;
-using AIPaste.Models.Settings;
-using NLog;
-using System;
-using Windows.Storage;
-using Windows.Win32.UI.Input.KeyboardAndMouse;
-using Windows.System;
-using AIPaste.Services.LLMServices;
-using AIPaste.Services.StartupServices;
+﻿using NLog;
 
-namespace AIPaste.Services.SettingsServices
+namespace AIPaste.Models.Settings.SettingsServices
 {
-    internal class SettingsService
+    internal class SettingsService : ISettingsService
     {
         private readonly SettingsStore _settingsStore;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -29,7 +21,8 @@ namespace AIPaste.Services.SettingsServices
             }
         }
 
-        private SettingsService() {
+        private SettingsService()
+        {
             _settingsStore = new SettingsStore();
             _presentAppSettings = _settingsStore.LoadSettings();
         }

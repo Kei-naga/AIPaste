@@ -7,7 +7,7 @@ using Microsoft.SemanticKernel.Connectors.Google;
 // using Microsoft.SemanticKernel.Connectors.Google;
 #pragma warning disable SKEXP0070
 
-namespace AIPaste.Services.LLMServices
+namespace AIPaste.Models.LLMModels
 {
     internal class GeminiStrategy : ILlmStrategy
     {
@@ -25,7 +25,8 @@ namespace AIPaste.Services.LLMServices
                 apiKey: _modelSettings.ApiKey);
             return builder;
         }
-        public PromptExecutionSettings GetPromptExecutionSettings() {
+        public PromptExecutionSettings GetPromptExecutionSettings()
+        {
             return new GeminiPromptExecutionSettings();
         }
 
@@ -37,7 +38,7 @@ namespace AIPaste.Services.LLMServices
                 {
                     return false;
                 }
-                return Task.Run(() => 
+                return Task.Run(() =>
                     {
                         return CheckConnection(settings.ApiKey, settings.ModelName);
                     }).GetAwaiter().GetResult();

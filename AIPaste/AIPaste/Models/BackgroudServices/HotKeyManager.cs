@@ -1,4 +1,5 @@
 ﻿using System;
+using AIPaste.Models.BackgroudServices;
 using AIPaste.Models.KeyModels;
 using NLog;
 using Windows.System;
@@ -6,10 +7,10 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace AIPaste.Services.BackgroudServices
 {
-    internal partial class HotKeyManager(Action action) : IDisposable
+    internal partial class HotKeyManager(Action action) : IDisposable, IHotKeyManager
     {
         private HotkeyMessageDummyWindow? _DummuyWindow;
-        public KeyPattern KeyPattern = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
+        public KeyPattern KeyPattern { get; set; } = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
         private Action _onHotKeyPressed = action;
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 

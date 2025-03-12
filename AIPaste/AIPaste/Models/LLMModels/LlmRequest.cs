@@ -3,7 +3,7 @@ using Windows.ApplicationModel.Resources;
 
 namespace AIPaste.Models.LLMModels
 {
-    internal class LlmRequestModel(string targetText, string userInput)
+    internal class LlmRequest(string targetText, string userInput)
     {
         public string TargetText { get; set; } = targetText;
         public string UserInput { get; set; } = userInput;

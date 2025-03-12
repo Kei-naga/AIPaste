@@ -6,7 +6,7 @@ using NLog;
 using Windows.Storage;
 using Windows.System;
 
-namespace AIPaste.Services.SettingsServices
+namespace AIPaste.Models.Settings.SettingsServices
 {
     internal class SettingsStore
     {

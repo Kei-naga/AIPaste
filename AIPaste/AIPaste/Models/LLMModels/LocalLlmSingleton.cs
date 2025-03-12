@@ -7,7 +7,7 @@ using AIPaste.Models.Settings;
 using LLama.Common;
 using LLama;
 
-namespace AIPaste.Services.LLMServices
+namespace AIPaste.Models.LLMModels
 {
     internal class LocalLlmSingleton
     {
@@ -23,7 +23,7 @@ namespace AIPaste.Services.LLMServices
             };
             Localmodel = LLamaWeights.LoadFromFile(Parameters);
         }
-        
+
         public static LocalLlmSingleton GetInstance(LLMLocalModelSettings modelSettings)
         {
             if (_instance == null)
