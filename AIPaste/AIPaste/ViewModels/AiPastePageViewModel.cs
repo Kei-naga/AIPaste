@@ -15,7 +15,7 @@ namespace AIPaste.ViewModels
         private readonly IClipboardOperator _clipboardOperator;
         private readonly ILlmTextCorrector _llmTextCorrector;
         private Logger _logger = LogManager.GetCurrentClassLogger();
-        private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForViewIndependentUse();
+        private readonly ResourceLoader _resourceLoader;
 
         private string _targetText = "";
         public string TargetText
@@ -51,16 +51,17 @@ namespace AIPaste.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public AiPastePageViewModel()
+        public AiPastePageViewModel(ResourceLoader? resourceLoader = null)
         {
+            _resourceLoader = resourceLoader ?? ResourceLoader.GetForViewIndependentUse();
             _logger.Debug("AiPastePageViewModel created");
             var appSettings = SettingsService.GetInstance().LoadSettings();
             _clipboardOperator = new ClipboardOperator();
             _clipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
-            var llmStrategyProvider = new LlmStrategyProvider(appSettings);
-            var llmStrategy = llmStrategyProvider.GetLlmStrategy();
-            _llmTextCorrector = new LlmTextCorrector(llmStrategy, ResourceLoader.GetForViewIndependentUse().GetString("/LLMResources/SystemPrompt"));
+            var llmStrategy = new LlmStrategyProvider(appSettings).GetLlmStrategy();
+            var systemPrompt = _resourceLoader.GetString("/LLMResources/SystemPrompt");
+            _llmTextCorrector = new LlmTextCorrector(llmStrategy, systemPrompt);
         }
 
         public async Task GeneratingText(string userInput)
