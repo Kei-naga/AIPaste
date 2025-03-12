@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.SemanticKernel.ChatCompletion;
-using AIPaste.Models.Settings;
+using AIPaste.Models.DataModels;
 
 
 namespace AIPaste.Models.LLMModels

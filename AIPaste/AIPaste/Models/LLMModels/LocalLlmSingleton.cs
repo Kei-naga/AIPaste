@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AIPaste.Models.Settings;
 using LLama.Common;
 using LLama;
+using AIPaste.Models.DataModels;
 
 namespace AIPaste.Models.LLMModels
 {

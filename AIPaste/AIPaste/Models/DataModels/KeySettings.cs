@@ -1,8 +1,7 @@
-﻿using AIPaste.Models.KeyModels;
-using Windows.System;
+﻿using Windows.System;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
-namespace AIPaste.Models.Settings
+namespace AIPaste.Models.DataModels
 {
     internal struct KeySettings(bool IsHotkeyEnabled, KeyPattern KeyPattern)
     {

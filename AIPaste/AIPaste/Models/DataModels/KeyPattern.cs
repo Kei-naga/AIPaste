@@ -2,7 +2,7 @@
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.System;
 
-namespace AIPaste.Models.KeyModels
+namespace AIPaste.Models.DataModels
 {
     internal class KeyPattern(HOT_KEY_MODIFIERS modifiers, VirtualKey key)
     {

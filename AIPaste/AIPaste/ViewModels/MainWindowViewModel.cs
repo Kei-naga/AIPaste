@@ -1,6 +1,6 @@
 ﻿using System;
-using AIPaste.Models.Settings;
-using AIPaste.Models.Settings.SettingsServices;
+using AIPaste.Models.DataModels;
+using AIPaste.Models.SettingsServices;
 using AIPaste.Services.BackgroudServices;
 using Microsoft.UI.Xaml;
 using NLog;
@@ -15,7 +15,7 @@ namespace AIPaste.ViewModels
         private readonly Action _action;
         public MainWindowViewModel(Action action)
         {
-            var settingsService = SettingsService.Instance;
+            var settingsService = SettingsService.GetInstance();
             _appSettings = settingsService.LoadSettings();
             _action = action;
             // TODO: ここらへんの処理は切り出して別クラスにしたい。ホットキー用のシングルトンクラスを作って、そこに処理を移す

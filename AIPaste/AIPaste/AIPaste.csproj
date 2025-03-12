@@ -96,6 +96,11 @@
     </Page>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="common\" />
+    <Folder Include="Models\KeyModels\" />
+  </ItemGroup>
+
     <!-- Publish Properties -->
   <PropertyGroup>
     <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>

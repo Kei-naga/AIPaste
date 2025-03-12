@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using AIPaste.Models.KeyModels;
+using AIPaste.Models.DataModels;
 using Microsoft.UI.Xaml;
 using Windows.Win32;
 

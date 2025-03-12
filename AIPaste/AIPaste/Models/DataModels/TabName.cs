@@ -1,5 +1,4 @@
-﻿
-namespace AIPaste.Models.Common
+﻿namespace AIPaste.Models.DataModels
 {
     public enum TabName
     {

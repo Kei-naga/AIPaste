@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AIPaste.Models.Settings
+namespace AIPaste.Models.DataModels
 {
     interface ILLMModelSettings
     {

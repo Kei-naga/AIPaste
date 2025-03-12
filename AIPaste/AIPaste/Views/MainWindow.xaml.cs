@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using AIPaste.Models.Common;
+using AIPaste.Models.DataModels;
 using AIPaste.ViewModels;
 using AIPaste.Views;
 using H.NotifyIcon;

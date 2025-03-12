@@ -7,7 +7,13 @@ namespace AIPaste.Models.ClipboardOperate
 {
     public class ClipboardOperator : IClipboardOperator
     {
-        private Logger _logger = LogManager.GetCurrentClassLogger();
+        private Logger _logger;
+
+        public ClipboardOperator(Logger? logger = null)
+        {
+            _logger = logger ?? LogManager.GetCurrentClassLogger();
+            _logger.Debug("ClipboardOperator created");
+        }
 
         /// <summary>
         /// get text from clipboard asynchronously
@@ -37,7 +43,7 @@ namespace AIPaste.Models.ClipboardOperate
         /// <summary>
         /// set text from clipboard asynchronously
         /// </summary>
-        public static void SetText(string text)
+        public void SetText(string text)
         {
             try
             {
@@ -60,7 +66,7 @@ namespace AIPaste.Models.ClipboardOperate
         /// register clipboard content changed handler
         /// </summary>
         /// <param name="onContentChanged">A delegate that will be called on change</param>
-        public static void RegisterContentChangedHandler(EventHandler<object> onContentChanged)
+        public void RegisterContentChangedHandler(EventHandler<object> onContentChanged)
         {
             Clipboard.ContentChanged += onContentChanged;
         }
@@ -69,7 +75,7 @@ namespace AIPaste.Models.ClipboardOperate
         /// unregister clipboard content changed handler
         /// </summary>
         /// <param name="onContentChanged">a delegate  </param>
-        public static void UnregisterContentChangedHandler(EventHandler<object> onContentChanged)
+        public void UnregisterContentChangedHandler(EventHandler<object> onContentChanged)
         {
             Clipboard.ContentChanged -= onContentChanged;
         }

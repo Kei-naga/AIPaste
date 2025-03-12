@@ -1,29 +1,28 @@
-﻿using NLog;
+﻿using AIPaste.Models.DataModels;
+using NLog;
 
-namespace AIPaste.Models.Settings.SettingsServices
+namespace AIPaste.Models.SettingsServices
 {
     internal class SettingsService : ISettingsService
     {
-        private readonly SettingsStore _settingsStore;
+        private readonly ISettingsStore _settingsStore;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private AppSettings _presentAppSettings;
 
         static private SettingsService? _instance;
-        public static SettingsService Instance
+
+        public static SettingsService GetInstance(ISettingsStore? settingsStore = null)
         {
-            get
+            if (_instance == null)
             {
-                if (_instance == null)
-                {
-                    _instance = new SettingsService();
-                }
-                return _instance;
+                _instance = new SettingsService(settingsStore ?? new SettingsStore());
             }
+            return _instance;
         }
 
-        private SettingsService()
+        private SettingsService(ISettingsStore settingsStore)
         {
-            _settingsStore = new SettingsStore();
+            _settingsStore = settingsStore;
             _presentAppSettings = _settingsStore.LoadSettings();
         }
 

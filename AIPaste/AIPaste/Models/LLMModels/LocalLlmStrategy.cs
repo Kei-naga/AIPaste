@@ -1,5 +1,4 @@
 ﻿using System;
-using AIPaste.Models.Settings;
 using LLama;
 using LLamaSharp.SemanticKernel.ChatCompletion;
 using LLamaSharp.SemanticKernel;
@@ -12,6 +11,7 @@ using ManagedCuda;
 using LLama.Abstractions;
 using System.Collections.Generic;
 using System.Text;
+using AIPaste.Models.DataModels;
 
 
 namespace AIPaste.Models.LLMModels
@@ -22,26 +22,13 @@ namespace AIPaste.Models.LLMModels
         private readonly IHistoryTransform _historyTransform;
         private readonly LLamaSharpPromptExecutionSettings _promptExecutionSettings;
         public ILLMModelSettings ModelSettings => _llmInstance.ModelSettings;
+        public ModelType ModelType => ModelType.LocalLLM;
 
-        public LocalLlmStrategy(LLMLocalModelSettings modelSettings)
+        public LocalLlmStrategy(LocalLlmSingleton localLlmSingleton, IHistoryTransform historyTransform, LLamaSharpPromptExecutionSettings llamaSharpPromptExecutionSettings)
         {
-            try
-            {
-                _llmInstance = LocalLlmSingleton.GetInstance(modelSettings);
-                _historyTransform = new HistoryTransform();
-                _promptExecutionSettings = new LLamaSharpPromptExecutionSettings()
-                {
-                    MaxTokens = _llmInstance.ModelSettings.MaxTokens,
-                    Temperature = 0.0,
-                    TopP = 0.0,
-                    StopSequences = new List<string>()
-                };
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetCurrentClassLogger().Error(ex, "Failed to initialize local model");
-                throw;
-            }
+            _llmInstance = localLlmSingleton;
+            _historyTransform = historyTransform;
+            _promptExecutionSettings = llamaSharpPromptExecutionSettings;
         }
 
         public IKernelBuilder GetKernelBuilder()

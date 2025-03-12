@@ -1,18 +1,17 @@
 ﻿using System;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-using AIPaste.Models.KeyModels;
-using AIPaste.Models.Settings;
 using NLog;
 using Windows.Storage;
 using Windows.System;
+using AIPaste.Models.DataModels;
 
-namespace AIPaste.Models.Settings.SettingsServices
+namespace AIPaste.Models.SettingsServices
 {
-    internal class SettingsStore
+    internal class SettingsStore : ISettingsStore
     {
-        static private readonly ApplicationDataContainer _mainContainer;
-        static private readonly ApplicationDataContainer _localLlmContainer;
-        static private readonly ApplicationDataContainer _geminiContainer;
+        private readonly ApplicationDataContainer _mainContainer;
+        private readonly ApplicationDataContainer _localLlmContainer;
+        private readonly ApplicationDataContainer _geminiContainer;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private const string AUTO_START_KEY = "AutoStart";
         private const string MODEL_TYPE_KEY = "ModelType";
@@ -28,7 +27,7 @@ namespace AIPaste.Models.Settings.SettingsServices
         private const string MODIFERS_KEY = "Modifers";
         private const string HOTKEY_KEY = "Hotkey";
 
-        static SettingsStore()
+        public SettingsStore()
         {
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
             _mainContainer = localSettings.CreateContainer("MainContainer", ApplicationDataCreateDisposition.Always);

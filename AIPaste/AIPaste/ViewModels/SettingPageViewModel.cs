@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using AIPaste.Models.Settings;
-using AIPaste.Models.KeyModels;
 using NLog;
 using Windows.System;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using AIPaste.Models.LLMModels;
 using AIPaste.Models.StartupServices;
-using AIPaste.Models.Settings.SettingsServices;
+using AIPaste.Models.DataModels;
+using AIPaste.Models.SettingsServices;
 
 namespace AIPaste.ViewModels
 {
@@ -21,7 +20,7 @@ namespace AIPaste.ViewModels
 
         public SettingsPageViewModel()
         {
-            _settingsService = SettingsService.Instance;
+            _settingsService = SettingsService.GetInstance();
             _appSettings = _settingsService.LoadSettings();
             
             UpdateSettings();

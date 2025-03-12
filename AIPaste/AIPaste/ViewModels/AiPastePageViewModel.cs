@@ -1,18 +1,17 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using AIPaste.Models.Settings;
 using NLog;
 using AIPaste.Models.LLMModels;
 using Windows.ApplicationModel.Resources;
 using AIPaste.Models.ClipboardOperate;
-using AIPaste.Models.Settings.SettingsServices;
+using AIPaste.Models.SettingsServices;
 
 namespace AIPaste.ViewModels
 {
     public partial class AiPastePageViewModel : INotifyPropertyChanged
     {
-        private readonly ClipboardOperator _clipboardOperator = new();
+        private readonly ClipboardOperator _clipboardOperator;
         private readonly LlmTextCorrector _llmTextCorrector;
         private Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForViewIndependentUse();
@@ -54,10 +53,13 @@ namespace AIPaste.ViewModels
         public AiPastePageViewModel()
         {
             _logger.Debug("AiPastePageViewModel created");
-            var appSettings = SettingsService.Instance.LoadSettings();
-            ClipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
+            var appSettings = SettingsService.GetInstance().LoadSettings();
+            _clipboardOperator = new ClipboardOperator();
+            _clipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
-            _llmTextCorrector = new LlmTextCorrector(appSettings);
+            var llmStrategyProvider = new LlmStrategyProvider(appSettings);
+            var llmStrategy = llmStrategyProvider.GetLlmStrategy();
+            _llmTextCorrector = new LlmTextCorrector(llmStrategy, ResourceLoader.GetForViewIndependentUse().GetString("/LLMResources/SystemPrompt"));
         }
 
         public async Task GeneratingText(string userInput)
@@ -90,7 +92,7 @@ namespace AIPaste.ViewModels
 
         public void ChangeTargetText()
         {
-            ClipboardOperator.SetText(OutputText);
+            _clipboardOperator.SetText(OutputText);
         }
 
         async private void SetTargetTextFromClipboard()

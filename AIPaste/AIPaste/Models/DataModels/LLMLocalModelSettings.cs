@@ -1,8 +1,8 @@
 ﻿using ManagedCuda;
 
-namespace AIPaste.Models.Settings
+namespace AIPaste.Models.DataModels
 {
-    internal class LLMLocalModelSettings(string ModelPath, bool GpuEnable, int GpuLayerCount, uint MaxContextSize, int MaxTokens): ILLMModelSettings
+    internal class LLMLocalModelSettings(string ModelPath, bool GpuEnable, int GpuLayerCount, uint MaxContextSize, int MaxTokens) : ILLMModelSettings
     {
         public string ModelPath { get; set; } = ModelPath;
         public int GpuLayerCount { get; set; } = GpuLayerCount;

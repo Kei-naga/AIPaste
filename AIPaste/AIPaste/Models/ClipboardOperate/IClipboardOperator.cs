@@ -9,8 +9,8 @@ namespace AIPaste.Models.ClipboardOperate
     internal interface IClipboardOperator
     {
         Task<string> GetTextAsync();
-        static abstract void SetText(string text);
-        static abstract void RegisterContentChangedHandler(EventHandler<object> onContentChanged);
-        static abstract void UnregisterContentChangedHandler(EventHandler<object> onContentChanged);
+        void SetText(string text);
+        void RegisterContentChangedHandler(EventHandler<object> onContentChanged);
+        void UnregisterContentChangedHandler(EventHandler<object> onContentChanged);
     }
 }

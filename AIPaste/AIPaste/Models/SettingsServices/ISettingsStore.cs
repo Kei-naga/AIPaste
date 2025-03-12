@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AIPaste.Models.Settings;
+using AIPaste.Models.DataModels;
 
-namespace AIPaste.Models.Settings.SettingsServices
+namespace AIPaste.Models.SettingsServices
 {
-    internal interface ISettingsService
+    internal interface ISettingsStore
     {
         AppSettings LoadSettings();
         void SaveSettings(AppSettings appSettings);

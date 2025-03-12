@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using AIPaste.Models.Settings;
+using AIPaste.Models.DataModels;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
@@ -13,6 +13,7 @@ namespace AIPaste.Models.LLMModels
     {
         private readonly GeminiModelSettings _modelSettings;
         public ILLMModelSettings ModelSettings => _modelSettings;
+        public ModelType ModelType => ModelType.Gemini;
         public GeminiStrategy(GeminiModelSettings modelSettings)
         {
             _modelSettings = modelSettings;
