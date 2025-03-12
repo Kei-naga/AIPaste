@@ -98,7 +98,6 @@
 
   <ItemGroup>
     <Folder Include="common\" />
-    <Folder Include="Models\KeyModels\" />
   </ItemGroup>
 
     <!-- Publish Properties -->

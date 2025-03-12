@@ -2,7 +2,7 @@
 
 namespace AIPaste.Models.DataModels
 {
-    class GeminiModelSettings(string apiKey, string modelName = "gemini-2.0-flash", string location = "", uint maxContextSize = 1048576) : ILLMModelSettings
+    internal class GeminiModelSettings(string apiKey, string modelName = "gemini-2.0-flash", string location = "", uint maxContextSize = 1048576) : ILLMModelSettings
     {
         public string ApiKey { get; set; } = apiKey;
         public string ModelName { get; set; } = modelName;

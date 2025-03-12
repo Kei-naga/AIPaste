@@ -2,7 +2,7 @@
 
 namespace AIPaste.Models.DataModels
 {
-    interface ILLMModelSettings
+    internal interface ILLMModelSettings
     {
         public static ILLMModelSettings GetDefaultSettings()
         {

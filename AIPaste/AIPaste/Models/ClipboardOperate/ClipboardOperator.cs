@@ -5,7 +5,7 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace AIPaste.Models.ClipboardOperate
 {
-    public class ClipboardOperator : IClipboardOperator
+    internal class ClipboardOperator : IClipboardOperator
     {
         private Logger _logger;
 
