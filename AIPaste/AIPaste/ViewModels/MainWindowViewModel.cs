@@ -21,8 +21,7 @@ namespace AIPaste.ViewModels
             // TODO: ここらへんの処理は切り出して別クラスにしたい。ホットキー用のシングルトンクラスを作って、そこに処理を移す
             if (_appSettings.KeySettings.IsHotkeyEnabled && !RegisterHotKey())
             {
-                var keySettings = _appSettings.KeySettings;
-                keySettings.IsHotkeyEnabled = false;
+                var keySettings = new KeySettings(false, _appSettings.KeySettings.KeyPattern);
                 _appSettings.KeySettings = keySettings;
                 settingsService.SaveSettings(_appSettings);
             }
