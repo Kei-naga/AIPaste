@@ -94,12 +94,26 @@ namespace AIPaste.ViewModels
 
         public void ChangeTargetText()
         {
-            _clipboardOperator.SetText(OutputText);
+            try
+            {
+                _clipboardOperator.SetText(OutputText);
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(ex, "Failed to set text to clipboard");
+            }   
         }
 
         async private void SetTargetTextFromClipboard()
         {
-            TargetText =  await _clipboardOperator.GetTextAsync();
+            try
+            {
+                TargetText = await _clipboardOperator.GetTextAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(ex, "Failed to get text from clipboard");
+            }
         }
 
         void OnClipboardContentChanged(object? sender, object? e) => SetTargetTextFromClipboard();

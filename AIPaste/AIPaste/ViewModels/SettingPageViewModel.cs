@@ -276,15 +276,22 @@ namespace AIPaste.ViewModels
             }
             _settingsChanged = false;
             _logger.Info("Saving new Settings");
-            
-            
-            var modifiedSettings = SettingsUpdate(newSettings);
-            if (!newSettings.Equals(modifiedSettings)){
-                UpdateSettings(modifiedSettings);
+            try
+            {
+                var modifiedSettings = SettingsUpdate(newSettings);
+                if (!newSettings.Equals(modifiedSettings))
+                {
+                    UpdateSettings(modifiedSettings);
+                    return false;
+                }
+                _settingsService.SaveSettings(newSettings);
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Failed to save settings");
                 return false;
             }
-            _settingsService.SaveSettings(newSettings);
-            return true;
         }
 
         private AppSettings GetCurrentAppSettings()

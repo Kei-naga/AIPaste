@@ -27,7 +27,7 @@ namespace AIPaste.ViewModels
             }
         }
 
-        internal bool UpdateSettings(AppSettings appSettings)
+        public bool UpdateSettings(AppSettings appSettings)
         {
             _appSettings = appSettings;
             if (_appSettings.KeySettings.IsHotkeyEnabled)
