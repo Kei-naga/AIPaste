@@ -59,23 +59,6 @@ namespace AIPaste.Models.LLMModels
             LocalLlmSingleton.Dispose();
         }
 
-        public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings)
-        {
-            if (modelSettings is LLMLocalModelSettings localModelSettings)
-        {
-            try
-            {
-                LocalLlmSingleton.GetInstance(localModelSettings);
-                    return true;
-            }
-            catch
-               {
-                    return false;
-                }
-            }
-            return false;
-        }
-
         public int GetTokenCount(Microsoft.SemanticKernel.ChatCompletion.ChatHistory chatHistory)
         {
             string text = _historyTransform.HistoryToText(chatHistory.ToLLamaSharpChatHistory());

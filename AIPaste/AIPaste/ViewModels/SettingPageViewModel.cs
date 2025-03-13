@@ -265,7 +265,10 @@ namespace AIPaste.ViewModels
                 _logger.Debug("No settings changed, not saving");
                 return true;
             }
-            if (!IsValidLlmSettings())
+
+            var newSettings = GetCurrentAppSettings();
+
+            if (!IsValidLlmSettings(newSettings))
             {
                 _logger.Debug("Invalid llm Settings");
                 UpdateSettings();
@@ -273,6 +276,19 @@ namespace AIPaste.ViewModels
             }
             _settingsChanged = false;
             _logger.Info("Saving new Settings");
+            
+            
+            var modifiedSettings = SettingsUpdate(newSettings);
+            if (!newSettings.Equals(modifiedSettings)){
+                UpdateSettings(modifiedSettings);
+                return false;
+            }
+            _settingsService.SaveSettings(newSettings);
+            return true;
+        }
+
+        private AppSettings GetCurrentAppSettings()
+        {
             var localModelSettings = new LLMLocalModelSettings(
                 ModelPath: LLMModelPath,
                 GpuEnable: GpuEnabled,
@@ -284,43 +300,34 @@ namespace AIPaste.ViewModels
             var modifier = KeyPattern.GetModifiers(CtrlModifier, AltModifier, ShiftModifier, WinModifier);
             var keyPattern = new KeyPattern(modifier, Key);
             var keySettings = new KeySettings(IsHotkeyEnabled, keyPattern);
-            var newSettings = new AppSettings(
+            return new AppSettings(
                 AutoStart,
                 ModelTypeName,
                 keySettings,
                 localModelSettings,
                 geminiModelSettings
             );
-            var modifiedSettings = SettingsUpdate(newSettings);
-            if (!newSettings.Equals(modifiedSettings)){
-                UpdateSettings(modifiedSettings);
-                return false;
-            }
-            _settingsService.SaveSettings(newSettings);
-            return true;
         }
 
-        private bool IsValidLlmSettings()
+        private bool IsValidLlmSettings(AppSettings appSettings)
         {
-            ILLMModelSettings modelSettings;
-            if (ModelTypeName == ModelType.LocalLLM)
+            try
             {
-                modelSettings = new LLMLocalModelSettings(
-                    ModelPath: LLMModelPath,
-                    GpuEnable: GpuEnabled,
-                    GpuLayerCount: GpuLayerCount,
-                    MaxContextSize: _appSettings.LocalLLMSettings.MaxContextSize,
-                    MaxTokens: MaxTokens
-                );
-                return LlmTextCorrector.CheckSettingsIntegrity(modelSettings);
+                var llmStrategy = new LlmStrategyFactory(appSettings).GetLlmStrategy();
+                var testLlmTextCorrector = new LlmTextCorrector(llmStrategy, "test prompt");
+                if (!testLlmTextCorrector.CheckIntegrity())
+                {
+                    throw new Exception("Failed to generate text");
+                }
+                return true;
             }
-            else if (ModelTypeName == ModelType.Gemini)
+            catch (Exception e)
             {
-                modelSettings = new GeminiModelSettings(ApiKey);
-                // TODO: Implement GeminiProvider to check settings integrity
-                return LlmTextCorrector.CheckSettingsIntegrity(modelSettings);
+                _logger.Debug(e, "Is invalid llm settings");
+                return false;
             }
-            return false;
+
+
         }
 
         private AppSettings SettingsUpdate(AppSettings newSettings)

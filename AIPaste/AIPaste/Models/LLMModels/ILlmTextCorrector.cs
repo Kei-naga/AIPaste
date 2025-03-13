@@ -14,6 +14,6 @@ namespace AIPaste.Models.LLMModels
         ChatHistory ChatHistory { get; }
         void ResetChat();
         IAsyncEnumerable<string> GeneratingText(LlmRequest requestModel);
-        static abstract bool CheckSettingsIntegrity(ILLMModelSettings modelSettings);
+        bool CheckIntegrity();
     }
 }

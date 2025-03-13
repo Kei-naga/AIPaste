@@ -5,6 +5,7 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using NLog;
 using AIPaste.Models.DataModels;
+using System.Threading.Tasks;
 
 namespace AIPaste.Models.LLMModels
 {
@@ -72,20 +73,33 @@ namespace AIPaste.Models.LLMModels
         }
 
 
-        public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings)
+        public bool CheckIntegrity()
         {
-            if (modelSettings is GeminiModelSettings geminiModelSettings)
+            return Task.Run(() =>
+                {
+                    return CheckConnection();
+                }).GetAwaiter().GetResult();
+        }
+
+        private async Task<bool> CheckConnection()
+        {
+            var testHistory = new ChatHistory();
+            testHistory.AddSystemMessage("you are my assistant");
+            testHistory.AddUserMessage("Hello!");
+            try
             {
-                return GeminiStrategy.CheckSettingsIntegrity(geminiModelSettings);
+                var testTask = _chatCompletionService.GetChatMessageContentAsync(testHistory, kernel: _kernel);
+                var result = await testTask;
+                if (!(result.Items.Count > 0))
+                {
+                    return false;
+                }
             }
-            else if (modelSettings is LLMLocalModelSettings localModelSettings)
-            {
-                return LocalLlmStrategy.CheckSettingsIntegrity(localModelSettings);
-            }
-            else
+            catch
             {
                 return false;
             }
+            return true;
         }
     }
 }

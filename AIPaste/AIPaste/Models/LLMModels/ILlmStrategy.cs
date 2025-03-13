@@ -14,7 +14,6 @@ namespace AIPaste.Models.LLMModels
         ModelType ModelType { get; }
         PromptExecutionSettings GetPromptExecutionSettings();
         IKernelBuilder GetKernelBuilder();
-        static abstract bool CheckSettingsIntegrity(ILLMModelSettings modelSettings);
         int GetTokenCount(ChatHistory chatHistory);
         ILLMModelSettings ModelSettings { get; }
     }

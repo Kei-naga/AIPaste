@@ -3,6 +3,7 @@ using AIPaste.Models.DataModels;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
+using NLog;
 
 // using Microsoft.SemanticKernel.Connectors.Google;
 #pragma warning disable SKEXP0070
@@ -14,8 +15,10 @@ namespace AIPaste.Models.LLMModels
         private readonly GeminiModelSettings _modelSettings;
         public ILLMModelSettings ModelSettings => _modelSettings;
         public ModelType ModelType => ModelType.Gemini;
-        public GeminiStrategy(GeminiModelSettings modelSettings)
+        private readonly ILogger _logger;
+        public GeminiStrategy(GeminiModelSettings modelSettings, ILogger? logger = null)
         {
+            _logger = logger ?? LogManager.GetCurrentClassLogger();
             _modelSettings = modelSettings;
         }
         public IKernelBuilder GetKernelBuilder()
@@ -29,41 +32,6 @@ namespace AIPaste.Models.LLMModels
         public PromptExecutionSettings GetPromptExecutionSettings()
         {
             return new GeminiPromptExecutionSettings();
-        }
-
-        public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings)
-        {
-            if (modelSettings is GeminiModelSettings settings)
-            {
-                if (string.IsNullOrEmpty(settings.ApiKey) || string.IsNullOrEmpty(settings.ModelName))
-                {
-                    return false;
-                }
-                return Task.Run(() =>
-                    {
-                        return CheckConnection(settings.ApiKey, settings.ModelName);
-                    }).GetAwaiter().GetResult();
-            }
-            return false;
-        }
-
-        private static async Task<bool> CheckConnection(string apiKey, string modeName)
-        {
-            var testHistory = new ChatHistory();
-            testHistory.AddSystemMessage("you are my assistant");
-            testHistory.AddUserMessage("Hello!");
-            var testKernel = Kernel.CreateBuilder().AddGoogleAIGeminiChatCompletion(modeName, apiKey).Build();
-            var geminiChatCompletion = testKernel.GetRequiredService<IChatCompletionService>();
-            try
-            {
-                Task testTask = geminiChatCompletion.GetChatMessageContentAsync(testHistory, kernel: testKernel);
-                await testTask;
-            }
-            catch
-            {
-                return false;
-            }
-            return true;
         }
 
         public int GetTokenCount(ChatHistory chatHistory)
