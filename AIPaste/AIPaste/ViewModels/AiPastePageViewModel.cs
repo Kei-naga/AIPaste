@@ -59,7 +59,7 @@ namespace AIPaste.ViewModels
             _clipboardOperator = new ClipboardOperator();
             _clipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
-            var llmStrategy = new LlmStrategyProvider(appSettings).GetLlmStrategy();
+            var llmStrategy = new LlmStrategyFactory(appSettings).GetLlmStrategy();
             var systemPrompt = _resourceLoader.GetString("/LLMResources/SystemPrompt");
             _llmTextCorrector = new LlmTextCorrector(llmStrategy, systemPrompt);
         }

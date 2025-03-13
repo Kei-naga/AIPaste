@@ -62,14 +62,14 @@ namespace AIPaste.Models.LLMModels
         public static bool CheckSettingsIntegrity(ILLMModelSettings modelSettings)
         {
             if (modelSettings is LLMLocalModelSettings localModelSettings)
+        {
+            try
             {
-                try
-                {
-                    LocalLlmSingleton.GetInstance(localModelSettings);
+                LocalLlmSingleton.GetInstance(localModelSettings);
                     return true;
-                }
-                catch
-                {
+            }
+            catch
+               {
                     return false;
                 }
             }

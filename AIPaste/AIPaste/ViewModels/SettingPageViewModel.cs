@@ -346,14 +346,16 @@ namespace AIPaste.ViewModels
             return newSettings;
         }
 
-        private static async void AutoStartToggleChanged(bool changedStatus)
+        private async void AutoStartToggleChanged(bool changedStatus)
         {
-            await StartupManager.ToggleStartupAsync(changedStatus);
-            var actualState = await StartupManager.IsAutoStartupMode();
+            var startupManager = new StartupManager();
+            await startupManager.ToggleStartupAsync(changedStatus);
+            var actualState = await startupManager.IsAutoStartupMode();
             if (changedStatus != actualState)
             {
                 throw new Exception("Failed to set AutoStart");
             }
+            _logger.Info($"AutoStart set to {changedStatus}");
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

@@ -6,16 +6,16 @@ namespace AIPaste.Models.SettingsServices
     internal class SettingsService : ISettingsService
     {
         private readonly ISettingsStore _settingsStore;
-        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private AppSettings _presentAppSettings;
 
         static private SettingsService? _instance;
 
         public static SettingsService GetInstance(ISettingsStore? settingsStore = null)
         {
-            if (_instance == null)
+            settingsStore ??= new SettingsStore();
+            if (_instance == null || _instance._settingsStore.Equals(settingsStore))
             {
-                _instance = new SettingsService(settingsStore ?? new SettingsStore());
+                _instance = new SettingsService(settingsStore);
             }
             return _instance;
         }

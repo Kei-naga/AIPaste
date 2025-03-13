@@ -6,10 +6,10 @@ using LLamaSharp.SemanticKernel.ChatCompletion;
 
 namespace AIPaste.Models.LLMModels
 {
-    internal class LlmStrategyProvider : ILlmStrategyProvider
+    internal class LlmStrategyFactory : ILlmStrategyFactory
     {
         private readonly AppSettings _appSettings;
-        public LlmStrategyProvider(AppSettings appSettings) {
+        public LlmStrategyFactory(AppSettings appSettings) {
             _appSettings = appSettings;
         }
 
@@ -39,7 +39,7 @@ namespace AIPaste.Models.LLMModels
         }
     }
 
-    internal interface ILlmStrategyProvider
+    public interface ILlmStrategyFactory
     {
         ILlmStrategy GetLlmStrategy();
     }

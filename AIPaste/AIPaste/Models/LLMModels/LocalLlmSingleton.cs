@@ -21,7 +21,6 @@ namespace AIPaste.Models.LLMModels
                 ContextSize = ModelSettings.MaxContextSize,
                 GpuLayerCount = ModelSettings.GpuLayerCount
             };
-            Localmodel = LLamaWeights.LoadFromFile(Parameters);
         }
 
         public static LocalLlmSingleton GetInstance(LLMLocalModelSettings modelSettings)
@@ -45,12 +44,26 @@ namespace AIPaste.Models.LLMModels
         }
 
         public LLMLocalModelSettings ModelSettings { get; private set; }
-        public LLamaWeights Localmodel { get; private set; }
         public ModelParams Parameters { get; private set; }
+
+        public LLamaWeights Localmodel { get 
+            {
+                _localmodel ??= LLamaWeights.LoadFromFile(Parameters);
+                return _localmodel;
+            }}
+
+        private LLamaWeights? _localmodel;
+
+        public LLamaWeights ReloadModel()
+        {
+            _localmodel?.Dispose();
+            _localmodel = LLamaWeights.LoadFromFile(Parameters);
+            return _localmodel;
+        }
 
         public static void Dispose()
         {
-            _instance?.Localmodel.Dispose();
+            _instance?._localmodel?.Dispose();
             _instance = null;
         }
     }

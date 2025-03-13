@@ -5,12 +5,12 @@ using Windows.ApplicationModel;
 
 namespace AIPaste.Models.StartupServices
 {
-    internal class StartupManager
+    internal class StartupManager(Logger? logger = null)
     {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = logger ?? LogManager.GetCurrentClassLogger();
         private const string TASK_ID = "AIPasteAutoStart";
 
-        public static async Task ToggleStartupAsync(bool enable)
+        public async Task ToggleStartupAsync(bool enable)
         {
             var startupTask = await StartupTask.GetAsync(TASK_ID);
             if (enable)
@@ -31,7 +31,7 @@ namespace AIPaste.Models.StartupServices
             }
         }
 
-        public static async Task<bool> IsAutoStartupMode()
+        public async Task<bool> IsAutoStartupMode()
         {
             StartupTask startupTask = await StartupTask.GetAsync(TASK_ID);
             return startupTask.State == StartupTaskState.Enabled;
