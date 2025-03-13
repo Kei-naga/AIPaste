@@ -3,7 +3,7 @@ using NLog;
 
 namespace AIPaste.Models.SettingsServices
 {
-    internal class SettingsService : ISettingsService
+    public class SettingsService : ISettingsService
     {
         private readonly ISettingsStore _settingsStore;
         private AppSettings _presentAppSettings;

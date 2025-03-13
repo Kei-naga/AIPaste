@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AIPaste.Models.LLMModels
 {
-    internal class LlmTextCorrector : ILlmTextCorrector
+    public class LlmTextCorrector : ILlmTextCorrector
     {
         public string PresentResponse { get; set; } = string.Empty;
         private readonly Kernel _kernel;

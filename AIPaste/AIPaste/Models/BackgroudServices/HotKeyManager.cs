@@ -6,7 +6,7 @@ using Windows.System;
 
 namespace AIPaste.Services.BackgroudServices
 {
-    internal partial class HotKeyManager(Action action) : IDisposable, IHotKeyManager
+    public partial class HotKeyManager(Action action) : IDisposable, IHotKeyManager
     {
         private HotkeyMessageDummyWindow? _DummuyWindow;
         public KeyPattern KeyPattern { get; set; } = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
