@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AIPaste.Models.ClipboardOperate
 {
-    internal interface IClipboardOperator
+    public interface IClipboardOperator
     {
         Task<string> GetTextAsync();
         void SetText(string text);

@@ -1,6 +1,6 @@
 ﻿namespace AIPaste.Models.DataModels
 {
-    internal class AppSettings(bool autoStartSetting, ModelType modelType, KeySettings keySettings, LLMLocalModelSettings llmLocalModelSettings, GeminiModelSettings geminiModelSettings)
+    public class AppSettings(bool autoStartSetting, ModelType modelType, KeySettings keySettings, LLMLocalModelSettings llmLocalModelSettings, GeminiModelSettings geminiModelSettings)
     {
         public bool AutoStart { get; set; } = autoStartSetting;
         public ModelType ModelType { get; set; } = modelType;

@@ -8,7 +8,7 @@ using AIPaste.Models.DataModels;
 
 namespace AIPaste.Models.LLMModels
 {
-    internal interface ILlmTextCorrector
+    public interface ILlmTextCorrector
     {
         string PresentResponse { get; }
         ChatHistory ChatHistory { get; }

@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using NLog;
 using Windows.System;
-using Windows.Win32.UI.Input.KeyboardAndMouse;
 using AIPaste.Models.LLMModels;
 using AIPaste.Models.StartupServices;
 using AIPaste.Models.DataModels;

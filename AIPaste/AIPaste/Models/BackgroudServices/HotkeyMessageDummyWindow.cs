@@ -29,7 +29,7 @@ namespace AIPaste.Models.BackgroudServices
             int attempts = 0;
             while (attempts < 3)
             {
-                var success = PInvoke.RegisterHotKey(_hwnd, _hotkeyId, keyPattern.Modifiers, (uint)keyPattern.Key);
+                var success = PInvoke.RegisterHotKey(_hwnd, _hotkeyId, (Windows.Win32.UI.Input.KeyboardAndMouse.HOT_KEY_MODIFIERS)keyPattern.Modifiers, (uint)keyPattern.Key);
                 if (success)
                 {
                     _logger.Info($"Hotkey registered: {keyPattern}");

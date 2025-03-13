@@ -3,7 +3,7 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace AIPaste.Models.DataModels
 {
-    internal struct KeySettings(bool IsHotkeyEnabled, KeyPattern KeyPattern)
+    public struct KeySettings(bool IsHotkeyEnabled, KeyPattern KeyPattern)
     {
         public bool IsHotkeyEnabled = IsHotkeyEnabled;
         public KeyPattern KeyPattern = KeyPattern;

@@ -7,7 +7,7 @@ using AIPaste.Models.DataModels;
 
 namespace AIPaste.Models.BackgroudServices
 {
-    internal interface IHotKeyManager
+    public interface IHotKeyManager
     {
         KeyPattern KeyPattern { get; set; }
         bool RegisterHotKey(KeyPattern keyPattern);

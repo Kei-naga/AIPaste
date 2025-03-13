@@ -1,9 +1,9 @@
 ﻿using System;
 using Windows.ApplicationModel.Resources;
 
-namespace AIPaste.Models.LLMModels
+namespace AIPaste.Models.DataModels
 {
-    internal class LlmRequest(string targetText, string userInput, ResourceLoader? resourceLoader = null)
+    public class LlmRequest(string targetText, string userInput, ResourceLoader? resourceLoader = null)
     {
         public string TargetText { get; set; } = targetText;
         public string UserInput { get; set; } = userInput;

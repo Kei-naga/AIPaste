@@ -9,7 +9,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace AIPaste.Models.LLMModels
 {
-    internal interface ILlmStrategy
+    public interface ILlmStrategy
     {
         ModelType ModelType { get; }
         PromptExecutionSettings GetPromptExecutionSettings();

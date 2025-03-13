@@ -1,10 +1,9 @@
 ﻿using System.Linq;
-using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.System;
 
 namespace AIPaste.Models.DataModels
 {
-    internal class KeyPattern(HOT_KEY_MODIFIERS modifiers, VirtualKey key)
+    public class KeyPattern(HOT_KEY_MODIFIERS modifiers, VirtualKey key)
     {
         public HOT_KEY_MODIFIERS Modifiers { get; set; } = modifiers;
         public VirtualKey Key { get; set; } = key;
@@ -86,5 +85,14 @@ namespace AIPaste.Models.DataModels
         {
             return Modifiers == otherPattern.Modifiers && Key == otherPattern.Key;
         }
+    }
+
+    public enum HOT_KEY_MODIFIERS : uint
+    {
+        MOD_ALT = 0x00000001,
+        MOD_CONTROL = 0x00000002,
+        MOD_NOREPEAT = 0x00004000,
+        MOD_SHIFT = 0x00000004,
+        MOD_WIN = 0x00000008,
     }
 }

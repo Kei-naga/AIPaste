@@ -3,7 +3,6 @@ using AIPaste.Models.BackgroudServices;
 using AIPaste.Models.DataModels;
 using NLog;
 using Windows.System;
-using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace AIPaste.Services.BackgroudServices
 {
