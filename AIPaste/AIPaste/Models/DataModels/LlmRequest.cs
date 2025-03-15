@@ -3,7 +3,7 @@ using Windows.ApplicationModel.Resources;
 
 namespace AIPaste.Models.DataModels
 {
-    public class LlmRequest(string targetText, string userInput, ResourceLoader? resourceLoader = null)
+    public class LlmRequest(string targetText, string userInput, ResourceLoader? resourceLoader = null) : ILlmRequest
     {
         public string TargetText { get; set; } = targetText;
         public string UserInput { get; set; } = userInput;
@@ -20,5 +20,12 @@ namespace AIPaste.Models.DataModels
         {
             return ToOptimizedRequest();
         }
+    }
+
+    public interface ILlmRequest
+    {
+        string TargetText { get; set; }
+        string UserInput { get; set; }
+        string ToOptimizedRequest();
     }
 }

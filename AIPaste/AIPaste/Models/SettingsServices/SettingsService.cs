@@ -13,7 +13,7 @@ namespace AIPaste.Models.SettingsServices
         public static SettingsService GetInstance(ISettingsStore? settingsStore = null)
         {
             settingsStore ??= new SettingsStore();
-            if (_instance == null || _instance._settingsStore.Equals(settingsStore))
+            if (_instance == null || _instance._settingsStore.GetType != settingsStore.GetType)
             {
                 _instance = new SettingsService(settingsStore);
             }

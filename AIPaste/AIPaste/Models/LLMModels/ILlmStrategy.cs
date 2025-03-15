@@ -13,7 +13,7 @@ namespace AIPaste.Models.LLMModels
     {
         ModelType ModelType { get; }
         PromptExecutionSettings GetPromptExecutionSettings();
-        IKernelBuilder GetKernelBuilder();
+        Kernel GetKernel();
         int GetTokenCount(ChatHistory chatHistory);
         ILLMModelSettings ModelSettings { get; }
     }

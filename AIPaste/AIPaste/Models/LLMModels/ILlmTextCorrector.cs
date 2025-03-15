@@ -13,7 +13,7 @@ namespace AIPaste.Models.LLMModels
         string PresentResponse { get; }
         ChatHistory ChatHistory { get; }
         void ResetChat();
-        IAsyncEnumerable<string> GeneratingText(LlmRequest requestModel);
+        IAsyncEnumerable<string> GeneratingText(ILlmRequest requestModel);
         bool CheckIntegrity();
     }
 }

@@ -9,7 +9,7 @@ using AIPaste.Models.DataModels;
 
 namespace AIPaste.Models.LLMModels
 {
-    internal class LocalLlmSingleton
+    public class LocalLlmSingleton
     {
         private static LocalLlmSingleton? _instance;
         private static readonly object _lock = new();

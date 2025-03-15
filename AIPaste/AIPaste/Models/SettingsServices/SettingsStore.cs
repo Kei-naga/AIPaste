@@ -6,7 +6,7 @@ using AIPaste.Models.DataModels;
 
 namespace AIPaste.Models.SettingsServices
 {
-    internal class SettingsStore : ISettingsStore
+    public class SettingsStore : ISettingsStore
     {
         private readonly ApplicationDataContainer _mainContainer;
         private readonly ApplicationDataContainer _localLlmContainer;

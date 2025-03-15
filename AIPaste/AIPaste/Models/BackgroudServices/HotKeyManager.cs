@@ -12,11 +12,12 @@ namespace AIPaste.Services.BackgroudServices
         public KeyPattern KeyPattern { get; set; } = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
         private Action _onHotKeyPressed = action;
 
-        public bool RegisterHotKey(KeyPattern keyPattern)
+        public bool RegisterHotKey(KeyPattern keyPattern, IHotkeyControler? hotkeyControler = null)
         {
+            hotkeyControler ??= new SystemHotkeyControler();
             _DummuyWindow?.Dispose();
             KeyPattern = keyPattern;
-            _DummuyWindow = new HotkeyMessageDummyWindow(_onHotKeyPressed);
+            _DummuyWindow = new HotkeyMessageDummyWindow(_onHotKeyPressed, hotkeyControler);
             return _DummuyWindow.RegisterHotKey(KeyPattern);
         }
 

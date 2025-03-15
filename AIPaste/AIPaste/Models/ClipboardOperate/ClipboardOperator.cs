@@ -7,11 +7,13 @@ namespace AIPaste.Models.ClipboardOperate
 {
     public class ClipboardOperator : IClipboardOperator
     {
-        private Logger _logger;
+        private ILogger _logger;
+        private IClipboardAccess _clipboard;
 
-        public ClipboardOperator(Logger? logger = null)
+        public ClipboardOperator(IClipboardAccess? clipboard = null, ILogger? logger = null)
         {
             _logger = logger ?? LogManager.GetCurrentClassLogger();
+            _clipboard = clipboard ?? new SystemClipboard();
             _logger.Debug("ClipboardOperator created");
         }
 
@@ -22,7 +24,7 @@ namespace AIPaste.Models.ClipboardOperate
         {
             try
             {
-                var content = Clipboard.GetContent();
+                var content = _clipboard.GetContent();
                 if (content.Contains(StandardDataFormats.Text))
                 {
                     var text = await content.GetTextAsync();
@@ -54,7 +56,7 @@ namespace AIPaste.Models.ClipboardOperate
 
                 var dataPackage = new DataPackage();
                 dataPackage.SetText(text);
-                Clipboard.SetContent(dataPackage);
+                _clipboard.SetContent(dataPackage);
             }
             catch (Exception ex)
             {
@@ -68,7 +70,7 @@ namespace AIPaste.Models.ClipboardOperate
         /// <param name="onContentChanged">A delegate that will be called on change</param>
         public void RegisterContentChangedHandler(EventHandler<object> onContentChanged)
         {
-            Clipboard.ContentChanged += onContentChanged;
+            _clipboard.ContentChanged += onContentChanged;
         }
 
         /// <summary>
@@ -77,7 +79,7 @@ namespace AIPaste.Models.ClipboardOperate
         /// <param name="onContentChanged">a delegate  </param>
         public void UnregisterContentChangedHandler(EventHandler<object> onContentChanged)
         {
-            Clipboard.ContentChanged -= onContentChanged;
+            _clipboard.ContentChanged -= onContentChanged;
         }
     }
 }

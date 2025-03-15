@@ -6,6 +6,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using NLog;
 using AIPaste.Models.DataModels;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace AIPaste.Models.LLMModels
 {
@@ -28,8 +29,7 @@ namespace AIPaste.Models.LLMModels
             _llmStrategy = llmStrategy;
             _systemPrompt = systemPrompt;
             _promptExecutionSettings = _llmStrategy.GetPromptExecutionSettings();
-            var builder = _llmStrategy.GetKernelBuilder();
-            _kernel = builder.Build();
+            _kernel = _llmStrategy.GetKernel();
             _chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
             _chatHistory = chatHistory ?? new ChatHistory();
             _chatHistory.AddSystemMessage(_systemPrompt);
@@ -41,7 +41,7 @@ namespace AIPaste.Models.LLMModels
             _chatHistory.AddSystemMessage(_systemPrompt);
         }
 
-        public async IAsyncEnumerable<string> GeneratingText(LlmRequest requestModel)
+        public async IAsyncEnumerable<string> GeneratingText(ILlmRequest requestModel)
         {
             _chatHistory.AddUserMessage(requestModel.ToOptimizedRequest());
             TruncateChatHistoryByTokenLimit();
@@ -90,7 +90,7 @@ namespace AIPaste.Models.LLMModels
             {
                 var testTask = _chatCompletionService.GetChatMessageContentAsync(testHistory, kernel: _kernel);
                 var result = await testTask;
-                if (!(result.Items.Count > 0))
+                if (String.IsNullOrEmpty(result.Items.OfType<TextContent>().FirstOrDefault()?.Text ?? null))
                 {
                     return false;
                 }

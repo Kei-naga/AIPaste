@@ -10,7 +10,7 @@ using NLog;
 
 namespace AIPaste.Models.LLMModels
 {
-    internal class GeminiStrategy : ILlmStrategy
+    public class GeminiStrategy : ILlmStrategy
     {
         private readonly GeminiModelSettings _modelSettings;
         public ILLMModelSettings ModelSettings => _modelSettings;
@@ -21,13 +21,13 @@ namespace AIPaste.Models.LLMModels
             _logger = logger ?? LogManager.GetCurrentClassLogger();
             _modelSettings = modelSettings;
         }
-        public IKernelBuilder GetKernelBuilder()
+        public Kernel GetKernel()
         {
             var builder = Kernel.CreateBuilder();
             builder.AddGoogleAIGeminiChatCompletion(
                 modelId: _modelSettings.ModelName,
                 apiKey: _modelSettings.ApiKey);
-            return builder;
+            return builder.Build();
         }
         public PromptExecutionSettings GetPromptExecutionSettings()
         {

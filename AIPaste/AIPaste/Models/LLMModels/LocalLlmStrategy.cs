@@ -16,7 +16,7 @@ using AIPaste.Models.DataModels;
 
 namespace AIPaste.Models.LLMModels
 {
-    internal class LocalLlmStrategy : ILlmStrategy
+    public class LocalLlmStrategy : ILlmStrategy
     {
         private LocalLlmSingleton _llmInstance;
         private readonly IHistoryTransform _historyTransform;
@@ -31,7 +31,7 @@ namespace AIPaste.Models.LLMModels
             _promptExecutionSettings = llamaSharpPromptExecutionSettings;
         }
 
-        public IKernelBuilder GetKernelBuilder()
+        public Kernel GetKernel()
         {
             var builder = Kernel.CreateBuilder();
             var ex = new StatelessExecutor(_llmInstance.Localmodel, _llmInstance.Parameters);
@@ -43,7 +43,7 @@ namespace AIPaste.Models.LLMModels
                     historyTransform: _historyTransform
                 )
             );
-            return builder;
+            return builder.Build();
         }
 
         public PromptExecutionSettings GetPromptExecutionSettings()

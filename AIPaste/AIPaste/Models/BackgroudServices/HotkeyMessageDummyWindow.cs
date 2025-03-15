@@ -2,26 +2,31 @@
 using System.Runtime.InteropServices;
 using AIPaste.Models.DataModels;
 using Microsoft.UI.Xaml;
-using Windows.Win32;
+using NLog;
+using Windows.Win32.Foundation;
+using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace AIPaste.Models.BackgroudServices
 {
     internal class HotkeyMessageDummyWindow : Window
     {
         private const uint WM_HOTKEY = 0x0312; // Hotkey message
-        private Windows.Win32.UI.WindowsAndMessaging.WNDPROC? _origPrc;
-        private readonly Windows.Win32.UI.WindowsAndMessaging.WNDPROC _hotKeyPrc;
-        private readonly Windows.Win32.Foundation.HWND _hwnd;
+        private IntPtr _origPrc;
+        private readonly WNDPROC _hotKeyPrc;
+        private readonly HWND _hwnd;
         private readonly Action _onHotKeyPressed;
         private int _hotkeyId;
-        private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+        private readonly IHotkeyControler _hotkeyControler;
+        private readonly ILogger _logger;
 
-        public HotkeyMessageDummyWindow(Action action)
+        public HotkeyMessageDummyWindow(Action action, IHotkeyControler hotkeyControler, ILogger? logger = null)
         {
+            _hotkeyControler = hotkeyControler;
+            _logger = logger ?? LogManager.GetCurrentClassLogger();
             _hotkeyId = GetHashCode();
             _onHotKeyPressed = action;
             _hotKeyPrc = HotKeyPrc;
-            _hwnd = new Windows.Win32.Foundation.HWND(WinRT.Interop.WindowNative.GetWindowHandle(this).ToInt32());
+            _hwnd = new HWND(WinRT.Interop.WindowNative.GetWindowHandle(this).ToInt32());
         }
 
         public bool RegisterHotKey(KeyPattern keyPattern)
@@ -29,12 +34,11 @@ namespace AIPaste.Models.BackgroudServices
             int attempts = 0;
             while (attempts < 3)
             {
-                var success = PInvoke.RegisterHotKey(_hwnd, _hotkeyId, (Windows.Win32.UI.Input.KeyboardAndMouse.HOT_KEY_MODIFIERS)keyPattern.Modifiers, (uint)keyPattern.Key);
+                var success = _hotkeyControler.RegisterHotKey(_hwnd, _hotkeyId, keyPattern.Modifiers, (uint)keyPattern.Key);
                 if (success)
                 {
                     _logger.Info($"Hotkey registered: {keyPattern}");
-                    var hotKeyPrcPointer = Marshal.GetFunctionPointerForDelegate(_hotKeyPrc);
-                    _origPrc = Marshal.GetDelegateForFunctionPointer<Windows.Win32.UI.WindowsAndMessaging.WNDPROC>(PInvoke.SetWindowLongPtr(_hwnd, Windows.Win32.UI.WindowsAndMessaging.WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, hotKeyPrcPointer));
+                    _origPrc = _hotkeyControler.SetHotKeyProc(_hwnd, _hotKeyPrc);
                     return true;
                 }
                 _logger.Debug("Failed to register hotkey, trying again");
@@ -45,25 +49,31 @@ namespace AIPaste.Models.BackgroudServices
             return false;
         }
 
-        private Windows.Win32.Foundation.LRESULT HotKeyPrc(Windows.Win32.Foundation.HWND hwnd,
+        private LRESULT HotKeyPrc(HWND hwnd,
             uint uMsg,
-            Windows.Win32.Foundation.WPARAM wParam,
-            Windows.Win32.Foundation.LPARAM lParam)
+            WPARAM wParam,
+            LPARAM lParam)
         {
             if (uMsg == WM_HOTKEY)
             {
                 _onHotKeyPressed.Invoke();
 
-                return (Windows.Win32.Foundation.LRESULT)nint.Zero;
+                return (LRESULT)nint.Zero;
             }
-
-            return PInvoke.CallWindowProc(_origPrc, hwnd, uMsg, wParam, lParam);
+            var intPtrLRESULT = _hotkeyControler.CallWindowProc(
+                _origPrc,
+                hwnd, 
+                uMsg,
+                new IntPtr((int)wParam.Value), 
+                lParam
+            );
+            return new LRESULT(intPtrLRESULT.ToInt32());
         }
 
         public void Dispose()
         {
             _logger.Info("Unregister hotkey");
-            PInvoke.UnregisterHotKey(_hwnd, _hotkeyId);
+            _hotkeyControler.UnregisterHotKey(_hwnd, _hotkeyId);
             Close();
         }
     }
