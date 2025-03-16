@@ -14,14 +14,17 @@ namespace AIPaste.ViewModels
     public partial class SettingsPageViewModel : INotifyPropertyChanged
     {
         private AppSettings _appSettings;
-        private SettingsService _settingsService;
+        private ISettingsService _settingsService;
+        private readonly IStartupManager _startupManager;
+
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public SettingsPageViewModel()
+        public SettingsPageViewModel(ISettingsService? settingsService = null, ITextCorrectService? textCorrectService = null, IStartupManager? startupManager =null)
         {
-            _settingsService = SettingsService.GetInstance();
+            _settingsService = settingsService ?? SettingsService.GetInstance();
             _appSettings = _settingsService.LoadSettings();
-            
+            _startupManager = startupManager ?? new StartupManager();
+
             UpdateSettingsOnView();
         }
 
@@ -314,9 +317,7 @@ namespace AIPaste.ViewModels
         {
             try
             {
-                var llmStrategy = new LlmStrategyFactory(appSettings).GetLlmStrategy();
-                var testLlmTextCorrector = new LlmTextCorrector(llmStrategy, "test prompt");
-                if (!testLlmTextCorrector.CheckIntegrity())
+                if (!TextCorrectService.CheckIntegrity(appSettings))
                 {
                     throw new Exception("Failed to generate text");
                 }
@@ -331,7 +332,7 @@ namespace AIPaste.ViewModels
 
         private bool ApplyHostkeySettings(AppSettings newSettings)
         {
-            if (!App.MainWindow?.ViewModel.UpdateSettings(newSettings) ?? false)
+            if (!App.MainWindow?.ViewModel.UpdateHotkeySettings(newSettings.KeySettings) ?? false)
             {
                 _appSettings.KeySettings = new KeySettings(false, newSettings.KeySettings.KeyPattern);
                 return false;
@@ -353,9 +354,8 @@ namespace AIPaste.ViewModels
 
         private async void AutoStartToggleChanged(bool changedStatus)
         {
-            var startupManager = new StartupManager();
-            await startupManager.ToggleStartupAsync(changedStatus);
-            var actualState = await startupManager.IsAutoStartupMode();
+            await _startupManager.ToggleStartupAsync(changedStatus);
+            var actualState = await _startupManager.IsAutoStartupMode();
             if (changedStatus != actualState)
             {
                 throw new Exception("Failed to set AutoStart");

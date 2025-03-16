@@ -13,6 +13,7 @@ namespace AIPaste.Models.LLMModels
             var llmStrategy = new LlmStrategyFactory(appSettings).GetLlmStrategy();
             _textCorrector = new LlmTextCorrector(llmStrategy, systemPrompt, logger: logger);
         }
+
         public string PresentResponse { get => _textCorrector.PresentResponse; }
         public ChatHistory ChatHistory { get => _textCorrector.ChatHistory; }
         public void ResetChat() => _textCorrector.ResetChat();
@@ -23,6 +24,11 @@ namespace AIPaste.Models.LLMModels
                 yield return text;
             }
         }
-        public bool CheckIntegrity() => _textCorrector.CheckIntegrity();
+        public static bool CheckIntegrity(AppSettings appSettings)
+        {
+            var llmStrategy = new LlmStrategyFactory(appSettings).GetLlmStrategy();
+            var textCorrector = new LlmTextCorrector(llmStrategy, "test prompt");
+            return textCorrector.CheckIntegrity();
+        }
     }
 }

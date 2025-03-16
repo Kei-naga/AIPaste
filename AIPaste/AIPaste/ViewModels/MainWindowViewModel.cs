@@ -10,43 +10,42 @@ namespace AIPaste.ViewModels
 {
     public class MainWindowViewModel
     {
-        private AppSettings _appSettings;
         private readonly IHotKeyManager _hotKeyManager;
+        private readonly ISettingsService _settingsService;
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         
         public MainWindowViewModel(Action action, ISettingsService? settingsService = null)
         {
-            settingsService ??= SettingsService.GetInstance();
-            _appSettings = settingsService.LoadSettings();
+            _settingsService = settingsService ?? SettingsService.GetInstance();
+            var appSettings = _settingsService.LoadSettings();
             _hotKeyManager = new HotKeyManager(action);
-            RegisterHotKeyFirstly(settingsService);
+            RegisterHotKeyFirstly(appSettings);
         }
 
         public MainWindowViewModel(IHotKeyManager hotKeyManager, ISettingsService? settingsService = null)
         {
-            settingsService ??= SettingsService.GetInstance();
-            _appSettings = settingsService.LoadSettings();
+            _settingsService = settingsService ?? SettingsService.GetInstance();
+            var appSettings = _settingsService.LoadSettings();
             _hotKeyManager = hotKeyManager;
-            RegisterHotKeyFirstly(settingsService);
+            RegisterHotKeyFirstly(appSettings);
         }
 
         // TODO: ここらへんの処理は切り出して別クラスにしたい。ホットキー用のシングルトンクラスを作って、そこに処理を移す
-        private void RegisterHotKeyFirstly(ISettingsService settingsService)
+        private void RegisterHotKeyFirstly(AppSettings appSettings)
         {
-            if (_appSettings.KeySettings.IsHotkeyEnabled && !RegisterHotKey())
+            if (!UpdateHotkeySettings(appSettings.KeySettings))
             {
-                var keySettings = new KeySettings(false, _appSettings.KeySettings.KeyPattern);
-                _appSettings.KeySettings = keySettings;
-                settingsService.SaveSettings(_appSettings);
+                var keySettings = new KeySettings(false, appSettings.KeySettings.KeyPattern);
+                appSettings.KeySettings = keySettings;
+                _settingsService.SaveSettings(appSettings);
             }
         }
 
-        public bool UpdateSettings(AppSettings appSettings)
+        public bool UpdateHotkeySettings(KeySettings keySettings)
         {
-            _appSettings = appSettings;
-            if (_appSettings.KeySettings.IsHotkeyEnabled)
+            if (keySettings.IsHotkeyEnabled)
             {
-                return RegisterHotKey();
+                return RegisterHotKey(keySettings.KeyPattern);
             }
             else
             {
@@ -55,10 +54,10 @@ namespace AIPaste.ViewModels
             }
         }
 
-        private bool RegisterHotKey()
+        private bool RegisterHotKey(KeyPattern keyPattern)
         {
             _hotKeyManager.UnRegisterHotKey();
-            return _hotKeyManager.RegisterHotKey(_appSettings.KeySettings.KeyPattern);
+            return _hotKeyManager.RegisterHotKey(keyPattern);
         }
 
         public void UnRegisterHotKey() => _hotKeyManager.UnRegisterHotKey();

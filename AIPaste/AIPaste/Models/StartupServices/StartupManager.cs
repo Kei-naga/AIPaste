@@ -5,7 +5,7 @@ using Windows.ApplicationModel;
 
 namespace AIPaste.Models.StartupServices
 {
-    internal class StartupManager(Logger? logger = null)
+    public class StartupManager(Logger? logger = null) : IStartupManager
     {
         private readonly Logger _logger = logger ?? LogManager.GetCurrentClassLogger();
         private const string TASK_ID = "AIPasteAutoStart";
@@ -36,5 +36,11 @@ namespace AIPaste.Models.StartupServices
             StartupTask startupTask = await StartupTask.GetAsync(TASK_ID);
             return startupTask.State == StartupTaskState.Enabled;
         }
+    }
+
+    public interface IStartupManager
+    {
+        Task ToggleStartupAsync(bool enable);
+        Task<bool> IsAutoStartupMode();
     }
 }

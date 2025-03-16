@@ -10,6 +10,6 @@ namespace AIPaste.Models.LLMModels
         ChatHistory ChatHistory { get; }
         void ResetChat();
         IAsyncEnumerable<string> GeneratingText(ILlmRequest requestModel);
-        bool CheckIntegrity();
+        abstract static bool CheckIntegrity(AppSettings appSettings);
     }
 }
