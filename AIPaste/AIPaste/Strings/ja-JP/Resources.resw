@@ -214,6 +214,6 @@
     <value>保存に失敗したため、設定を修正前に戻しました。設定を見直してください。</value>
   </data>
   <data name="AIPastePage_InappropriateOutput" xml:space="preserve">
-    <value />
+    <value>不正な文章が生成されました</value>
   </data>
 </root>
