@@ -6,11 +6,11 @@ using Windows.System;
 
 namespace AIPaste.Services.BackgroudServices
 {
-    public partial class HotKeyManager(Action action) : IDisposable, IHotKeyManager
+    public partial class HotKeyManager(Action action) : IHotKeyManager
     {
         private HotkeyMessageDummyWindow? _DummuyWindow;
         public KeyPattern KeyPattern { get; set; } = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
-        private Action _onHotKeyPressed = action;
+        private readonly Action _onHotKeyPressed = action;
 
         public bool RegisterHotKey(KeyPattern keyPattern, IHotkeyControler? hotkeyControler = null)
         {
@@ -21,7 +21,7 @@ namespace AIPaste.Services.BackgroudServices
             return _DummuyWindow.RegisterHotKey(KeyPattern);
         }
 
-        public void Dispose()
+        public void UnRegisterHotKey()
         {
             _DummuyWindow?.Dispose();
             _DummuyWindow = null;

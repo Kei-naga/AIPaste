@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace AIPaste.Models.LLMModels
 {
-    public class LlmTextCorrector : ILlmTextCorrector
+    public class LlmTextCorrector
     {
         public string PresentResponse { get; set; } = string.Empty;
         private readonly Kernel _kernel;
@@ -21,9 +21,9 @@ namespace AIPaste.Models.LLMModels
         private readonly PromptExecutionSettings _promptExecutionSettings;
         private readonly ILlmStrategy _llmStrategy;
 
-        private readonly Logger _logger;
+        private readonly ILogger _logger;
 
-        public LlmTextCorrector(ILlmStrategy llmStrategy, string systemPrompt, ChatHistory? chatHistory = null , Logger? logger = null)
+        public LlmTextCorrector(ILlmStrategy llmStrategy, string systemPrompt, ChatHistory? chatHistory = null , ILogger? logger = null)
         {
             _logger = logger ?? LogManager.GetCurrentClassLogger();
             _llmStrategy = llmStrategy;

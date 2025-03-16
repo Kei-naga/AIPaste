@@ -146,15 +146,7 @@ namespace AIPasteTests.Models.LLMModels
         {
             var path = await HFDownloader.DownloadFileAsync("QuantFactory/Meta-Llama-3-8B-GGUF", "Meta-Llama-3-8B.Q2_K.gguf");
             var localLlmSettings = new LLMLocalModelSettings(path, true, 32, 1024, 256);
-            var localLlmSingleton = LocalLlmSingleton.GetInstance(localLlmSettings);
-            var llamaSharpPromptExecutionSettings = new LLamaSharpPromptExecutionSettings()
-                {
-                    MaxTokens = localLlmSettings.MaxTokens,
-                    Temperature = 0.0,
-                    TopP = 0.0,
-                    StopSequences = new List<string>()
-                };
-            var localLlmStrategy = new LocalLlmStrategy(localLlmSingleton, new HistoryTransform(), llamaSharpPromptExecutionSettings);
+            var localLlmStrategy = new LocalLlmStrategy(localLlmSettings, new HistoryTransform());
             var moqRequest = new Mock<ILlmRequest>();
             moqRequest.Setup(x => x.ToOptimizedRequest()).Returns("hello");
 

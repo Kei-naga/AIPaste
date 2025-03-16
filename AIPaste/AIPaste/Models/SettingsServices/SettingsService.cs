@@ -10,9 +10,9 @@ namespace AIPaste.Models.SettingsServices
 
         static private SettingsService? _instance;
 
-        public static SettingsService GetInstance(ISettingsStore? settingsStore = null)
+        public static SettingsService GetInstance(ISettingsStore? settingsStore = null, ILogger? logger = null)
         {
-            settingsStore ??= new SettingsStore();
+            settingsStore ??= new SettingsStore(logger);
             if (_instance == null || _instance._settingsStore.GetType != settingsStore.GetType)
             {
                 _instance = new SettingsService(settingsStore);

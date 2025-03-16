@@ -13,8 +13,8 @@ namespace AIPaste.ViewModels
     public partial class AiPastePageViewModel : INotifyPropertyChanged
     {
         private readonly IClipboardOperator _clipboardOperator;
-        private readonly ILlmTextCorrector _llmTextCorrector;
-        private Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly ITextCorrectService _llmTextCorrectService;
+        private ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly ResourceLoader _resourceLoader;
 
         private string _targetText = "";
@@ -51,17 +51,16 @@ namespace AIPaste.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public AiPastePageViewModel(ResourceLoader? resourceLoader = null)
+        public AiPastePageViewModel(ISettingsService? settingsService = null, IClipboardOperator? clipboardOperator = null, ResourceLoader? resourceLoader = null)
         {
-            _resourceLoader = resourceLoader ?? ResourceLoader.GetForViewIndependentUse();
             _logger.Debug("AiPastePageViewModel created");
-            var appSettings = SettingsService.GetInstance().LoadSettings();
-            _clipboardOperator = new ClipboardOperator();
+            _resourceLoader = resourceLoader ?? ResourceLoader.GetForViewIndependentUse();
+            var appSettings = settingsService?.LoadSettings() ?? SettingsService.GetInstance().LoadSettings();
+            _clipboardOperator = clipboardOperator ?? new ClipboardOperator();
             _clipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
-            var llmStrategy = new LlmStrategyFactory(appSettings).GetLlmStrategy();
             var systemPrompt = _resourceLoader.GetString("/LLMResources/SystemPrompt");
-            _llmTextCorrector = new LlmTextCorrector(llmStrategy, systemPrompt);
+            _llmTextCorrectService = new TextCorrectService(appSettings, systemPrompt);
         }
 
         public async Task GeneratingText(string userInput)
@@ -70,11 +69,11 @@ namespace AIPaste.ViewModels
             OutputText = "";
             try
             {
-                await foreach (var chunk in _llmTextCorrector.GeneratingText(requestModel))
+                await foreach (var chunk in _llmTextCorrectService.GeneratingText(requestModel))
                 {
                     OutputText += chunk;
                 }
-                if (!CheckResponse(_llmTextCorrector.PresentResponse))
+                if (!CheckResponse(_llmTextCorrectService.PresentResponse))
                 {
                     throw new InvalidOperationException("LLM generated an empty string");
                 }
@@ -84,7 +83,7 @@ namespace AIPaste.ViewModels
                 OutputText = _resourceLoader.GetString("AIPastePage_InappropriateOutput");
                 _logger.Warn(ex, "Missing GeneratingText");
             }
-            OutputText = _llmTextCorrector.PresentResponse;
+            OutputText = _llmTextCorrectService.PresentResponse;
         }
 
         private static bool CheckResponse(string response)

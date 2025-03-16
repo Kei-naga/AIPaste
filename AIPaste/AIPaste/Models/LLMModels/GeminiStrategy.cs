@@ -1,26 +1,19 @@
-﻿using System.Threading.Tasks;
-using AIPaste.Models.DataModels;
+﻿using AIPaste.Models.DataModels;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
-using NLog;
 
 // using Microsoft.SemanticKernel.Connectors.Google;
 #pragma warning disable SKEXP0070
 
 namespace AIPaste.Models.LLMModels
 {
-    public class GeminiStrategy : ILlmStrategy
+    public class GeminiStrategy(GeminiModelSettings modelSettings) : ILlmStrategy
     {
-        private readonly GeminiModelSettings _modelSettings;
+        private readonly GeminiModelSettings _modelSettings = modelSettings;
         public ILLMModelSettings ModelSettings => _modelSettings;
         public ModelType ModelType => ModelType.Gemini;
-        private readonly ILogger _logger;
-        public GeminiStrategy(GeminiModelSettings modelSettings, ILogger? logger = null)
-        {
-            _logger = logger ?? LogManager.GetCurrentClassLogger();
-            _modelSettings = modelSettings;
-        }
+
         public Kernel GetKernel()
         {
             var builder = Kernel.CreateBuilder();

@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.SemanticKernel.ChatCompletion;
+﻿using System.Collections.Generic;
 using AIPaste.Models.DataModels;
-
+using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace AIPaste.Models.LLMModels
 {
-    public interface ILlmTextCorrector
+    public interface ITextCorrectService
     {
         string PresentResponse { get; }
         ChatHistory ChatHistory { get; }

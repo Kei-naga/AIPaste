@@ -10,6 +10,7 @@ namespace AIPaste.Models.BackgroudServices
     public interface IHotKeyManager
     {
         KeyPattern KeyPattern { get; set; }
-        bool RegisterHotKey(KeyPattern keyPattern, IHotkeyControler hotkeyControler);
+        bool RegisterHotKey(KeyPattern keyPattern, IHotkeyControler? hotkeyControler = null);
+        void UnRegisterHotKey();
     }
 }

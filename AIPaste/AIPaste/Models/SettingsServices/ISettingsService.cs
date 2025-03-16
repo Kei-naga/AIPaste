@@ -7,7 +7,7 @@ using AIPaste.Models.DataModels;
 
 namespace AIPaste.Models.SettingsServices
 {
-    internal interface ISettingsService
+    public interface ISettingsService
     {
         AppSettings LoadSettings();
         void SaveSettings(AppSettings appSettings);

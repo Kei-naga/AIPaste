@@ -13,13 +13,6 @@ namespace AIPaste.Models.SettingsServices.Tests
     [TestClass()]
     public class SettingsServiceTests
     {
-        private Mock<ISettingsStore> GetSettingsStoreMoq()
-        {
-            var moqSettingsStore = new Mock<ISettingsStore>();
-            var appSettings = AppSettings.GetDefaultSettings();
-            moqSettingsStore.Setup(x => x.LoadSettings()).Returns(appSettings);
-            return moqSettingsStore;
-        }
         [TestMethod()]
         public void GetInstanceTest()
         {

@@ -1,17 +1,12 @@
-﻿using System;
-using LLama;
+﻿using LLama;
 using LLamaSharp.SemanticKernel.ChatCompletion;
 using LLamaSharp.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel;
-using LLama.Common;
 using Microsoft.Extensions.DependencyInjection;
-using NLog;
-using ManagedCuda;
 using LLama.Abstractions;
-using System.Collections.Generic;
-using System.Text;
 using AIPaste.Models.DataModels;
+using System.Collections.Generic;
 
 
 namespace AIPaste.Models.LLMModels
@@ -24,11 +19,17 @@ namespace AIPaste.Models.LLMModels
         public ILLMModelSettings ModelSettings => _llmInstance.ModelSettings;
         public ModelType ModelType => ModelType.LocalLLM;
 
-        public LocalLlmStrategy(LocalLlmSingleton localLlmSingleton, IHistoryTransform historyTransform, LLamaSharpPromptExecutionSettings llamaSharpPromptExecutionSettings)
+        public LocalLlmStrategy(LLMLocalModelSettings modelSettings, IHistoryTransform historyTransform)
         {
-            _llmInstance = localLlmSingleton;
+            _llmInstance = LocalLlmSingleton.GetInstance(modelSettings);
             _historyTransform = historyTransform;
-            _promptExecutionSettings = llamaSharpPromptExecutionSettings;
+            _promptExecutionSettings = new LLamaSharpPromptExecutionSettings()
+            {
+                MaxTokens = modelSettings.MaxTokens,
+                Temperature = 0.0,
+                TopP = 0.0,
+                StopSequences = new List<string>()
+            };
         }
 
         public Kernel GetKernel()

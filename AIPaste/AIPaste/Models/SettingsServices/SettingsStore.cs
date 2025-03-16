@@ -11,7 +11,7 @@ namespace AIPaste.Models.SettingsServices
         private readonly ApplicationDataContainer _mainContainer;
         private readonly ApplicationDataContainer _localLlmContainer;
         private readonly ApplicationDataContainer _geminiContainer;
-        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly ILogger _logger;
         private const string AUTO_START_KEY = "AutoStart";
         private const string MODEL_TYPE_KEY = "ModelType";
         private const string MODEL_PATH_KEY = "ModelPath";
@@ -26,8 +26,9 @@ namespace AIPaste.Models.SettingsServices
         private const string MODIFERS_KEY = "Modifers";
         private const string HOTKEY_KEY = "Hotkey";
 
-        public SettingsStore()
+        public SettingsStore(ILogger? logger)
         {
+            _logger = logger ?? LogManager.GetCurrentClassLogger();
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
             _mainContainer = localSettings.CreateContainer("MainContainer", ApplicationDataCreateDisposition.Always);
             _localLlmContainer = _mainContainer.CreateContainer("LocalLLMContainer", ApplicationDataCreateDisposition.Always);

@@ -267,14 +267,14 @@ namespace AIPaste.ViewModels
             }
 
             var newSettings = GetCurrentAppSettings();
-
+            _settingsChanged = false;
             if (!IsValidLlmSettings(newSettings))
             {
                 _logger.Debug("Invalid llm Settings");
                 UpdateSettings();
                 return false;
             }
-            _settingsChanged = false;
+            
             _logger.Info("Saving new Settings");
             try
             {
