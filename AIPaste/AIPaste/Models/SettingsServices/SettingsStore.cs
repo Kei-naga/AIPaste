@@ -53,7 +53,7 @@ namespace AIPaste.Models.SettingsServices
             }
             catch (Exception e)
             {
-                _logger.Info(e, "Failed to load settings, resetting settings");
+                _logger.Error(e, "Failed to load settings, resetting settings");
                 return ResetSettings();
             }
         }

@@ -109,11 +109,13 @@ namespace AIPaste
                 {
                     if (args.IsSettingsSelected)
                     {
+                        _logger.Trace("navigating setting page");
                         contentFrame.Navigate(typeof(SettingsPage));
                     }
                     switch (args.SelectedItemContainer.Tag.ToString())
                     {
                         case nameof(TabName.AiPastePage):
+                            _logger.Trace("navigating AiPastePage");
                             contentFrame.Navigate(typeof(AiPastePage));
                             break;
                     }

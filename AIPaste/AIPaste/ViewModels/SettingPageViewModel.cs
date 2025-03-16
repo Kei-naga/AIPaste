@@ -14,16 +14,24 @@ namespace AIPaste.ViewModels
     public partial class SettingsPageViewModel : INotifyPropertyChanged
     {
         private AppSettings _appSettings;
-        private ISettingsService _settingsService;
+        private readonly ISettingsService _settingsService;
         private readonly IStartupManager _startupManager;
+        private readonly ITextCorrectorFactory _textCorrectorFactory;
 
-        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly ILogger _logger;
 
-        public SettingsPageViewModel(ISettingsService? settingsService = null, ITextCorrectService? textCorrectService = null, IStartupManager? startupManager =null)
+        public SettingsPageViewModel(
+            ISettingsService? settingsService = null, 
+            IStartupManager? startupManager =null, 
+            ITextCorrectorFactory? textCorrectorFactory = null,
+            ILogger? logger = null )
         {
+            _logger = logger ?? LogManager.GetCurrentClassLogger();
+            _logger.Trace("SettingsPageViewModel created");
             _settingsService = settingsService ?? SettingsService.GetInstance();
             _appSettings = _settingsService.LoadSettings();
             _startupManager = startupManager ?? new StartupManager();
+            _textCorrectorFactory = textCorrectorFactory ?? new TextCorrectorFactory();
 
             UpdateSettingsOnView();
         }
@@ -274,7 +282,7 @@ namespace AIPaste.ViewModels
 
             if (newSettings.Equals(_appSettings))
             {
-                _logger.Debug("No settings changed, not saving");
+                _logger.Trace("No settings changed, not saving");
                 return true;
             }
 
@@ -303,11 +311,17 @@ namespace AIPaste.ViewModels
             try
             {
                 _settingsService.SaveSettings(newSettings);
+                if (newSettings.ModelType != ModelType.LocalLLM)
+                {
+                    _logger.Trace("Disposing LocalLlmModel");
+                    LocalLlmSingleton.Dispose();
+                }
                 UpdateSettingsOnView(newSettings);
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Failed to save settings");
+                _logger.Error(e, "Failed to save settings. Failing back.");
+                _settingsService.SaveSettings(_appSettings);
                 return false;
             }
             return true;
@@ -317,7 +331,8 @@ namespace AIPaste.ViewModels
         {
             try
             {
-                if (!TextCorrectService.CheckIntegrity(appSettings))
+                var textCorrector = _textCorrectorFactory.CreateLlmTextCorrector(appSettings);
+                if (!textCorrector.CheckIntegrity())
                 {
                     throw new Exception("Failed to generate text");
                 }

@@ -96,10 +96,6 @@
     </Page>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="common\" />
-  </ItemGroup>
-
     <!-- Publish Properties -->
   <PropertyGroup>
     <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>

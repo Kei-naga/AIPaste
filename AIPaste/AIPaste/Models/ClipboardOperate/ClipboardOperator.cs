@@ -14,7 +14,7 @@ namespace AIPaste.Models.ClipboardOperate
         {
             _logger = logger ?? LogManager.GetCurrentClassLogger();
             _clipboard = clipboard ?? new SystemClipboard();
-            _logger.Debug("ClipboardOperator created");
+            _logger.Trace("ClipboardOperator created");
         }
 
         /// <summary>

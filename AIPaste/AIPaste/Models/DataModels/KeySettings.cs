@@ -1,5 +1,4 @@
 ﻿using Windows.System;
-using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace AIPaste.Models.DataModels
 {

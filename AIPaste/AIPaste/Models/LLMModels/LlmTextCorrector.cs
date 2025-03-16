@@ -10,9 +10,9 @@ using System.Linq;
 
 namespace AIPaste.Models.LLMModels
 {
-    public class LlmTextCorrector
+    public class LlmTextCorrector : ILlmTextCorrector
     {
-        public string PresentResponse { get; set; } = string.Empty;
+        public string PresentResponse { get; private set; } = string.Empty;
         private readonly Kernel _kernel;
         private readonly IChatCompletionService _chatCompletionService;
         private readonly ChatHistory _chatHistory;
@@ -71,7 +71,6 @@ namespace AIPaste.Models.LLMModels
                 contextSize = _llmStrategy.GetTokenCount(_chatHistory);
             }
         }
-
 
         public bool CheckIntegrity()
         {

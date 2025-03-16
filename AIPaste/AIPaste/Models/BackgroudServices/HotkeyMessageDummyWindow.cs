@@ -41,7 +41,7 @@ namespace AIPaste.Models.BackgroudServices
                     _origPrc = _hotkeyControler.SetHotKeyProc(_hwnd, _hotKeyPrc);
                     return true;
                 }
-                _logger.Debug("Failed to register hotkey, trying again");
+                _logger.Trace("Failed to register hotkey, trying again");
                 _hotkeyId = GetHashCode();
                 attempts++;
             }

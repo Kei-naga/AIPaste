@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Windows.System;
 
 namespace AIPaste.Models.DataModels
@@ -10,24 +11,24 @@ namespace AIPaste.Models.DataModels
 
         public string[] AnalyzeModifier()
         {
-            string[] modifiers = [];
+            var modifiers = new List<string>();
             if (Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_ALT))
             {
-                modifiers.Append("Alt");
+                modifiers.Add("Alt");
             }
             if (Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_CONTROL))
             {
-                modifiers.Append("Ctrl");
+                modifiers.Add("Ctrl");
             }
             if (Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_SHIFT))
             {
-                modifiers.Append("Shift");
+                modifiers.Add("Shift");
             }
             if (Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_WIN))
             {
-                modifiers.Append("Win");
+                modifiers.Add("Win");
             }
-            return modifiers;
+            return modifiers.ToArray();
         }
 
         public static HOT_KEY_MODIFIERS GetKeyModifierFromString(string[] modifiers)

@@ -3,19 +3,19 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using NLog;
 using AIPaste.Models.LLMModels;
-using Windows.ApplicationModel.Resources;
 using AIPaste.Models.ClipboardOperate;
 using AIPaste.Models.SettingsServices;
 using AIPaste.Models.DataModels;
+using AIPaste.common;
 
 namespace AIPaste.ViewModels
 {
     public partial class AiPastePageViewModel : INotifyPropertyChanged
     {
         private readonly IClipboardOperator _clipboardOperator;
-        private readonly ITextCorrectService _llmTextCorrectService;
-        private ILogger _logger = LogManager.GetCurrentClassLogger();
-        private readonly ResourceLoader _resourceLoader;
+        private readonly ILlmTextCorrector _llmTextCorrector;
+        private ILogger _logger;
+        private readonly IResourceLoaderWrapper _resourceLoader;
 
         private string _targetText = "";
         public string TargetText
@@ -51,16 +51,22 @@ namespace AIPaste.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public AiPastePageViewModel(ISettingsService? settingsService = null, IClipboardOperator? clipboardOperator = null, ResourceLoader? resourceLoader = null)
+        public AiPastePageViewModel(
+            ISettingsService? settingsService = null,
+            ITextCorrectorFactory? textCorrectorFactory = null,
+            IClipboardOperator? clipboardOperator = null, 
+            IResourceLoaderWrapper? resourceLoader = null, 
+            ILogger? logger = null )
         {
-            _logger.Debug("AiPastePageViewModel created");
-            _resourceLoader = resourceLoader ?? ResourceLoader.GetForViewIndependentUse();
+            _logger = logger ?? LogManager.GetCurrentClassLogger();
+            _logger.Trace("AiPastePageViewModel created");
+            _resourceLoader = resourceLoader ?? new ResourceLoaderWrapper();
             var appSettings = settingsService?.LoadSettings() ?? SettingsService.GetInstance().LoadSettings();
             _clipboardOperator = clipboardOperator ?? new ClipboardOperator();
             _clipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
-            var systemPrompt = _resourceLoader.GetString("/LLMResources/SystemPrompt");
-            _llmTextCorrectService = new TextCorrectService(appSettings, systemPrompt);
+            textCorrectorFactory ??= new TextCorrectorFactory();
+            _llmTextCorrector = textCorrectorFactory.CreateLlmTextCorrector(appSettings);
         }
 
         public async Task GeneratingText(string userInput)
@@ -69,11 +75,11 @@ namespace AIPaste.ViewModels
             OutputText = "";
             try
             {
-                await foreach (var chunk in _llmTextCorrectService.GeneratingText(requestModel))
+                await foreach (var chunk in _llmTextCorrector.GeneratingText(requestModel))
                 {
                     OutputText += chunk;
                 }
-                if (!CheckResponse(_llmTextCorrectService.PresentResponse))
+                if (!CheckResponse(_llmTextCorrector.PresentResponse))
                 {
                     throw new InvalidOperationException("LLM generated an empty string");
                 }
@@ -83,7 +89,7 @@ namespace AIPaste.ViewModels
                 OutputText = _resourceLoader.GetString("AIPastePage_InappropriateOutput");
                 _logger.Warn(ex, "Missing GeneratingText");
             }
-            OutputText = _llmTextCorrectService.PresentResponse;
+            OutputText = _llmTextCorrector.PresentResponse;
         }
 
         private static bool CheckResponse(string response)

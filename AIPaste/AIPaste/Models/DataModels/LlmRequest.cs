@@ -1,13 +1,14 @@
 ﻿using System;
+using AIPaste.common;
 using Windows.ApplicationModel.Resources;
 
 namespace AIPaste.Models.DataModels
 {
-    public class LlmRequest(string targetText, string userInput, ResourceLoader? resourceLoader = null) : ILlmRequest
+    public class LlmRequest(string targetText, string userInput, IResourceLoaderWrapper? resourceLoader = null) : ILlmRequest
     {
         public string TargetText { get; set; } = targetText;
         public string UserInput { get; set; } = userInput;
-        private readonly ResourceLoader _resourceLoader = resourceLoader ?? ResourceLoader.GetForViewIndependentUse();
+        private readonly IResourceLoaderWrapper _resourceLoader = resourceLoader ?? new ResourceLoaderWrapper();
 
         public string ToOptimizedRequest()
         {
@@ -16,10 +17,7 @@ namespace AIPaste.Models.DataModels
                 + _resourceLoader.GetString("/LLMResources/UserInstructionFlagForOptimizingText") + Environment.NewLine
                 + UserInput;
         }
-        public override string ToString()
-        {
-            return ToOptimizedRequest();
-        }
+        public override string ToString() => ToOptimizedRequest();
     }
 
     public interface ILlmRequest

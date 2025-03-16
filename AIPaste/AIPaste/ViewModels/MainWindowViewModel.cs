@@ -2,9 +2,7 @@
 using AIPaste.Models.BackgroudServices;
 using AIPaste.Models.DataModels;
 using AIPaste.Models.SettingsServices;
-using AIPaste.Services.BackgroudServices;
 using NLog;
-using static System.Collections.Specialized.BitVector32;
 
 namespace AIPaste.ViewModels
 {
@@ -12,21 +10,20 @@ namespace AIPaste.ViewModels
     {
         private readonly IHotKeyManager _hotKeyManager;
         private readonly ISettingsService _settingsService;
-        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-        
-        public MainWindowViewModel(Action action, ISettingsService? settingsService = null)
-        {
-            _settingsService = settingsService ?? SettingsService.GetInstance();
-            var appSettings = _settingsService.LoadSettings();
-            _hotKeyManager = new HotKeyManager(action);
-            RegisterHotKeyFirstly(appSettings);
-        }
+        private readonly ILogger _logger;
 
-        public MainWindowViewModel(IHotKeyManager hotKeyManager, ISettingsService? settingsService = null)
+        public MainWindowViewModel(
+            Action action, 
+            IHotKeyManagerFactory? hotKeyManagerFactory = null, 
+            ISettingsService? settingsService = null, 
+            ILogger? logger = null )
         {
+            _logger = logger ?? LogManager.GetCurrentClassLogger();
+            _logger.Trace("MainWindowViewModel created");
+            hotKeyManagerFactory ??= new HotkeyManagerFactory();
+            _hotKeyManager = hotKeyManagerFactory.CreateHotKeyManager(action);
             _settingsService = settingsService ?? SettingsService.GetInstance();
             var appSettings = _settingsService.LoadSettings();
-            _hotKeyManager = hotKeyManager;
             RegisterHotKeyFirstly(appSettings);
         }
 

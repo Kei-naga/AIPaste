@@ -4,12 +4,12 @@ using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace AIPaste.Models.LLMModels
 {
-    public interface ITextCorrectService
+    public interface ILlmTextCorrector
     {
         string PresentResponse { get; }
         ChatHistory ChatHistory { get; }
         void ResetChat();
         IAsyncEnumerable<string> GeneratingText(ILlmRequest requestModel);
-        abstract static bool CheckIntegrity(AppSettings appSettings);
+        bool CheckIntegrity();
     }
 }
