@@ -1,4 +1,7 @@
-﻿using AIPaste.Models.DataModels;
+﻿using System;
+using AIPaste.Models.DataModels;
+using AIPaste.Models.LLMModels;
+using AIPaste.Models.StartupServices;
 using NLog;
 
 namespace AIPaste.Models.SettingsServices
@@ -7,6 +10,7 @@ namespace AIPaste.Models.SettingsServices
     {
         private readonly ISettingsStore _settingsStore;
         private AppSettings _presentAppSettings;
+        private readonly ILogger _logger;
 
         static private SettingsService? _instance;
 
@@ -15,13 +19,14 @@ namespace AIPaste.Models.SettingsServices
             settingsStore ??= new SettingsStore(logger);
             if (_instance == null || _instance._settingsStore.GetType != settingsStore.GetType)
             {
-                _instance = new SettingsService(settingsStore);
+                _instance = new SettingsService(settingsStore, logger);
             }
             return _instance;
         }
 
-        private SettingsService(ISettingsStore settingsStore)
+        private SettingsService(ISettingsStore settingsStore, ILogger? logger)
         {
+            _logger = logger ?? LogManager.GetCurrentClassLogger();
             _settingsStore = settingsStore;
             _presentAppSettings = _settingsStore.LoadSettings();
         }

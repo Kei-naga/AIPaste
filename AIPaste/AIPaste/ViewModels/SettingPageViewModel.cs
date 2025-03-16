@@ -22,10 +22,10 @@ namespace AIPaste.ViewModels
             _settingsService = SettingsService.GetInstance();
             _appSettings = _settingsService.LoadSettings();
             
-            UpdateSettings();
+            UpdateSettingsOnView();
         }
 
-        private void UpdateSettings(AppSettings? newSettings = null)
+        private void UpdateSettingsOnView(AppSettings? newSettings = null)
         {
             if (newSettings != null)
             {
@@ -56,8 +56,6 @@ namespace AIPaste.ViewModels
                 .Select(vk => new Tuple<string, VirtualKey>(vk.ToString(), vk))
                 .ToList();
 
-        private bool _settingsChanged = false;
-
         private string _llmModelPath = "";
         public string LLMModelPath
         {
@@ -68,7 +66,6 @@ namespace AIPaste.ViewModels
                 {
                     _llmModelPath = value;
                     OnPropertyChanged(nameof(LLMModelPath));
-                    _settingsChanged = true;
                 }
             }
         }
@@ -83,7 +80,6 @@ namespace AIPaste.ViewModels
                 {
                     _gpuLayerCount = value;
                     OnPropertyChanged(nameof(GpuLayerCount));
-                    _settingsChanged = true;
                 }
             }
         }
@@ -98,7 +94,6 @@ namespace AIPaste.ViewModels
                 {
                     _maxTokens = value;
                     OnPropertyChanged(nameof(MaxTokens));
-                    _settingsChanged = true;
                 }
             }
         }
@@ -113,7 +108,6 @@ namespace AIPaste.ViewModels
                 {
                     _gpuEnabled = value;
                     OnPropertyChanged(nameof(GpuEnabled));
-                    _settingsChanged = true;
                 }
             }
         }
@@ -128,7 +122,6 @@ namespace AIPaste.ViewModels
                 {
                     _isHotkeyEnabled = value;
                     OnPropertyChanged(nameof(IsHotkeyEnabled));
-                    _settingsChanged = true;
                 }
             }
         }
@@ -143,7 +136,6 @@ namespace AIPaste.ViewModels
                 {
                     _key = value;
                     OnPropertyChanged(nameof(Key));
-                    _settingsChanged = true;
                 }
             }
         }
@@ -158,7 +150,6 @@ namespace AIPaste.ViewModels
                 {
                     _ctrlModifier = value;
                         OnPropertyChanged(nameof(CtrlModifier));
-                        _settingsChanged = true;
                 }
             }
         }
@@ -173,7 +164,6 @@ namespace AIPaste.ViewModels
                 {
                     _altModifier = value;
                         OnPropertyChanged(nameof(AltModifier));
-                        _settingsChanged = true;
                 }
             }
         }
@@ -188,7 +178,6 @@ namespace AIPaste.ViewModels
                 {
                     _shiftModifier = value;
                         OnPropertyChanged(nameof(ShiftModifier));
-                        _settingsChanged = true;
                 }
             }
         }
@@ -203,7 +192,6 @@ namespace AIPaste.ViewModels
                 {
                     _winModifier = value;
                         OnPropertyChanged(nameof(WinModifier));
-                        _settingsChanged = true;
                 }
             }
         }
@@ -218,7 +206,6 @@ namespace AIPaste.ViewModels
                 {
                     _autoStart = value;
                     OnPropertyChanged(nameof(AutoStart));
-                    _settingsChanged = true;
                 }
             }
         }
@@ -233,7 +220,6 @@ namespace AIPaste.ViewModels
                 {
                     _modelTypeName = value;
                     OnPropertyChanged(nameof(ModelType));
-                    _settingsChanged = true;
                     OnPropertyChanged(nameof(IsLocalLLMSelected));
                     OnPropertyChanged(nameof(IsGeminiSelected));
                 }
@@ -253,44 +239,7 @@ namespace AIPaste.ViewModels
                 {
                     _apiKey = value;
                     OnPropertyChanged(nameof(ApiKey));
-                    _settingsChanged = true;
                 }
-            }
-        }
-
-        public bool SaveSettings()
-        {
-            if (!_settingsChanged)
-            {
-                _logger.Debug("No settings changed, not saving");
-                return true;
-            }
-
-            var newSettings = GetCurrentAppSettings();
-            _settingsChanged = false;
-            if (!IsValidLlmSettings(newSettings))
-            {
-                _logger.Debug("Invalid llm Settings");
-                UpdateSettings();
-                return false;
-            }
-            
-            _logger.Info("Saving new Settings");
-            try
-            {
-                var modifiedSettings = SettingsUpdate(newSettings);
-                if (!newSettings.Equals(modifiedSettings))
-                {
-                    UpdateSettings(modifiedSettings);
-                    return false;
-                }
-                _settingsService.SaveSettings(newSettings);
-                return true;
-            }
-            catch (Exception e)
-            {
-                _logger.Error(e, "Failed to save settings");
-                return false;
             }
         }
 
@@ -316,6 +265,51 @@ namespace AIPaste.ViewModels
             );
         }
 
+        public bool SaveSettings()
+        {
+            var newSettings = GetCurrentAppSettings();
+
+            if (newSettings.Equals(_appSettings))
+            {
+                _logger.Debug("No settings changed, not saving");
+                return true;
+            }
+
+            if (!IsValidLlmSettings(newSettings))
+            {
+                _logger.Warn("Invalid llm Settings");
+                UpdateSettingsOnView();
+                return false;
+            }
+
+            if (!ApplyHostkeySettings(newSettings))
+            {
+                _logger.Error("Failed to apply hotkey settings");
+                UpdateSettingsOnView();
+                return false;
+            }
+
+            if (!ApplyAutoStartSettings(newSettings))
+            {
+                _logger.Error("Failed to apply auto start settings");
+                UpdateSettingsOnView();
+                return false;
+            }
+
+            _logger.Info("Saving new Settings");
+            try
+            {
+                _settingsService.SaveSettings(newSettings);
+                UpdateSettingsOnView(newSettings);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Failed to save settings");
+                return false;
+            }
+            return true;
+        }
+
         private bool IsValidLlmSettings(AppSettings appSettings)
         {
             try
@@ -333,31 +327,28 @@ namespace AIPaste.ViewModels
                 _logger.Debug(e, "Is invalid llm settings");
                 return false;
             }
-
-
         }
 
-        private AppSettings SettingsUpdate(AppSettings newSettings)
+        private bool ApplyHostkeySettings(AppSettings newSettings)
         {
-            if (newSettings.ModelType != ModelType.LocalLLM)
-            {
-                _logger.Info("Despose Local LLM");
-                LocalLlmStrategy.Dispose();
-            }
-
-            // TODO: ここらへんの更新処理はもう少しスマートに書けるかも
             if (!App.MainWindow?.ViewModel.UpdateSettings(newSettings) ?? false)
             {
-                newSettings.KeySettings = new KeySettings(false, newSettings.KeySettings.KeyPattern);
+                _appSettings.KeySettings = new KeySettings(false, newSettings.KeySettings.KeyPattern);
+                return false;
             }
+            return true;
+        }
 
+        private bool ApplyAutoStartSettings(AppSettings newSettings)
+        {
             try { AutoStartToggleChanged(newSettings.AutoStart); }
             catch (Exception e)
             {
                 _logger.Warn(e);
-                newSettings.AutoStart = false;
+                _appSettings.AutoStart = false;
+                return false;
             }
-            return newSettings;
+            return true;
         }
 
         private async void AutoStartToggleChanged(bool changedStatus)

@@ -80,7 +80,7 @@ namespace AIPaste.Models.SettingsServices
             var apiKey = (string)_geminiContainer.Values[API_KEY_KEY];
             var modelName = (string)_geminiContainer.Values[MODEL_NAME_KEY];
             var location = (string)_geminiContainer.Values[LOCATION_KEY];
-            var maxContextsize = (uint)_localLlmContainer.Values[CONTEXT_SIZE_KEY];
+            var maxContextsize = (uint)_geminiContainer.Values[CONTEXT_SIZE_KEY];
             return new GeminiModelSettings(apiKey, modelName, location, maxContextsize);
         }
 
