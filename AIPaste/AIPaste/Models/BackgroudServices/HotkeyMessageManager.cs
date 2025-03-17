@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using AIPaste.Models.DataModels;
 using Microsoft.UI.Xaml;
 using NLog;
@@ -8,7 +7,7 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace AIPaste.Models.BackgroudServices
 {
-    internal class HotkeyMessageDummyWindow : Window
+    internal class HotkeyMessageManager : IDisposable
     {
         private const uint WM_HOTKEY = 0x0312; // Hotkey message
         private IntPtr _origPrc;
@@ -16,17 +15,19 @@ namespace AIPaste.Models.BackgroudServices
         private readonly HWND _hwnd;
         private readonly Action _onHotKeyPressed;
         private int _hotkeyId;
+        private readonly Window _dummyWindow;
         private readonly IHotkeyControler _hotkeyControler;
         private readonly ILogger _logger;
 
-        public HotkeyMessageDummyWindow(Action action, IHotkeyControler hotkeyControler, ILogger? logger = null)
+        public HotkeyMessageManager(Action action, IHotkeyControler hotkeyControler, ILogger? logger = null)
         {
             _hotkeyControler = hotkeyControler;
             _logger = logger ?? LogManager.GetCurrentClassLogger();
             _hotkeyId = GetHashCode();
             _onHotKeyPressed = action;
             _hotKeyPrc = HotKeyPrc;
-            _hwnd = new HWND(WinRT.Interop.WindowNative.GetWindowHandle(this).ToInt32());
+            _dummyWindow = new Window();
+            _hwnd = new HWND(WinRT.Interop.WindowNative.GetWindowHandle(_dummyWindow).ToInt32());
         }
 
         public bool RegisterHotKey(KeyPattern keyPattern)
@@ -74,7 +75,7 @@ namespace AIPaste.Models.BackgroudServices
         {
             _logger.Info("Unregister hotkey");
             _hotkeyControler.UnregisterHotKey(_hwnd, _hotkeyId);
-            Close();
+            _dummyWindow.Close();
         }
     }
 }

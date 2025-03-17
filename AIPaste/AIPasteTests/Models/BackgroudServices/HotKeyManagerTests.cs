@@ -16,28 +16,28 @@ namespace AIPaste.Services.BackgroudServices.Tests
     public class HotKeyManagerTests
     {
         
-        //[TestMethod]
-        //public void RegisterHotKeyTest()
-        //{
-        //        var hotkeyControler = new HotkeyControlerStub();
-        //        var count = 0;
-        //        var action = new Action(() => { count++; });
-        //        var hotKeyManager = new HotKeyManager(action);
-        //        var dummyKeyPattern = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
+        [TestMethod]
+        public void RegisterHotKeyTest()
+        {
+                var hotkeyControler = new HotkeyControlerStub();
+                var count = 0;
+                var action = new Action(() => { count++; });
+                var hotKeyManager = new HotKeyManager(action);
+                var dummyKeyPattern = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
 
-        //        hotKeyManager.RegisterHotKey(dummyKeyPattern, hotkeyControler);
-        //        hotkeyControler.PressHotKey();
-        //        hotkeyControler.PressHotKey();
+                hotKeyManager.RegisterHotKey(dummyKeyPattern, hotkeyControler);
+                hotkeyControler.PressHotKey();
+                hotkeyControler.PressHotKey();
 
 
-        //        Assert.AreEqual(2, count);
-        //}
+                Assert.AreEqual(2, count);
+        }
 
-        //[TestMethod()]
-        //public void DisposeTest()
-        //{
-        //    Assert.Fail();
-        //}
+        [TestMethod()]
+        public void DisposeTest()
+        {
+            Assert.Fail();
+        }
     }
 
     internal class HotkeyControlerStub(bool isSuccessRegister = true) : IHotkeyControler

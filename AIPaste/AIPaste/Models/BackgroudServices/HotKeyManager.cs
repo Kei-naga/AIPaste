@@ -8,23 +8,23 @@ namespace AIPaste.Services.BackgroudServices
 {
     public partial class HotKeyManager(Action action) : IHotKeyManager
     {
-        private HotkeyMessageDummyWindow? _DummuyWindow;
+        private HotkeyMessageManager? _hotkeyMessageManager;
         public KeyPattern KeyPattern { get; set; } = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
         private readonly Action _onHotKeyPressed = action;
 
         public bool RegisterHotKey(KeyPattern keyPattern, IHotkeyControler? hotkeyControler = null)
         {
             hotkeyControler ??= new SystemHotkeyControler();
-            _DummuyWindow?.Dispose();
+            _hotkeyMessageManager?.Dispose();
             KeyPattern = keyPattern;
-            _DummuyWindow = new HotkeyMessageDummyWindow(_onHotKeyPressed, hotkeyControler);
-            return _DummuyWindow.RegisterHotKey(KeyPattern);
+            _hotkeyMessageManager = new HotkeyMessageManager(_onHotKeyPressed, hotkeyControler);
+            return _hotkeyMessageManager.RegisterHotKey(KeyPattern);
         }
 
         public void UnRegisterHotKey()
         {
-            _DummuyWindow?.Dispose();
-            _DummuyWindow = null;
+            _hotkeyMessageManager?.Dispose();
+            _hotkeyMessageManager = null;
         }
     }
 }
