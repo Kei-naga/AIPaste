@@ -28,7 +28,7 @@ namespace AIPaste.ViewModels
         }
 
         // TODO: ここらへんの処理は切り出して別クラスにしたい。ホットキー用のシングルトンクラスを作って、そこに処理を移す
-        private void RegisterHotKeyFirstly(AppSettings appSettings)
+        private void RegisterHotKeyFirstly(IAppSettings appSettings)
         {
             if (!UpdateHotkeySettings(appSettings.KeySettings))
             {
@@ -38,7 +38,7 @@ namespace AIPaste.ViewModels
             }
         }
 
-        public bool UpdateHotkeySettings(KeySettings keySettings)
+        public bool UpdateHotkeySettings(IKeySettings keySettings)
         {
             if (keySettings.IsHotkeyEnabled)
             {
@@ -51,7 +51,7 @@ namespace AIPaste.ViewModels
             }
         }
 
-        private bool RegisterHotKey(KeyPattern keyPattern)
+        private bool RegisterHotKey(IKeyPattern keyPattern)
         {
             _hotKeyManager.UnRegisterHotKey();
             return _hotKeyManager.RegisterHotKey(keyPattern);

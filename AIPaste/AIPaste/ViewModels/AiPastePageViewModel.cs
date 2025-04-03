@@ -71,7 +71,7 @@ namespace AIPaste.ViewModels
 
         public async Task GeneratingText(string userInput)
         {
-            var requestModel = new LlmRequest(TargetText, userInput);
+            var requestModel = new LlmRequest(TargetText, userInput, _resourceLoader);
             OutputText = "";
             try
             {

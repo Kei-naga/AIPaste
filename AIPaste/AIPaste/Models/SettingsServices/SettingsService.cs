@@ -9,7 +9,7 @@ namespace AIPaste.Models.SettingsServices
     public class SettingsService : ISettingsService
     {
         private readonly ISettingsStore _settingsStore;
-        private AppSettings _presentAppSettings;
+        private IAppSettings _presentAppSettings;
         private readonly ILogger _logger;
 
         static private SettingsService? _instance;
@@ -31,18 +31,18 @@ namespace AIPaste.Models.SettingsServices
             _presentAppSettings = _settingsStore.LoadSettings();
         }
 
-        public AppSettings LoadSettings()
+        public IAppSettings LoadSettings()
         {
             return _presentAppSettings;
         }
 
-        public void SaveSettings(AppSettings appSettings)
+        public void SaveSettings(IAppSettings appSettings)
         {
             _presentAppSettings = appSettings;
             _settingsStore.SaveSettings(appSettings);
         }
 
-        public AppSettings ResetSettings()
+        public IAppSettings ResetSettings()
         {
             _presentAppSettings = _settingsStore.ResetSettings();
             return _presentAppSettings;

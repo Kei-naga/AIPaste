@@ -1,10 +1,10 @@
 ﻿namespace AIPaste.Models.DataModels
 {
-    public class AppSettings(bool autoStartSetting, ModelType modelType, KeySettings keySettings, LLMLocalModelSettings llmLocalModelSettings, GeminiModelSettings geminiModelSettings)
+    public class AppSettings(bool autoStartSetting, ModelType modelType, IKeySettings keySettings, LLMLocalModelSettings llmLocalModelSettings, GeminiModelSettings geminiModelSettings): IAppSettings
     {
         public bool AutoStart { get; set; } = autoStartSetting;
         public ModelType ModelType { get; set; } = modelType;
-        public KeySettings KeySettings { get; set; } = keySettings;
+        public IKeySettings KeySettings { get; set; } = keySettings;
         public LLMLocalModelSettings LocalLLMSettings { get; set; } = llmLocalModelSettings;
         public GeminiModelSettings GeminiSettings { get; set; } = geminiModelSettings;
 
@@ -13,7 +13,7 @@
             return new AppSettings(
                 autoStartSetting: true,
                 modelType: ModelType.LocalLLM,
-                keySettings: KeySettings.GetDefaultSettings(),
+                keySettings: DataModels.KeySettings.GetDefaultSettings(),
                 llmLocalModelSettings: (LLMLocalModelSettings)LLMLocalModelSettings.GetDefaultSettings(),
                 geminiModelSettings: (GeminiModelSettings)GeminiModelSettings.GetDefaultSettings()
             );

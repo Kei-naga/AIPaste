@@ -9,15 +9,14 @@ namespace AIPaste.Services.BackgroudServices
     public partial class HotKeyManager(Action action) : IHotKeyManager
     {
         private HotkeyMessageManager? _hotkeyMessageManager;
-        public KeyPattern KeyPattern { get; set; } = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
+        public IKeyPattern KeyPattern { get; set; } = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
         private readonly Action _onHotKeyPressed = action;
 
-        public bool RegisterHotKey(KeyPattern keyPattern, IHotkeyControler? hotkeyControler = null)
+        public bool RegisterHotKey(IKeyPattern keyPattern)
         {
-            hotkeyControler ??= new SystemHotkeyControler();
             _hotkeyMessageManager?.Dispose();
             KeyPattern = keyPattern;
-            _hotkeyMessageManager = new HotkeyMessageManager(_onHotKeyPressed, hotkeyControler);
+            _hotkeyMessageManager = new HotkeyMessageManager(_onHotKeyPressed);
             return _hotkeyMessageManager.RegisterHotKey(KeyPattern);
         }
 

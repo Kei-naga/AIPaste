@@ -4,7 +4,7 @@ using Windows.System;
 
 namespace AIPaste.Models.DataModels
 {
-    public class KeyPattern(HOT_KEY_MODIFIERS modifiers, VirtualKey key)
+    public class KeyPattern(HOT_KEY_MODIFIERS modifiers, VirtualKey key) : IKeyPattern
     {
         public HOT_KEY_MODIFIERS Modifiers { get; set; } = modifiers;
         public VirtualKey Key { get; set; } = key;
@@ -95,5 +95,14 @@ namespace AIPaste.Models.DataModels
         MOD_NOREPEAT = 0x00004000,
         MOD_SHIFT = 0x00000004,
         MOD_WIN = 0x00000008,
+    }
+
+    public interface IKeyPattern
+    {
+        HOT_KEY_MODIFIERS Modifiers { get; set; }
+        VirtualKey Key { get; set; }
+        string[] AnalyzeModifier();
+        string ToString();
+        bool Equals(KeyPattern otherPattern);
     }
 }

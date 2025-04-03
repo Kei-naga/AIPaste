@@ -1,27 +1,29 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using AIPaste.Models.DataModels;
 using Microsoft.UI.Xaml;
 using NLog;
+using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace AIPaste.Models.BackgroudServices
 {
-    internal class HotkeyMessageManager : IDisposable
+    internal partial class HotkeyMessageManager : IDisposable
     {
+        #pragma warning disable IDE1006 // 命名スタイル
         private const uint WM_HOTKEY = 0x0312; // Hotkey message
+        #pragma warning restore IDE1006 // 命名スタイル
         private IntPtr _origPrc;
         private readonly WNDPROC _hotKeyPrc;
         private readonly HWND _hwnd;
         private readonly Action _onHotKeyPressed;
         private int _hotkeyId;
         private readonly Window _dummyWindow;
-        private readonly IHotkeyControler _hotkeyControler;
         private readonly ILogger _logger;
 
-        public HotkeyMessageManager(Action action, IHotkeyControler hotkeyControler, ILogger? logger = null)
+        public HotkeyMessageManager(Action action, ILogger? logger = null)
         {
-            _hotkeyControler = hotkeyControler;
             _logger = logger ?? LogManager.GetCurrentClassLogger();
             _hotkeyId = GetHashCode();
             _onHotKeyPressed = action;
@@ -30,16 +32,17 @@ namespace AIPaste.Models.BackgroudServices
             _hwnd = new HWND(WinRT.Interop.WindowNative.GetWindowHandle(_dummyWindow).ToInt32());
         }
 
-        public bool RegisterHotKey(KeyPattern keyPattern)
+        public bool RegisterHotKey(IKeyPattern keyPattern)
         {
             int attempts = 0;
             while (attempts < 3)
             {
-                var success = _hotkeyControler.RegisterHotKey(_hwnd, _hotkeyId, keyPattern.Modifiers, (uint)keyPattern.Key);
+                var success = PInvoke.RegisterHotKey(_hwnd, _hotkeyId, (Windows.Win32.UI.Input.KeyboardAndMouse.HOT_KEY_MODIFIERS)keyPattern.Modifiers, (uint)keyPattern.Key);
                 if (success)
                 {
                     _logger.Info($"Hotkey registered: {keyPattern}");
-                    _origPrc = _hotkeyControler.SetHotKeyProc(_hwnd, _hotKeyPrc);
+                    var hotKeyPrcPointer = Marshal.GetFunctionPointerForDelegate(_hotKeyPrc);
+                    _origPrc = PInvoke.SetWindowLongPtr(_hwnd, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, hotKeyPrcPointer);
                     return true;
                 }
                 _logger.Trace("Failed to register hotkey, trying again");
@@ -61,20 +64,15 @@ namespace AIPaste.Models.BackgroudServices
 
                 return (LRESULT)nint.Zero;
             }
-            var intPtrLRESULT = _hotkeyControler.CallWindowProc(
-                _origPrc,
-                hwnd, 
-                uMsg,
-                new IntPtr((int)wParam.Value), 
-                lParam
-            );
-            return new LRESULT(intPtrLRESULT.ToInt32());
+            var wndProc = Marshal.GetDelegateForFunctionPointer<Windows.Win32.UI.WindowsAndMessaging.WNDPROC>(_origPrc);
+            var intPtrLRESULT = PInvoke.CallWindowProc(wndProc, hwnd, uMsg, wParam, lParam);
+            return new LRESULT(intPtrLRESULT);
         }
 
         public void Dispose()
         {
             _logger.Info("Unregister hotkey");
-            _hotkeyControler.UnregisterHotKey(_hwnd, _hotkeyId);
+            PInvoke.UnregisterHotKey(_hwnd, _hotkeyId);
             _dummyWindow.Close();
         }
     }

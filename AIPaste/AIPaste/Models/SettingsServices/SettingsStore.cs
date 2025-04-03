@@ -35,7 +35,7 @@ namespace AIPaste.Models.SettingsServices
             _geminiContainer = _mainContainer.CreateContainer("GeminiContainer", ApplicationDataCreateDisposition.Always);
         }
 
-        public AppSettings LoadSettings()
+        public IAppSettings LoadSettings()
         {
             try
             {
@@ -93,7 +93,7 @@ namespace AIPaste.Models.SettingsServices
             return new KeySettings(isHotkeyEnabled, keyPattern);
         }
 
-        public void SaveSettings(AppSettings appSettings)
+        public void SaveSettings(IAppSettings appSettings)
         {
             _logger.Info("Saving settings");
             _mainContainer.Values[AUTO_START_KEY] = appSettings.AutoStart;
@@ -123,7 +123,7 @@ namespace AIPaste.Models.SettingsServices
             _geminiContainer.Values[CONTEXT_SIZE_KEY] = geminiModelSettings.MaxContextSize;
         }
 
-        private void SaveKeySettings(KeySettings keySettings)
+        private void SaveKeySettings(IKeySettings keySettings)
         {
             _logger.Debug($"Saving Key Settings: {keySettings}");
             _mainContainer.Values[IS_HOTKEY_ENABLED_KEY] = keySettings.IsHotkeyEnabled;
@@ -131,7 +131,7 @@ namespace AIPaste.Models.SettingsServices
             _mainContainer.Values[MODIFERS_KEY] = (int)keySettings.KeyPattern.Modifiers;
         }
 
-        public AppSettings ResetSettings()
+        public IAppSettings ResetSettings()
         {
             _logger.Info("Resetting settings");
             var defaultAppSettings = AppSettings.GetDefaultSettings();

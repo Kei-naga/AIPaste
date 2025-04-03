@@ -8,7 +8,7 @@ namespace AIPaste.Models.LLMModels
 {
     public class TextCorrectorFactory : ITextCorrectorFactory
     {
-        public ILlmTextCorrector CreateLlmTextCorrector(AppSettings appSettings, IResourceLoaderWrapper? resourceLoader = null, ILogger? logger = null)
+        public ILlmTextCorrector CreateLlmTextCorrector(IAppSettings appSettings, IResourceLoaderWrapper? resourceLoader = null, ILogger? logger = null)
         {
             resourceLoader ??= new ResourceLoaderWrapper();
             var llmStrategy = GetLlmStrategy(appSettings);
@@ -16,7 +16,7 @@ namespace AIPaste.Models.LLMModels
             return new LlmTextCorrector(llmStrategy, systemPrompt, logger: logger);
         }
 
-        private ILlmStrategy GetLlmStrategy(AppSettings appSettings)
+        private ILlmStrategy GetLlmStrategy(IAppSettings appSettings)
         {
             switch (appSettings.ModelType)
             {
@@ -33,6 +33,6 @@ namespace AIPaste.Models.LLMModels
 
     public interface ITextCorrectorFactory
     {
-        ILlmTextCorrector CreateLlmTextCorrector(AppSettings appSettings, IResourceLoaderWrapper? resourceLoader = null, ILogger? logger = null);
+        ILlmTextCorrector CreateLlmTextCorrector(IAppSettings appSettings, IResourceLoaderWrapper? resourceLoader = null, ILogger? logger = null);
     }
 }

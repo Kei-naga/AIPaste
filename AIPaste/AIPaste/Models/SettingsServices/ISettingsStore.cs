@@ -9,8 +9,8 @@ namespace AIPaste.Models.SettingsServices
 {
     public interface ISettingsStore
     {
-        AppSettings LoadSettings();
-        void SaveSettings(AppSettings appSettings);
-        AppSettings ResetSettings();
+        IAppSettings LoadSettings();
+        void SaveSettings(IAppSettings appSettings);
+        IAppSettings ResetSettings();
     }
 }

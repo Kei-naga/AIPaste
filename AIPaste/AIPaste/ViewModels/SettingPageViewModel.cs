@@ -13,7 +13,7 @@ namespace AIPaste.ViewModels
 {
     public partial class SettingsPageViewModel : INotifyPropertyChanged
     {
-        private AppSettings _appSettings;
+        private IAppSettings _appSettings;
         private readonly ISettingsService _settingsService;
         private readonly IStartupManager _startupManager;
         private readonly ITextCorrectorFactory _textCorrectorFactory;
