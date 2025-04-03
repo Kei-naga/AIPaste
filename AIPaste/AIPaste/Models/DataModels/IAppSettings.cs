@@ -11,7 +11,8 @@ namespace AIPaste.Models.DataModels
         bool AutoStart { get; set; }
         ModelType ModelType { get; set; }
         IKeySettings KeySettings { get; set; }
-        LLMLocalModelSettings LocalLLMSettings { get; set; }
-        GeminiModelSettings GeminiSettings { get; set; }
+        ILLMModelSettings[] ModelSettingsList { get; set; }
+        string ToString();
+        bool Equals(IAppSettings otherSettings);
     }
 }

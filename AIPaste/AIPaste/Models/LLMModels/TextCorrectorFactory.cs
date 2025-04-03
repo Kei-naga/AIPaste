@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using AIPaste.common;
 using AIPaste.Models.DataModels;
 using LLamaSharp.SemanticKernel.ChatCompletion;
@@ -22,9 +23,13 @@ namespace AIPaste.Models.LLMModels
             {
                 case ModelType.LocalLLM:
                     var historyTransform = new HistoryTransform();
-                    return new LocalLlmStrategy(appSettings.LocalLLMSettings, historyTransform);
+                    var localLlmSettings = appSettings.ModelSettingsList.FirstOrDefault(x => x is LLMLocalModelSettings) as LLMLocalModelSettings 
+                        ?? throw new Exception("Local LLM settings not found");
+                    return new LocalLlmStrategy(localLlmSettings, historyTransform);
                 case ModelType.Gemini:
-                    return new GeminiStrategy(appSettings.GeminiSettings);
+                    var geminiSettings = appSettings.ModelSettingsList.FirstOrDefault(x => x is GeminiModelSettings) as GeminiModelSettings
+                        ?? throw new Exception("Gemini settings not found");
+                    return new GeminiStrategy(geminiSettings);
                 default:
                     throw new Exception("not find model type");
             }

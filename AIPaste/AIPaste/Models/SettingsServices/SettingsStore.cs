@@ -3,6 +3,7 @@ using NLog;
 using Windows.Storage;
 using Windows.System;
 using AIPaste.Models.DataModels;
+using System.Linq;
 
 namespace AIPaste.Models.SettingsServices
 {
@@ -45,7 +46,7 @@ namespace AIPaste.Models.SettingsServices
                 var keySettings = LoadKeySettings();
                 var AutoStart = (bool)_mainContainer.Values[AUTO_START_KEY];
                 var modelType = (ModelType)_mainContainer.Values[MODEL_TYPE_KEY];
-                var appSettings = new AppSettings(AutoStart, modelType, keySettings, llmModelSettings, geminiModelSettings);
+                var appSettings = new AppSettings(AutoStart, modelType, keySettings, [llmModelSettings, geminiModelSettings]);
                 _logger.Debug($"Loaded settimgs: {appSettings}");
                 _logger.Debug($"Local LLM Settings: {llmModelSettings}");
                 _logger.Debug($"Gemini Setting: {geminiModelSettings}");
@@ -99,9 +100,23 @@ namespace AIPaste.Models.SettingsServices
             _mainContainer.Values[AUTO_START_KEY] = appSettings.AutoStart;
             _mainContainer.Values[MODEL_TYPE_KEY] = (int)appSettings.ModelType;
             SaveKeySettings(appSettings.KeySettings);
-            SaveLocalLLMModelSettings(appSettings.LocalLLMSettings);
-            SaveGeminiModelSettings(appSettings.GeminiSettings);
+            SaveLlmModeSettings(appSettings.ModelSettingsList);
             _logger.Debug($"Saved settings: {appSettings}");
+        }
+
+        private void SaveLlmModeSettings(ILLMModelSettings[] modelSettingsList)
+        {
+            foreach (var modelSettings in modelSettingsList)
+            {
+                if (modelSettings is LLMLocalModelSettings localLlmModelSettings)
+                {
+                    SaveLocalLLMModelSettings(localLlmModelSettings);
+                }
+                else if (modelSettings is GeminiModelSettings geminiModelSettings)
+                {
+                    SaveGeminiModelSettings(geminiModelSettings);
+                }
+            }
         }
 
         private void SaveLocalLLMModelSettings(LLMLocalModelSettings llmModelSettings)

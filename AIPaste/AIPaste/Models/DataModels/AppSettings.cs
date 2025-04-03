@@ -1,12 +1,13 @@
-﻿namespace AIPaste.Models.DataModels
+﻿using System.Linq;
+
+namespace AIPaste.Models.DataModels
 {
-    public class AppSettings(bool autoStartSetting, ModelType modelType, IKeySettings keySettings, LLMLocalModelSettings llmLocalModelSettings, GeminiModelSettings geminiModelSettings): IAppSettings
+    public class AppSettings(bool autoStartSetting, ModelType modelType, IKeySettings keySettings, ILLMModelSettings[] modelSettingsList) : IAppSettings
     {
         public bool AutoStart { get; set; } = autoStartSetting;
         public ModelType ModelType { get; set; } = modelType;
         public IKeySettings KeySettings { get; set; } = keySettings;
-        public LLMLocalModelSettings LocalLLMSettings { get; set; } = llmLocalModelSettings;
-        public GeminiModelSettings GeminiSettings { get; set; } = geminiModelSettings;
+        public ILLMModelSettings[] ModelSettingsList { get; set; } = modelSettingsList;
 
         public static AppSettings GetDefaultSettings()
         {
@@ -14,8 +15,7 @@
                 autoStartSetting: true,
                 modelType: ModelType.LocalLLM,
                 keySettings: DataModels.KeySettings.GetDefaultSettings(),
-                llmLocalModelSettings: (LLMLocalModelSettings)LLMLocalModelSettings.GetDefaultSettings(),
-                geminiModelSettings: (GeminiModelSettings)GeminiModelSettings.GetDefaultSettings()
+                modelSettingsList: new ILLMModelSettings[] { LLMLocalModelSettings.GetDefaultSettings(), GeminiModelSettings.GetDefaultSettings() }
             );
         }
 
@@ -24,13 +24,21 @@
             return $"ModelSettings:  AutoStart: {AutoStart}, ModelType: {ModelType}";
         }
 
-        public bool Equals(AppSettings otherSettings)
+        public bool Equals(IAppSettings otherSettings)
         {
             return AutoStart == otherSettings.AutoStart &&
                 ModelType == otherSettings.ModelType &&
                 KeySettings.Equals(otherSettings.KeySettings) &&
-                LocalLLMSettings.Equals(otherSettings.LocalLLMSettings) &&
-                GeminiSettings.Equals(otherSettings.GeminiSettings);
+                SameLlmSettings(otherSettings.ModelSettingsList);
+        }
+
+        private bool SameLlmSettings(ILLMModelSettings[] otherLlmSettingsList)
+        {
+            return ModelSettingsList.Select(x =>
+            {
+                var otherLlmSettings = otherLlmSettingsList.FirstOrDefault(y => y.GetType() == x.GetType());
+                return otherLlmSettings != null && x.Equals(otherLlmSettings);
+            }).All(x => x);
         }
     }
 

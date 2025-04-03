@@ -42,10 +42,11 @@ namespace AIPaste.ViewModels
             {
                 _appSettings = newSettings;
             }
-            LLMModelPath = _appSettings.LocalLLMSettings.ModelPath;
-            GpuLayerCount = _appSettings.LocalLLMSettings.GpuLayerCount;
-            MaxTokens = _appSettings.LocalLLMSettings.MaxTokens;
-            GpuEnabled = _appSettings.LocalLLMSettings.GpuEnabled;
+            var localLlmSettings = GetLocalLlmSettings();
+            LLMModelPath = localLlmSettings.ModelPath;
+            GpuLayerCount = localLlmSettings.GpuLayerCount;
+            MaxTokens = localLlmSettings.MaxTokens;
+            GpuEnabled = localLlmSettings.GpuEnabled;
             IsHotkeyEnabled = _appSettings.KeySettings.IsHotkeyEnabled;
             Key = _appSettings.KeySettings.KeyPattern.Key;
             CtrlModifier = _appSettings.KeySettings.KeyPattern.Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_CONTROL);
@@ -54,7 +55,18 @@ namespace AIPaste.ViewModels
             WinModifier = _appSettings.KeySettings.KeyPattern.Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_WIN);
             AutoStart = _appSettings.AutoStart;
             ModelTypeName = _appSettings.ModelType;
-            ApiKey = _appSettings.GeminiSettings.ApiKey;
+            var geminiModelSettings = _appSettings.ModelSettingsList
+                .FirstOrDefault(x => x is GeminiModelSettings) as GeminiModelSettings
+                ?? throw new Exception("Gemini settings not found");
+            ApiKey = geminiModelSettings.ApiKey;
+        }
+
+        private LLMLocalModelSettings GetLocalLlmSettings()
+        {
+            var localLlmSettings = _appSettings.ModelSettingsList
+                .FirstOrDefault(x => x is LLMLocalModelSettings) as LLMLocalModelSettings
+                ?? throw new Exception("Local LLM settings not found");
+            return localLlmSettings;
         }
 
         public List<Tuple<string, ModelType>> ModelTypes = Enum.GetValues(typeof(ModelType))
@@ -256,11 +268,12 @@ namespace AIPaste.ViewModels
 
         private AppSettings GetCurrentAppSettings()
         {
+            var localLlmSettings = GetLocalLlmSettings();
             var localModelSettings = new LLMLocalModelSettings(
                 ModelPath: LLMModelPath,
                 GpuEnable: GpuEnabled,
                 GpuLayerCount: GpuLayerCount,
-                MaxContextSize: _appSettings.LocalLLMSettings.MaxContextSize,
+                MaxContextSize: localLlmSettings.MaxContextSize,
                 MaxTokens: MaxTokens
             );
             var geminiModelSettings = new GeminiModelSettings(ApiKey);
@@ -271,8 +284,7 @@ namespace AIPaste.ViewModels
                 AutoStart,
                 ModelTypeName,
                 keySettings,
-                localModelSettings,
-                geminiModelSettings
+                [localModelSettings, geminiModelSettings]
             );
         }
 
