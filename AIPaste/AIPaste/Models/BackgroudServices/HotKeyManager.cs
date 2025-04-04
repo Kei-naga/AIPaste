@@ -1,32 +1,29 @@
 ﻿using System;
-using AIPaste.Models.BackgroudServices;
 using AIPaste.Models.DataModels;
 using NLog;
 using Windows.System;
 
-namespace AIPaste.Services.BackgroudServices
+namespace AIPaste.Models.BackgroudServices
 {
     public partial class HotKeyManager : IHotKeyManager
     {
-        private HotkeyMessageManager? _hotkeyMessageManager;
+        private IHotkeyMessageManager _hotkeyMessageManager;
         public IKeyPattern KeyPattern { get; set; } = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
-        private readonly Action _onHotKeyPressed;
         private static HotKeyManager? _instance;
+        private readonly ILogger _logger;
 
-        private HotKeyManager(Action action)
+        private HotKeyManager(IHotkeyMessageManager hotkeyMessageManager, ILogger logger)
         {
-            _onHotKeyPressed = action;
+            _hotkeyMessageManager = hotkeyMessageManager;
+            _logger = logger;
         }
 
         /// <summary>
         /// Create a singleton instance of HotKeyManager.
         /// </summary>
-        public static HotKeyManager GetInstance(Action action)
+        public static HotKeyManager CreateInstance(IHotkeyMessageManager hotkeyMessageManager, ILogger logger)
         {
-            if (_instance == null)
-            {
-                _instance = new HotKeyManager(action);
-            }
+            _instance = new HotKeyManager(hotkeyMessageManager, logger);
             return _instance;
         }
 
@@ -44,16 +41,15 @@ namespace AIPaste.Services.BackgroudServices
 
         public bool RegisterHotKey(IKeyPattern keyPattern)
         {
-            _hotkeyMessageManager?.Dispose();
+            _hotkeyMessageManager.Dispose();
             KeyPattern = keyPattern;
-            _hotkeyMessageManager = new HotkeyMessageManager(_onHotKeyPressed);
             return _hotkeyMessageManager.RegisterHotKey(KeyPattern);
         }
 
         public void UnRegisterHotKey()
         {
-            _hotkeyMessageManager?.Dispose();
-            _hotkeyMessageManager = null;
+            _logger.Info("Unregister hotkey");
+            _hotkeyMessageManager.Dispose();
         }
     }
 }

@@ -9,31 +9,30 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace AIPaste.Models.BackgroudServices
 {
-    internal partial class HotkeyMessageManager : IDisposable
+    public partial class HotkeyMessageManager : IHotkeyMessageManager
     {
-        #pragma warning disable IDE1006 // 命名スタイル
+#pragma warning disable IDE1006 // 命名スタイル
         private const uint WM_HOTKEY = 0x0312; // Hotkey message
-        #pragma warning restore IDE1006 // 命名スタイル
-        private IntPtr _origPrc;
+#pragma warning restore IDE1006 // 命名スタイル
         private readonly WNDPROC _hotKeyPrc;
-        private readonly HWND _hwnd;
         private readonly Action _onHotKeyPressed;
-        private int _hotkeyId;
-        private readonly Window _dummyWindow;
         private readonly ILogger _logger;
+
+        private int _hotkeyId;
+        private Window? _dummyWindow;
+        private HWND _hwnd;
+        private IntPtr _origPrc;
 
         public HotkeyMessageManager(Action action, ILogger? logger = null)
         {
             _logger = logger ?? LogManager.GetCurrentClassLogger();
-            _hotkeyId = GetHashCode();
             _onHotKeyPressed = action;
             _hotKeyPrc = HotKeyPrc;
-            _dummyWindow = new Window();
-            _hwnd = new HWND(WinRT.Interop.WindowNative.GetWindowHandle(_dummyWindow).ToInt32());
         }
 
         public bool RegisterHotKey(IKeyPattern keyPattern)
         {
+            IntializeSettings();
             int attempts = 0;
             while (attempts < 3)
             {
@@ -51,6 +50,14 @@ namespace AIPaste.Models.BackgroudServices
             }
             _logger.Error("Failed to register hotkey");
             return false;
+        }
+
+        private void IntializeSettings()
+        {
+            Dispose();
+            _hotkeyId = GetHashCode();
+            _dummyWindow = new Window();
+            _hwnd = new HWND(WinRT.Interop.WindowNative.GetWindowHandle(_dummyWindow).ToInt32());
         }
 
         private LRESULT HotKeyPrc(HWND hwnd,
@@ -71,9 +78,14 @@ namespace AIPaste.Models.BackgroudServices
 
         public void Dispose()
         {
-            _logger.Info("Unregister hotkey");
             PInvoke.UnregisterHotKey(_hwnd, _hotkeyId);
-            _dummyWindow.Close();
+            _dummyWindow?.Close();
+            _dummyWindow = null;
         }
+    }
+
+    public interface IHotkeyMessageManager : IDisposable
+    {
+        bool RegisterHotKey(IKeyPattern keyPattern);
     }
 }

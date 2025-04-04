@@ -1,5 +1,5 @@
 ﻿using System;
-using AIPaste.Services.BackgroudServices;
+using NLog;
 
 namespace AIPaste.Models.BackgroudServices
 {
@@ -7,7 +7,9 @@ namespace AIPaste.Models.BackgroudServices
     {
         public IHotKeyManager CreateHotKeyManager(Action action)
         {
-            return HotKeyManager.GetInstance(action);
+            var logger = LogManager.GetCurrentClassLogger();
+            var hotkeyMessageManager = new HotkeyMessageManager(action, logger);
+            return HotKeyManager.CreateInstance(hotkeyMessageManager, logger);
         }
     }
 
