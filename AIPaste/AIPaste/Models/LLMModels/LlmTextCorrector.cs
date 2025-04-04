@@ -41,6 +41,9 @@ namespace AIPaste.Models.LLMModels
             _chatHistory.AddSystemMessage(_systemPrompt);
         }
 
+        /// <summary>
+        /// Generate text using the LLM model with streaming support.
+        /// </summary>
         public async IAsyncEnumerable<string> GeneratingText(ILlmRequest requestModel)
         {
             _chatHistory.AddUserMessage(requestModel.ToOptimizedRequest());
@@ -72,6 +75,9 @@ namespace AIPaste.Models.LLMModels
             }
         }
 
+        /// <summary>
+        /// Check the integrity of the LLM model by testing the connection.
+        /// </summary>
         public bool CheckIntegrity()
         {
             return Task.Run(() =>

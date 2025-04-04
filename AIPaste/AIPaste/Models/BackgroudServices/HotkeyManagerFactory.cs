@@ -7,7 +7,7 @@ namespace AIPaste.Models.BackgroudServices
     {
         public IHotKeyManager CreateHotKeyManager(Action action)
         {
-            return new HotKeyManager(action);
+            return HotKeyManager.GetInstance(action);
         }
     }
 

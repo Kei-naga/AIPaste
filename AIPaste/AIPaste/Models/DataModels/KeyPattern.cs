@@ -82,7 +82,7 @@ namespace AIPaste.Models.DataModels
             return $"{string.Join("+", AnalyzeModifier())}+{Key}";
         }
 
-        public bool Equals(KeyPattern otherPattern)
+        public bool Equals(IKeyPattern otherPattern)
         {
             return Modifiers == otherPattern.Modifiers && Key == otherPattern.Key;
         }
@@ -103,6 +103,6 @@ namespace AIPaste.Models.DataModels
         VirtualKey Key { get; set; }
         string[] AnalyzeModifier();
         string ToString();
-        bool Equals(KeyPattern otherPattern);
+        abstract bool Equals(IKeyPattern otherPattern);
     }
 }

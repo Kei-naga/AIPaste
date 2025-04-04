@@ -14,6 +14,7 @@ using AIPaste.Models.DataModels;
 using NLog;
 using Microsoft.SemanticKernel.ChatCompletion;
 using ManagedCuda;
+using AIPasteTests;
 
 namespace AIPaste.ViewModels.Tests
 {
@@ -93,40 +94,5 @@ namespace AIPaste.ViewModels.Tests
 
             clipboardOperatorMoq.Verify(x => x.SetText(It.IsAny<string>()), Times.Once);
         }
-    }
-
-    public class LlmTextCorrectorStub(string response, bool errorFlag) : ILlmTextCorrector
-    {
-        public async IAsyncEnumerable<string> GeneratingText(ILlmRequest requestModel)
-        {
-            if (_errorFlag)
-            {
-                throw new Exception("error");
-            }
-            ChatHistory.AddUserMessage(requestModel.ToOptimizedRequest());
-            foreach (var chunk in _dummyResponse.Select(x => x.ToString()).ToArray())
-            {
-                yield return chunk;
-                await Task.Delay(10);
-            }
-            PresentResponse = _dummyResponse;
-            ChatHistory.AddAssistantMessage(_dummyResponse);
-        }
-        public void ResetChat()
-        {
-            throw new NotImplementedException();
-        }
-        public bool CheckIntegrity()
-        {
-            if (_errorFlag)
-            {
-                return false;
-            }
-            return true;
-        }
-        public ChatHistory ChatHistory { get; } = [];
-        public string PresentResponse { get; set; } = "";
-        private string _dummyResponse = response;
-        private bool _errorFlag = errorFlag;
     }
 }

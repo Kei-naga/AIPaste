@@ -50,7 +50,7 @@ namespace AIPaste.ViewModels.Tests
         }
 
         [TestMethod()]
-        public void MainWindowViewModelTestWhenFailedUpdateHotkeySettings()
+        public void MainWindowViewModelTest_whenFailedUpdateHotkeySettings()
         {
             var hotKeyManagerFactoryMoq = GetHotKeyManagerFactoryMoq(false);
             var settingsServiceMoq = GetSettingsServiceMoq(true);

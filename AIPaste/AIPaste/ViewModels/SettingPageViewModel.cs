@@ -15,14 +15,14 @@ namespace AIPaste.ViewModels
     {
         private IAppSettings _appSettings;
         private readonly ISettingsService _settingsService;
-        private readonly IStartupManager _startupManager;
+        private readonly IAutoStartupManager _startupManager;
         private readonly ITextCorrectorFactory _textCorrectorFactory;
 
         private readonly ILogger _logger;
 
         public SettingsPageViewModel(
             ISettingsService? settingsService = null, 
-            IStartupManager? startupManager =null, 
+            IAutoStartupManager? startupManager =null, 
             ITextCorrectorFactory? textCorrectorFactory = null,
             ILogger? logger = null )
         {
@@ -30,7 +30,7 @@ namespace AIPaste.ViewModels
             _logger.Trace("SettingsPageViewModel created");
             _settingsService = settingsService ?? SettingsService.GetInstance();
             _appSettings = _settingsService.LoadSettings();
-            _startupManager = startupManager ?? new StartupManager();
+            _startupManager = startupManager ?? new AutoStartupManager();
             _textCorrectorFactory = textCorrectorFactory ?? new TextCorrectorFactory();
 
             UpdateSettingsOnView();
