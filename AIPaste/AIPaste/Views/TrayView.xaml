@@ -13,7 +13,7 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <tb:TaskbarIcon 
                 ToolTipText="AIPaste"
-            IconSource="\Images\AIPaste.ico"
+            IconSource="/Images/AIPaste_trayLogo.ico"
             LeftClickCommand="{x:Bind IconClicked}"
             NoLeftClickDelay="True"
             >

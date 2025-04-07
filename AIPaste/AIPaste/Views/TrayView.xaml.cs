@@ -10,9 +10,9 @@ namespace AIPaste.Views
 {
     public sealed partial class TrayView : UserControl
     {
-        private readonly ICommand IconClicked;
-        private readonly ICommand ExitClicked;
-        private readonly ICommand SettingsClicked;
+        public readonly ICommand IconClicked;
+        public readonly ICommand ExitClicked;
+        public readonly ICommand SettingsClicked;
         public TrayView()
         {
             InitializeComponent();
