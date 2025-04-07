@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Navigation;
 using NLog;
@@ -21,14 +22,10 @@ namespace AIPaste
         {
             this.InitializeComponent();
             var logger = LogManager.GetCurrentClassLogger();
-            if (IsDevelopmentMode())
-            {
+            LogManager.Configuration.Variables["isDevelopment"] = "false";
+            #if DEBUG
                 LogManager.Configuration.Variables["isDevelopment"] = "true";
-            }
-            else
-            {
-                LogManager.Configuration.Variables["isDevelopment"] = "false";
-            }
+            #endif
             logger.Info("Start AIPaste!");
             logger.Debug("Start on debug mode");
         }
@@ -48,11 +45,6 @@ namespace AIPaste
         void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
-        }
-
-        private bool IsDevelopmentMode()
-        {
-            return true;
         }
     }
 }
