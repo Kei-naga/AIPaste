@@ -27,34 +27,20 @@ namespace AIPaste.ViewModels
             RegisterHotKeyFirstly(appSettings);
         }
 
-        // TODO: ここらへんの処理は切り出して別クラスにしたい。ホットキー用のシングルトンクラスを作って、そこに処理を移す
         private void RegisterHotKeyFirstly(IAppSettings appSettings)
         {
-            if (!UpdateHotkeySettings(appSettings.KeySettings))
+            try
             {
+                _hotKeyManager.UpdateHotkeySettings(appSettings.KeySettings);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Failed to register hotkey");
+                _hotKeyManager.UnRegisterHotKey();
                 var keySettings = new KeySettings(false, appSettings.KeySettings.KeyPattern);
                 appSettings.KeySettings = keySettings;
                 _settingsService.SaveSettings(appSettings);
             }
-        }
-
-        public bool UpdateHotkeySettings(IKeySettings keySettings)
-        {
-            if (keySettings.IsHotkeyEnabled)
-            {
-                return RegisterHotKey(keySettings.KeyPattern);
-            }
-            else
-            {
-                UnRegisterHotKey();
-                return true;
-            }
-        }
-
-        private bool RegisterHotKey(IKeyPattern keyPattern)
-        {
-            _hotKeyManager.UnRegisterHotKey();
-            return _hotKeyManager.RegisterHotKey(keyPattern);
         }
 
         public void UnRegisterHotKey() => _hotKeyManager.UnRegisterHotKey();

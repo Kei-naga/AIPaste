@@ -16,11 +16,10 @@ namespace AIPaste.ViewModels.Tests
     [TestClass()]
     public class MainWindowViewModelTests
     {
-        private Mock<IHotKeyManagerFactory> GetHotKeyManagerFactoryMoq(bool isSuccessRegeisterHotkey)
+        private Mock<IHotKeyManagerFactory> GetHotKeyManagerFactoryMoq()
         {
             var moqHotKeyManagerFactory = new Mock<IHotKeyManagerFactory>();
             var moqHotKeyManager = new Mock<IHotKeyManager>();
-            moqHotKeyManager.Setup(x => x.RegisterHotKey(It.IsAny<IKeyPattern>())).Returns(isSuccessRegeisterHotkey);
             moqHotKeyManagerFactory.Setup(x => x.CreateHotKeyManager(It.IsAny<Action>())).Returns(moqHotKeyManager.Object);
             return moqHotKeyManagerFactory;
         }
@@ -41,7 +40,7 @@ namespace AIPaste.ViewModels.Tests
         [TestMethod()]
         public void MainWindowViewModelTest()
         {
-            var hotKeyManagerFactoryMoq = GetHotKeyManagerFactoryMoq(true);
+            var hotKeyManagerFactoryMoq = GetHotKeyManagerFactoryMoq();
             var settingsServiceMoq = GetSettingsServiceMoq(true);
 
             var viewModel = new MainWindowViewModel(() => { }, hotKeyManagerFactoryMoq.Object, settingsServiceMoq.Object);
@@ -52,53 +51,16 @@ namespace AIPaste.ViewModels.Tests
         [TestMethod()]
         public void MainWindowViewModelTest_whenFailedUpdateHotkeySettings()
         {
-            var hotKeyManagerFactoryMoq = GetHotKeyManagerFactoryMoq(false);
+            var hotKeyManagerFactoryMoq = new Mock<IHotKeyManagerFactory>();
+            var hotKeyManagerMoq = new Mock<IHotKeyManager>();
+            hotKeyManagerMoq.Setup(x => x.UpdateHotkeySettings(It.IsAny<IKeySettings>())).Throws(new Exception("Test exception"));
+            hotKeyManagerFactoryMoq.Setup(x => x.CreateHotKeyManager(It.IsAny<Action>())).Returns(hotKeyManagerMoq.Object);
             var settingsServiceMoq = GetSettingsServiceMoq(true);
 
             var viewModel = new MainWindowViewModel(() => { }, hotKeyManagerFactoryMoq.Object, settingsServiceMoq.Object);
             
             Assert.IsNotNull(viewModel);
             settingsServiceMoq.Verify(x => x.SaveSettings(It.IsAny<IAppSettings>()), Times.Once);
-        }
-
-        [TestMethod()]
-        public void UpdateHotkeySettingsTest_whenHotkeyIsEnbale()
-        {
-            var hotKeyManagerFactoryMoq = new Mock<IHotKeyManagerFactory>();
-            var hotKeyManagerMoq = new Mock<IHotKeyManager>();
-            hotKeyManagerMoq.Setup(x => x.RegisterHotKey(It.IsAny<IKeyPattern>())).Returns(true);
-            hotKeyManagerFactoryMoq.Setup(x => x.CreateHotKeyManager(It.IsAny<Action>())).Returns(hotKeyManagerMoq.Object);
-            var settingsServiceMoq = GetSettingsServiceMoq(true);
-            var keySettingsMoq = new Mock<IKeySettings>();
-            var keyPatternMoq = new Mock<IKeyPattern>();
-            keySettingsMoq.Setup(x => x.IsHotkeyEnabled).Returns(true);
-            keySettingsMoq.Setup(x => x.KeyPattern).Returns(keyPatternMoq.Object);
-
-            var viewModel = new MainWindowViewModel(() => { }, hotKeyManagerFactoryMoq.Object, settingsServiceMoq.Object);
-            var result = viewModel.UpdateHotkeySettings(keySettingsMoq.Object);
-
-            Assert.IsTrue(result);
-            hotKeyManagerMoq.Verify(x => x.RegisterHotKey(keyPatternMoq.Object), Times.Once);
-        }
-
-        [TestMethod()]
-        public void UpdateHotkeySettingsTest_whenHotkeyIsDisable()
-        {
-            var hotKeyManagerFactoryMoq = new Mock<IHotKeyManagerFactory>();
-            var hotKeyManagerMoq = new Mock<IHotKeyManager>();
-            hotKeyManagerMoq.Setup(x => x.RegisterHotKey(It.IsAny<IKeyPattern>())).Returns(true);
-            hotKeyManagerFactoryMoq.Setup(x => x.CreateHotKeyManager(It.IsAny<Action>())).Returns(hotKeyManagerMoq.Object);
-            var settingsServiceMoq = GetSettingsServiceMoq(true);
-            var keySettingsMoq = new Mock<IKeySettings>();
-            var keyPatternMoq = new Mock<IKeyPattern>();
-            keySettingsMoq.Setup(x => x.IsHotkeyEnabled).Returns(false);
-            keySettingsMoq.Setup(x => x.KeyPattern).Returns(keyPatternMoq.Object);
-
-            var viewModel = new MainWindowViewModel(() => { }, hotKeyManagerFactoryMoq.Object, settingsServiceMoq.Object);
-            var result = viewModel.UpdateHotkeySettings(keySettingsMoq.Object);
-
-            Assert.IsTrue(result);
-            hotKeyManagerMoq.Verify(x => x.RegisterHotKey(keyPatternMoq.Object), Times.Never);
         }
     }
 }

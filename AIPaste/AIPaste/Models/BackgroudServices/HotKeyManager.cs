@@ -39,17 +39,28 @@ namespace AIPaste.Models.BackgroudServices
             return _instance;
         }
 
-        public bool RegisterHotKey(IKeyPattern keyPattern)
+        public void RegisterHotKey(IKeyPattern keyPattern)
         {
-            _hotkeyMessageManager.Dispose();
             KeyPattern = keyPattern;
-            return _hotkeyMessageManager.RegisterHotKey(KeyPattern);
+            _hotkeyMessageManager.RegisterHotKey(KeyPattern);
         }
 
         public void UnRegisterHotKey()
         {
             _logger.Info("Unregister hotkey");
-            _hotkeyMessageManager.Dispose();
+            _hotkeyMessageManager.UnregisterHotKey();
+        }
+
+        public void UpdateHotkeySettings(IKeySettings keySettings)
+        {
+            if (keySettings.IsHotkeyEnabled)
+            {
+                RegisterHotKey(keySettings.KeyPattern);
+            }
+            else
+            {
+                UnRegisterHotKey();
+            }
         }
     }
 }

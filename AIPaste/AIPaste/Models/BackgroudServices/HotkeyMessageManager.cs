@@ -17,6 +17,7 @@ namespace AIPaste.Models.BackgroudServices
         private readonly WNDPROC _hotKeyPrc;
         private readonly Action _onHotKeyPressed;
         private readonly ILogger _logger;
+        private bool _isRegistered = false;
 
         private int _hotkeyId;
         private Window? _dummyWindow;
@@ -30,7 +31,7 @@ namespace AIPaste.Models.BackgroudServices
             _hotKeyPrc = HotKeyPrc;
         }
 
-        public bool RegisterHotKey(IKeyPattern keyPattern)
+        public void RegisterHotKey(IKeyPattern keyPattern)
         {
             IntializeSettings();
             int attempts = 0;
@@ -39,22 +40,23 @@ namespace AIPaste.Models.BackgroudServices
                 var success = PInvoke.RegisterHotKey(_hwnd, _hotkeyId, (Windows.Win32.UI.Input.KeyboardAndMouse.HOT_KEY_MODIFIERS)keyPattern.Modifiers, (uint)keyPattern.Key);
                 if (success)
                 {
-                    _logger.Info($"Hotkey registered: {keyPattern}");
+                    _logger.Trace($"Hotkey registered: {keyPattern}");
                     var hotKeyPrcPointer = Marshal.GetFunctionPointerForDelegate(_hotKeyPrc);
                     _origPrc = PInvoke.SetWindowLongPtr(_hwnd, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, hotKeyPrcPointer);
-                    return true;
+                    _isRegistered = true;
+                    return;
                 }
                 _logger.Trace("Failed to register hotkey, trying again");
                 _hotkeyId = GetHashCode();
                 attempts++;
             }
-            _logger.Error("Failed to register hotkey");
-            return false;
+            _isRegistered = false;
+            throw new InvalidOperationException($"Failed to register hotkey: {keyPattern}.");
         }
 
         private void IntializeSettings()
         {
-            Dispose();
+            UnregisterHotKey();
             _hotkeyId = GetHashCode();
             _dummyWindow = new Window();
             _hwnd = new HWND(WinRT.Interop.WindowNative.GetWindowHandle(_dummyWindow).ToInt32());
@@ -76,16 +78,21 @@ namespace AIPaste.Models.BackgroudServices
             return new LRESULT(intPtrLRESULT);
         }
 
-        public void Dispose()
+        public void UnregisterHotKey()
         {
-            PInvoke.UnregisterHotKey(_hwnd, _hotkeyId);
-            _dummyWindow?.Close();
-            _dummyWindow = null;
+            if (_isRegistered)
+            {
+                PInvoke.UnregisterHotKey(_hwnd, _hotkeyId);
+                _dummyWindow?.Close();
+                _dummyWindow = null;
+                _isRegistered = false;
+            }
         }
     }
 
-    public interface IHotkeyMessageManager : IDisposable
+    public interface IHotkeyMessageManager
     {
-        bool RegisterHotKey(IKeyPattern keyPattern);
+        void RegisterHotKey(IKeyPattern keyPattern);
+        void UnregisterHotKey();
     }
 }

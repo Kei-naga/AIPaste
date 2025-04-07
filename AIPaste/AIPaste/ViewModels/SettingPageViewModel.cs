@@ -8,6 +8,8 @@ using AIPaste.Models.LLMModels;
 using AIPaste.Models.StartupServices;
 using AIPaste.Models.DataModels;
 using AIPaste.Models.SettingsServices;
+using AIPaste.Models.BackgroudServices;
+using System.Threading.Tasks;
 
 namespace AIPaste.ViewModels
 {
@@ -17,6 +19,7 @@ namespace AIPaste.ViewModels
         private readonly ISettingsService _settingsService;
         private readonly IAutoStartupManager _startupManager;
         private readonly ITextCorrectorFactory _textCorrectorFactory;
+        private readonly IHotKeyManager _hotKeyManager;
 
         private readonly ILogger _logger;
 
@@ -24,6 +27,7 @@ namespace AIPaste.ViewModels
             ISettingsService? settingsService = null, 
             IAutoStartupManager? startupManager =null, 
             ITextCorrectorFactory? textCorrectorFactory = null,
+            IHotKeyManager? hotKeyManager = null,
             ILogger? logger = null )
         {
             _logger = logger ?? LogManager.GetCurrentClassLogger();
@@ -32,6 +36,8 @@ namespace AIPaste.ViewModels
             _appSettings = _settingsService.LoadSettings();
             _startupManager = startupManager ?? new AutoStartupManager();
             _textCorrectorFactory = textCorrectorFactory ?? new TextCorrectorFactory();
+            _hotKeyManager = (hotKeyManager ?? HotKeyManager.GetInstance()) 
+                ?? throw new Exception("HotKeyManager is not initialized");
 
             UpdateSettingsOnView();
         }
@@ -359,35 +365,46 @@ namespace AIPaste.ViewModels
 
         private bool ApplyHostkeySettings(AppSettings newSettings)
         {
-            if (!App.MainWindow?.ViewModel.UpdateHotkeySettings(newSettings.KeySettings) ?? false)
+            try
             {
-                _appSettings.KeySettings = new KeySettings(false, newSettings.KeySettings.KeyPattern);
+                _hotKeyManager.UpdateHotkeySettings(newSettings.KeySettings);
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Failed to apply hotkey settings");
+                _hotKeyManager.UnRegisterHotKey();
+                var newKeySettings = new KeySettings(false, newSettings.KeySettings.KeyPattern);
+                _appSettings.KeySettings = newKeySettings;
                 return false;
             }
-            return true;
         }
 
         private bool ApplyAutoStartSettings(AppSettings newSettings)
         {
-            try { AutoStartToggleChanged(newSettings.AutoStart); }
-            catch (Exception e)
+            var result = Task.Run(() =>
+                {
+                    return AutoStartToggleChanged(newSettings.AutoStart);
+                }).GetAwaiter().GetResult();
+            if (!result)
             {
-                _logger.Warn(e);
+                _logger.Warn("Failed to apply auto start settings");
                 _appSettings.AutoStart = false;
                 return false;
             }
+            _logger.Info($"AutoStart set to {newSettings.AutoStart}");
             return true;
         }
 
-        private async void AutoStartToggleChanged(bool changedStatus)
+        private async Task<bool> AutoStartToggleChanged(bool changedStatus)
         {
             await _startupManager.ToggleStartupAsync(changedStatus);
             var actualState = await _startupManager.IsAutoStartupMode();
             if (changedStatus != actualState)
             {
-                throw new Exception("Failed to set AutoStart");
+                return false;
             }
-            _logger.Info($"AutoStart set to {changedStatus}");
+            return true;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
