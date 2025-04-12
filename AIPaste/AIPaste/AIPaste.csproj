@@ -10,7 +10,6 @@
     <UseWinUI>true</UseWinUI>
     <Nullable>enable</Nullable>
 	<EnableMsixTooling>true</EnableMsixTooling>
-	<PublishProfile>Properties\PublishProfiles\win10-$(Platform).pubxml</PublishProfile>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Images\AIPaste_trayLogo.ico" />
