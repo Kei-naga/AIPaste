@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using AIPaste.common;
 using AIPaste.Models.DataModels;
 using Microsoft.UI.Xaml;
-using NLog;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -16,7 +16,7 @@ namespace AIPaste.Models.BackgroudServices
 #pragma warning restore IDE1006 // 命名スタイル
         private readonly WNDPROC _hotKeyPrc;
         private readonly Action _onHotKeyPressed;
-        private readonly ILogger _logger;
+        private readonly IMyLogger _logger;
         private bool _isRegistered = false;
 
         private int _hotkeyId;
@@ -24,9 +24,9 @@ namespace AIPaste.Models.BackgroudServices
         private HWND _hwnd;
         private IntPtr _origPrc;
 
-        public HotkeyMessageManager(Action action, ILogger? logger = null)
+        public HotkeyMessageManager(Action action, IMyLogger? logger = null)
         {
-            _logger = logger ?? LogManager.GetCurrentClassLogger();
+            _logger = logger ?? MyLogger.GetInstance();
             _onHotKeyPressed = action;
             _hotKeyPrc = HotKeyPrc;
         }

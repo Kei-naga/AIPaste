@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using AIPaste.common;
 using AIPaste.Models.DataModels;
 using AIPaste.ViewModels;
 using AIPaste.Views;
@@ -7,7 +8,6 @@ using H.NotifyIcon;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using NLog;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -20,7 +20,7 @@ namespace AIPaste
     /// </summary>
     public sealed partial class MainWindow : Window
     {
-        private readonly Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+        private readonly MyLogger _logger = MyLogger.GetInstance();
         public MainWindowViewModel ViewModel;
 
         public MainWindow()
@@ -41,7 +41,7 @@ namespace AIPaste
 
         private void OnWindowHideInsteadOfClose(object sender, WindowEventArgs args)
         {
-            _logger.Info("Close Window");
+            _logger.Info("CLOSE_WINDOW");
             args.Handled = true;
             this.Hide();
             this.SetFirstTab(TabName.AiPastePage);
@@ -85,7 +85,7 @@ namespace AIPaste
             {
                 ViewModel.UnRegisterHotKey();
                 args.Handled = false;
-                _logger.Info("Shutdown application!");
+                _logger.Info("SHUTDOWN_APP");
             };
         }
 
@@ -122,7 +122,8 @@ namespace AIPaste
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "Failed to load Page " + args.SelectedItemContainer.Tag.ToString());
+                    _logger.Error("FAILED_NAVIGATION", args.SelectedItemContainer.Tag.ToString() ?? "");
+                    _logger.Debug(ex);
                     contentFrame.Navigate(typeof(SettingsPage));
                     var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse();
                     SendDialog(
@@ -136,7 +137,8 @@ namespace AIPaste
         private void NavigationFailed(object sender, NavigationFailedEventArgs e)
         {
             e.Handled = true;
-            _logger.Error("Failed to load Page " + e.SourcePageType.FullName);
+            _logger.Error("FAILED_NAVIGATION", e.SourcePageType.FullName ?? "");
+            _logger.Debug(e.Exception);
             contentFrame.Navigate(typeof(SettingsPage));
             var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse();
             SendDialog(

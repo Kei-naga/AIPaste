@@ -1,8 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using AIPaste.common;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Navigation;
-using NLog;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -21,13 +18,11 @@ namespace AIPaste
         public App()
         {
             this.InitializeComponent();
-            var logger = LogManager.GetCurrentClassLogger();
-            LogManager.Configuration.Variables["isDevelopment"] = "false";
+            var logger = MyLogger.GetInstance();
             #if DEBUG
-                LogManager.Configuration.Variables["isDevelopment"] = "true";
+                logger.SetDevelopmentMode(true);
             #endif
-            logger.Info("Start AIPaste!");
-            logger.Debug("Start on debug mode");
+            logger.Info("START_APP");
         }
 
         public static MainWindow? MainWindow;

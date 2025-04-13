@@ -3,10 +3,10 @@ using System;
 using System.Text;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using NLog;
 using AIPaste.Models.DataModels;
 using System.Threading.Tasks;
 using System.Linq;
+using AIPaste.common;
 
 namespace AIPaste.Models.LLMModels
 {
@@ -21,11 +21,11 @@ namespace AIPaste.Models.LLMModels
         private readonly PromptExecutionSettings _promptExecutionSettings;
         private readonly ILlmStrategy _llmStrategy;
 
-        private readonly ILogger _logger;
+        private readonly IMyLogger _logger;
 
-        public LlmTextCorrector(ILlmStrategy llmStrategy, string systemPrompt, ChatHistory? chatHistory = null , ILogger? logger = null)
+        public LlmTextCorrector(ILlmStrategy llmStrategy, string systemPrompt, ChatHistory? chatHistory = null , IMyLogger? logger = null)
         {
-            _logger = logger ?? LogManager.GetCurrentClassLogger();
+            _logger = logger ?? MyLogger.GetInstance();
             _llmStrategy = llmStrategy;
             _systemPrompt = systemPrompt;
             _promptExecutionSettings = _llmStrategy.GetPromptExecutionSettings();

@@ -1,106 +1,113 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.20348.0</TargetPlatformMinVersion>
-    <RootNamespace>AIPaste</RootNamespace>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Platforms>x86;x64;ARM64</Platforms>
-    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
-    <UseWinUI>true</UseWinUI>
-    <Nullable>enable</Nullable>
-	<EnableMsixTooling>true</EnableMsixTooling>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Images\AIPaste_trayLogo.ico" />
-    <None Remove="MainWindow.xaml" />
-    <None Remove="Views\TrayView.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <AppxManifest Include="Package.appxmanifest">
-      <SubType>Designer</SubType>
-    </AppxManifest>
-  </ItemGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
+        <TargetPlatformMinVersion>10.0.20348.0</TargetPlatformMinVersion>
+        <RootNamespace>AIPaste</RootNamespace>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <Platforms>x64;ARM64</Platforms>
+        <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+        <UseWinUI>true</UseWinUI>
+        <Nullable>enable</Nullable>
+	    <EnableMsixTooling>true</EnableMsixTooling>
+	</PropertyGroup>
+    <ItemGroup>
+        <None Remove="Images\AIPaste_trayLogo.ico" />
+        <None Remove="MainWindow.xaml" />
+        <None Remove="Views\TrayView.xaml" />
+    </ItemGroup>
+	<ItemGroup>
+        <AppxManifest Include="Package.appxmanifest">
+            <SubType>Designer</SubType>
+        </AppxManifest>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Manifest Include="$(ApplicationManifest)" />
-  </ItemGroup>
+    <ItemGroup>
+        <Manifest Include="$(ApplicationManifest)" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
-    <PackageReference Include="H.NotifyIcon.WinUI" Version="2.3.0" />
-    <PackageReference Include="LLamaSharp" Version="0.23.0" />
-    <PackageReference Include="LLamaSharp.Backend.Cpu" Version="0.23.0" />
-    <PackageReference Include="LLamaSharp.Backend.Cuda11.Windows" Version="0.23.0" />
-    <PackageReference Include="LLamaSharp.Backend.Cuda12.Windows" Version="0.23.0" />
-    <PackageReference Include="LLamaSharp.Backend.Vulkan.Windows" Version="0.23.0" />
-    <PackageReference Include="LLamaSharp.semantic-kernel" Version="0.23.0" />
-    <PackageReference Include="ManagedCuda.NETStandard" Version="9.1.300" />
-    <PackageReference Include="Microsoft.SemanticKernel" Version="1.45.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Google" Version="1.45.0-alpha" />
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250310001" />
-    <PackageReference Include="NLog" Version="5.4.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
+        <PackageReference Include="H.NotifyIcon.WinUI" Version="2.3.0" />
+        <PackageReference Include="LLamaSharp" Version="0.23.0" />
+	    <!-- Workaround for LlamaSharp issue #382 https://github.com/SciSharp/LLamaSharp/issues/382 . Manually deploy the library  -->
+        <!--<PackageReference Include="LLamaSharp.Backend.Cpu" Version="0.23.0" />
+        <PackageReference Include="LLamaSharp.Backend.Cuda11.Windows" Version="0.23.0" />
+        <PackageReference Include="LLamaSharp.Backend.Cuda12.Windows" Version="0.23.0" />
+        <PackageReference Include="LLamaSharp.Backend.Vulkan.Windows" Version="0.23.0" />-->
+        <PackageReference Include="LLamaSharp.semantic-kernel" Version="0.23.0" />
+        <PackageReference Include="Microsoft.SemanticKernel" Version="1.45.0" />
+        <PackageReference Include="Microsoft.SemanticKernel.Connectors.Google" Version="1.45.0-alpha" />
+        <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250310001" />
+        <PackageReference Include="NLog" Version="5.4.0" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Page Update="Views\SettingsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+    <!-- Workaround for LlamaSharp issue #382. https://github.com/SciSharp/LLamaSharp/issues/382 -->
+    <ItemGroup>
+	    <Content Include="Binary\LLamaSharpBackend\**\*" PackageCopyToOutput="true">
+		    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		    <Link>runtimes\%(RecursiveDir)%(Filename)%(Extension)</Link>
+	    </Content>
+    </ItemGroup>
 
-  <ItemGroup>
-	<Content Include="Images\AIPaste_trayLogo.ico" />
-	<Content Include="Images\LockScreenLogo.scale-200.png" />
-	<Content Include="Images\SplashScreen.scale-200.png" />
-	<Content Include="Images\Square150x150Logo.scale-200.png" />
-	<Content Include="Images\Square44x44Logo.scale-200.png" />
-	<Content Include="Images\Square44x44Logo.targetsize-24_altform-unplated.png" />
-	<Content Include="Images\Wide310x150Logo.scale-200.png" />
-  </ItemGroup>
+    <ItemGroup>
+        <Page Update="Views\SettingsPage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        </Page>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+	    <Content Include="Images\AIPaste_trayLogo.ico" />
+	    <Content Include="Images\LockScreenLogo.scale-200.png" />
+	    <Content Include="Images\SplashScreen.scale-200.png" />
+	    <Content Include="Images\Square150x150Logo.scale-200.png" />
+	    <Content Include="Images\Square44x44Logo.scale-200.png" />
+	    <Content Include="Images\Square44x44Logo.targetsize-24_altform-unplated.png" />
+	    <Content Include="Images\Wide310x150Logo.scale-200.png" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+    <ItemGroup>
+        <None Update="NLog.config">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <Page Update="Views\TrayView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </Page>
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Update="NLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <Page Update="Views\TrayView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+    <ItemGroup>
+        <Page Update="MainWindow.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </Page>
+    </ItemGroup>
 
     <!-- Publish Properties -->
-  <PropertyGroup>
-    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
-    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
-    <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
-    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
-    <NuGetAudit>False</NuGetAudit>
-    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
-    <ApplicationIcon>AIPaste.ico</ApplicationIcon>
-  </PropertyGroup>
+    <PropertyGroup>
+		<RuntimeIdentifier Condition="'$(Platform)' == 'x64'">win-x64</RuntimeIdentifier>
+		<RuntimeIdentifier Condition="'$(Platform)' == 'ARM64'">win-arm64</RuntimeIdentifier>
+	    <SelfContained Condition="'$(Configuration)' != 'Debug'">true</SelfContained>
+	    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">true</PublishReadyToRun>
+		<!-- PublishReadyToRun is set to false to resolve NETSDK1096 when building with ARM64. a fix is ​​needed -->
+		<PublishReadyToRun Condition="'$(Platform)' == 'ARM64'">false</PublishReadyToRun>
+	    <!-- PublishTrimmed is set to false because SemanticKernel.Connectors.Google doesn't work well (probably because it disables reflection-based serialization). a fix is ​​needed -->
+	    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">false</PublishTrimmed>
+        <NuGetAudit>False</NuGetAudit>
+        <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+        <ApplicationIcon>AIPaste.ico</ApplicationIcon>
+        <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+        <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+        <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+        <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+        <AppxPackageDir>C:\Users\keita\source\repos\AIPaste\AIPaste\AIPaste\bin\publish\</AppxPackageDir>
+        <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+        <GenerateTestArtifacts>True</GenerateTestArtifacts>
+        <AppxBundle>Never</AppxBundle>
+        <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+        <PackageCertificateKeyFile>AIPaste_TemporaryKey.pfx</PackageCertificateKeyFile>
+    </PropertyGroup>
 </Project>

@@ -1,9 +1,8 @@
 ﻿using System;
-using NLog;
 using Windows.Storage;
 using Windows.System;
 using AIPaste.Models.DataModels;
-using System.Linq;
+using AIPaste.common;
 
 namespace AIPaste.Models.SettingsServices
 {
@@ -12,7 +11,8 @@ namespace AIPaste.Models.SettingsServices
         private readonly ApplicationDataContainer _mainContainer;
         private readonly ApplicationDataContainer _localLlmContainer;
         private readonly ApplicationDataContainer _geminiContainer;
-        private readonly ILogger _logger;
+        private readonly IMyLogger _logger;
+        #pragma warning disable IDE1006 // 命名スタイル
         private const string AUTO_START_KEY = "AutoStart";
         private const string MODEL_TYPE_KEY = "ModelType";
         private const string MODEL_PATH_KEY = "ModelPath";
@@ -26,10 +26,11 @@ namespace AIPaste.Models.SettingsServices
         private const string IS_HOTKEY_ENABLED_KEY = "IsHotkeyEnabled";
         private const string MODIFERS_KEY = "Modifers";
         private const string HOTKEY_KEY = "Hotkey";
+        #pragma warning restore IDE1006 // 命名スタイル
 
-        public SettingsStore(ILogger? logger)
+        public SettingsStore(IMyLogger? logger)
         {
-            _logger = logger ?? LogManager.GetCurrentClassLogger();
+            _logger = logger ?? MyLogger.GetInstance();
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
             _mainContainer = localSettings.CreateContainer("MainContainer", ApplicationDataCreateDisposition.Always);
             _localLlmContainer = _mainContainer.CreateContainer("LocalLLMContainer", ApplicationDataCreateDisposition.Always);
@@ -40,7 +41,7 @@ namespace AIPaste.Models.SettingsServices
         {
             try
             {
-                _logger.Info("Loading settings");
+                _logger.Info("LOAD_SETTINGS");
                 var llmModelSettings = LoadLocalLLMModelSettings();
                 var geminiModelSettings = LoadGeminiModelSettings();
                 var keySettings = LoadKeySettings();
@@ -54,7 +55,8 @@ namespace AIPaste.Models.SettingsServices
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Failed to load settings, resetting settings");
+                _logger.Error("FAILED_TO_LOAD_SETTINGS");
+                _logger.Debug(e);
                 return ResetSettings();
             }
         }
@@ -96,7 +98,6 @@ namespace AIPaste.Models.SettingsServices
 
         public void SaveSettings(IAppSettings appSettings)
         {
-            _logger.Info("Saving settings");
             _mainContainer.Values[AUTO_START_KEY] = appSettings.AutoStart;
             _mainContainer.Values[MODEL_TYPE_KEY] = (int)appSettings.ModelType;
             SaveKeySettings(appSettings.KeySettings);
@@ -148,7 +149,7 @@ namespace AIPaste.Models.SettingsServices
 
         public IAppSettings ResetSettings()
         {
-            _logger.Info("Resetting settings");
+            _logger.Info("RESET_SETTINGS");
             var defaultAppSettings = AppSettings.GetDefaultSettings();
             _mainContainer.Values.Clear();
             SaveSettings(defaultAppSettings);

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using NLog;
 using Windows.System;
 using AIPaste.Models.LLMModels;
 using AIPaste.Models.StartupServices;
@@ -10,6 +9,7 @@ using AIPaste.Models.DataModels;
 using AIPaste.Models.SettingsServices;
 using AIPaste.Models.BackgroudServices;
 using System.Threading.Tasks;
+using AIPaste.common;
 
 namespace AIPaste.ViewModels
 {
@@ -21,16 +21,16 @@ namespace AIPaste.ViewModels
         private readonly ITextCorrectorFactory _textCorrectorFactory;
         private readonly IHotKeyManager _hotKeyManager;
 
-        private readonly ILogger _logger;
+        private readonly IMyLogger _logger;
 
         public SettingsPageViewModel(
             ISettingsService? settingsService = null, 
             IAutoStartupManager? startupManager =null, 
             ITextCorrectorFactory? textCorrectorFactory = null,
             IHotKeyManager? hotKeyManager = null,
-            ILogger? logger = null )
+            IMyLogger? logger = null )
         {
-            _logger = logger ?? LogManager.GetCurrentClassLogger();
+            _logger = logger ??MyLogger.GetInstance();
             _logger.Trace("SettingsPageViewModel created");
             _settingsService = settingsService ?? SettingsService.GetInstance();
             _appSettings = _settingsService.LoadSettings();
@@ -306,26 +306,25 @@ namespace AIPaste.ViewModels
 
             if (!IsValidLlmSettings(newSettings))
             {
-                _logger.Warn("Invalid llm Settings");
+                _logger.Warn("INVALID_LLM_SETINGS");
                 UpdateSettingsOnView();
                 return false;
             }
 
             if (!ApplyHostkeySettings(newSettings))
             {
-                _logger.Error("Failed to apply hotkey settings");
+                _logger.Error("FAILED_TO_APPLY_HOTKEY");
                 UpdateSettingsOnView();
                 return false;
             }
 
             if (!ApplyAutoStartSettings(newSettings))
             {
-                _logger.Error("Failed to apply auto start settings");
+                _logger.Error("FAILED_TO_APPLY_AUTOSTART");
                 UpdateSettingsOnView();
                 return false;
             }
 
-            _logger.Info("Saving new Settings");
             try
             {
                 _settingsService.SaveSettings(newSettings);
@@ -335,10 +334,12 @@ namespace AIPaste.ViewModels
                     LocalLlmSingleton.Dispose();
                 }
                 UpdateSettingsOnView(newSettings);
+                _logger.Info("SUCCESS_SAVING");
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Failed to save settings. Failing back.");
+                _logger.Error("FAILING_BACK_SETTINGS");
+                _logger.Debug(e);
                 _settingsService.SaveSettings(_appSettings);
                 return false;
             }
@@ -372,7 +373,7 @@ namespace AIPaste.ViewModels
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Failed to apply hotkey settings");
+                _logger.Debug(e, "Failed to apply hotkey settings");
                 _hotKeyManager.UnRegisterHotKey();
                 var newKeySettings = new KeySettings(false, newSettings.KeySettings.KeyPattern);
                 _appSettings.KeySettings = newKeySettings;
@@ -388,11 +389,10 @@ namespace AIPaste.ViewModels
                 }).GetAwaiter().GetResult();
             if (!result)
             {
-                _logger.Warn("Failed to apply auto start settings");
                 _appSettings.AutoStart = false;
                 return false;
             }
-            _logger.Info($"AutoStart set to {newSettings.AutoStart}");
+            _logger.Trace($"AutoStart set to {newSettings.AutoStart}");
             return true;
         }
 

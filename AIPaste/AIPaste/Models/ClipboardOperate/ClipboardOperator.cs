@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Threading.Tasks;
-using NLog;
+using AIPaste.common;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace AIPaste.Models.ClipboardOperate
 {
     public class ClipboardOperator : IClipboardOperator
     {
-        private ILogger _logger;
+        private IMyLogger _logger;
         private IClipboardAccess _clipboard;
 
-        public ClipboardOperator(IClipboardAccess? clipboard = null, ILogger? logger = null)
+        public ClipboardOperator(IClipboardAccess? clipboard = null, IMyLogger? logger = null)
         {
-            _logger = logger ?? LogManager.GetCurrentClassLogger();
+            _logger = logger ?? MyLogger.GetInstance();
             _clipboard = clipboard ?? new SystemClipboard();
             _logger.Trace("ClipboardOperator created");
         }

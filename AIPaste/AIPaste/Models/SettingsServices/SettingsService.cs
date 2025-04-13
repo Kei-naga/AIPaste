@@ -1,8 +1,5 @@
-﻿using System;
+﻿using AIPaste.common;
 using AIPaste.Models.DataModels;
-using AIPaste.Models.LLMModels;
-using AIPaste.Models.StartupServices;
-using NLog;
 
 namespace AIPaste.Models.SettingsServices
 {
@@ -10,11 +7,11 @@ namespace AIPaste.Models.SettingsServices
     {
         private readonly ISettingsStore _settingsStore;
         private IAppSettings _presentAppSettings;
-        private readonly ILogger _logger;
+        private readonly IMyLogger _logger;
 
         static private SettingsService? _instance;
 
-        public static SettingsService GetInstance(ISettingsStore? settingsStore = null, ILogger? logger = null)
+        public static SettingsService GetInstance(ISettingsStore? settingsStore = null, IMyLogger? logger = null)
         {
             settingsStore ??= new SettingsStore(logger);
             if (_instance == null || _instance._settingsStore.GetType != settingsStore.GetType)
@@ -24,9 +21,9 @@ namespace AIPaste.Models.SettingsServices
             return _instance;
         }
 
-        private SettingsService(ISettingsStore settingsStore, ILogger? logger)
+        private SettingsService(ISettingsStore settingsStore, IMyLogger? logger)
         {
-            _logger = logger ?? LogManager.GetCurrentClassLogger();
+            _logger = logger ?? MyLogger.GetInstance();
             _settingsStore = settingsStore;
             _presentAppSettings = _settingsStore.LoadSettings();
         }
@@ -38,6 +35,7 @@ namespace AIPaste.Models.SettingsServices
 
         public void SaveSettings(IAppSettings appSettings)
         {
+            _logger.Info("SAVE_SETTINGS");
             _presentAppSettings = appSettings;
             _settingsStore.SaveSettings(appSettings);
         }

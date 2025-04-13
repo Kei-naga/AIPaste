@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using NLog;
 using AIPaste.Models.LLMModels;
 using AIPaste.Models.ClipboardOperate;
 using AIPaste.Models.SettingsServices;
@@ -14,7 +13,7 @@ namespace AIPaste.ViewModels
     {
         private readonly IClipboardOperator _clipboardOperator;
         private readonly ILlmTextCorrector _llmTextCorrector;
-        private ILogger _logger;
+        private IMyLogger _logger;
         private readonly IResourceLoaderWrapper _resourceLoader;
 
         private string _targetText = "";
@@ -56,9 +55,9 @@ namespace AIPaste.ViewModels
             ITextCorrectorFactory? textCorrectorFactory = null,
             IClipboardOperator? clipboardOperator = null, 
             IResourceLoaderWrapper? resourceLoader = null, 
-            ILogger? logger = null )
+            IMyLogger? logger = null )
         {
-            _logger = logger ?? LogManager.GetCurrentClassLogger();
+            _logger = logger ?? MyLogger.GetInstance();
             _logger.Trace("AiPastePageViewModel created");
             _resourceLoader = resourceLoader ?? new ResourceLoaderWrapper();
             var appSettings = settingsService?.LoadSettings() ?? SettingsService.GetInstance().LoadSettings();
@@ -87,7 +86,8 @@ namespace AIPaste.ViewModels
             catch(Exception ex)
             {
                 OutputText = _resourceLoader.GetString("AIPastePage_InappropriateOutput");
-                _logger.Warn(ex, "Missing GeneratingText");
+                _logger.Warn("FAILED_GENERATE_TEXT");
+                _logger.Debug(ex);
             }
             OutputText = _llmTextCorrector.PresentResponse;
         }
@@ -105,7 +105,8 @@ namespace AIPaste.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.Warn(ex, "Failed to set text to clipboard");
+                _logger.Warn("FAILED_TO_SET_CLIPBOARD_TEXT");
+                _logger.Debug(ex);
             }   
         }
 
@@ -117,7 +118,8 @@ namespace AIPaste.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.Warn(ex, "Failed to get text from clipboard");
+                _logger.Warn("FAILED_TO_GET_CLIPBOARD_TEXT");
+                _logger.Debug(ex);
             }
         }
 

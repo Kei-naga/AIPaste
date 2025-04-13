@@ -1,6 +1,5 @@
-﻿using System;
+﻿using AIPaste.common;
 using AIPaste.Models.DataModels;
-using NLog;
 using Windows.System;
 
 namespace AIPaste.Models.BackgroudServices
@@ -10,9 +9,9 @@ namespace AIPaste.Models.BackgroudServices
         private IHotkeyMessageManager _hotkeyMessageManager;
         public IKeyPattern KeyPattern { get; set; } = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL | HOT_KEY_MODIFIERS.MOD_ALT, VirtualKey.C);
         private static HotKeyManager? _instance;
-        private readonly ILogger _logger;
+        private readonly IMyLogger _logger;
 
-        private HotKeyManager(IHotkeyMessageManager hotkeyMessageManager, ILogger logger)
+        private HotKeyManager(IHotkeyMessageManager hotkeyMessageManager, IMyLogger logger)
         {
             _hotkeyMessageManager = hotkeyMessageManager;
             _logger = logger;
@@ -21,7 +20,7 @@ namespace AIPaste.Models.BackgroudServices
         /// <summary>
         /// Create a singleton instance of HotKeyManager.
         /// </summary>
-        public static HotKeyManager CreateInstance(IHotkeyMessageManager hotkeyMessageManager, ILogger logger)
+        public static HotKeyManager CreateInstance(IHotkeyMessageManager hotkeyMessageManager, IMyLogger logger)
         {
             _instance = new HotKeyManager(hotkeyMessageManager, logger);
             return _instance;
@@ -41,13 +40,14 @@ namespace AIPaste.Models.BackgroudServices
 
         public void RegisterHotKey(IKeyPattern keyPattern)
         {
+            _logger.Info("REGISTER_HOTKEY");
             KeyPattern = keyPattern;
             _hotkeyMessageManager.RegisterHotKey(KeyPattern);
         }
 
         public void UnRegisterHotKey()
         {
-            _logger.Info("Unregister hotkey");
+            _logger.Info("UNREGISTER_HOTKEY");
             _hotkeyMessageManager.UnregisterHotKey();
         }
 

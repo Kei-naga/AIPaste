@@ -1,6 +1,4 @@
-﻿using ManagedCuda;
-
-namespace AIPaste.Models.DataModels
+﻿namespace AIPaste.Models.DataModels
 {
     public class LLMLocalModelSettings(string ModelPath, bool GpuEnable, int GpuLayerCount, uint MaxContextSize, int MaxTokens) : ILLMModelSettings
     {
@@ -14,7 +12,7 @@ namespace AIPaste.Models.DataModels
         {
             return new LLMLocalModelSettings(
                 ModelPath: @"",
-                GpuEnable: IsGpuAvailable(),
+                GpuEnable: true,
                 GpuLayerCount: 32,
                 MaxContextSize: 1024,
                 MaxTokens: 256
@@ -36,19 +34,6 @@ namespace AIPaste.Models.DataModels
         public override string ToString()
         {
             return $"ModelPath: {ModelPath}, GpuLayerCount: {GpuLayerCount}, MaxContextSize: {MaxContextSize}, MaxTokens: {MaxTokens}";
-        }
-
-        private static bool IsGpuAvailable() // cheking for only nvidia gpu
-        {
-            try
-            {
-                using var cudaContext = new CudaContext();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
     }
 }

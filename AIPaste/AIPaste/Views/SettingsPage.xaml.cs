@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using AIPaste.ViewModels;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Windows.ApplicationModel.Resources;
-using NLog;
+using AIPaste.common;
 
 namespace AIPaste.Views
 {
@@ -11,7 +11,7 @@ namespace AIPaste.Views
     {
         public SettingsPageViewModel ViewModel;
         private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForViewIndependentUse();
-        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly MyLogger _logger = MyLogger.GetInstance();
 
         public SettingsPage()
         {
@@ -35,7 +35,8 @@ namespace AIPaste.Views
             }
             catch (System.Exception ex)
             {
-                _logger.Error(ex, "Failed to save settings");
+                _logger.Error("FAILED_SAVING");
+                _logger.Debug(ex);
             }
         }
 

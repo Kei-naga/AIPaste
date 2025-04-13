@@ -1,8 +1,8 @@
 ﻿using System;
+using AIPaste.common;
 using AIPaste.Models.BackgroudServices;
 using AIPaste.Models.DataModels;
 using AIPaste.Models.SettingsServices;
-using NLog;
 
 namespace AIPaste.ViewModels
 {
@@ -10,15 +10,15 @@ namespace AIPaste.ViewModels
     {
         private readonly IHotKeyManager _hotKeyManager;
         private readonly ISettingsService _settingsService;
-        private readonly ILogger _logger;
+        private readonly IMyLogger _logger;
 
         public MainWindowViewModel(
             Action action, 
             IHotKeyManagerFactory? hotKeyManagerFactory = null, 
             ISettingsService? settingsService = null, 
-            ILogger? logger = null )
+            IMyLogger? logger = null )
         {
-            _logger = logger ?? LogManager.GetCurrentClassLogger();
+            _logger = logger ?? MyLogger.GetInstance();
             _logger.Trace("MainWindowViewModel created");
             hotKeyManagerFactory ??= new HotkeyManagerFactory();
             _hotKeyManager = hotKeyManagerFactory.CreateHotKeyManager(action);
@@ -35,7 +35,8 @@ namespace AIPaste.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Failed to register hotkey");
+                _logger.Error("FAILED_REGISTER_HOTKEY");
+                _logger.Debug(ex);
                 _hotKeyManager.UnRegisterHotKey();
                 var keySettings = new KeySettings(false, appSettings.KeySettings.KeyPattern);
                 appSettings.KeySettings = keySettings;

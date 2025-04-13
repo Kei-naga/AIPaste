@@ -3,13 +3,12 @@ using System.Linq;
 using AIPaste.common;
 using AIPaste.Models.DataModels;
 using LLamaSharp.SemanticKernel.ChatCompletion;
-using NLog;
 
 namespace AIPaste.Models.LLMModels
 {
     public class TextCorrectorFactory : ITextCorrectorFactory
     {
-        public ILlmTextCorrector CreateLlmTextCorrector(IAppSettings appSettings, IResourceLoaderWrapper? resourceLoader = null, ILogger? logger = null)
+        public ILlmTextCorrector CreateLlmTextCorrector(IAppSettings appSettings, IResourceLoaderWrapper? resourceLoader = null, IMyLogger? logger = null)
         {
             resourceLoader ??= new ResourceLoaderWrapper();
             var llmStrategy = GetLlmStrategy(appSettings);
@@ -38,6 +37,6 @@ namespace AIPaste.Models.LLMModels
 
     public interface ITextCorrectorFactory
     {
-        ILlmTextCorrector CreateLlmTextCorrector(IAppSettings appSettings, IResourceLoaderWrapper? resourceLoader = null, ILogger? logger = null);
+        ILlmTextCorrector CreateLlmTextCorrector(IAppSettings appSettings, IResourceLoaderWrapper? resourceLoader = null, IMyLogger? logger = null);
     }
 }

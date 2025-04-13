@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
-using NLog;
+using AIPaste.common;
 using Windows.ApplicationModel;
 
 namespace AIPaste.Models.StartupServices
 {
-    public class AutoStartupManager(Logger? logger = null) : IAutoStartupManager
+    public class AutoStartupManager(IMyLogger? logger = null) : IAutoStartupManager
     {
-        private readonly Logger _logger = logger ?? LogManager.GetCurrentClassLogger();
+        private readonly IMyLogger _logger = logger ?? MyLogger.GetInstance();
         private const string TASK_ID = "AIPasteAutoStart";
 
         public async Task ToggleStartupAsync(bool enable)
@@ -17,7 +17,7 @@ namespace AIPaste.Models.StartupServices
             {
                 if (startupTask.State == StartupTaskState.Disabled)
                 {
-                    _logger.Info("auto start activating...");
+                    _logger.Info("ACTIVATE_AUTOSTART");
                     await startupTask.RequestEnableAsync();
                 }
             }
@@ -25,7 +25,7 @@ namespace AIPaste.Models.StartupServices
             {
                 if (startupTask.State == StartupTaskState.Enabled)
                 {
-                    _logger.Info("auto start deactivating...");
+                    _logger.Info("DEACTIVATE_AUTOSTART");
                     startupTask.Disable();
                 }
             }

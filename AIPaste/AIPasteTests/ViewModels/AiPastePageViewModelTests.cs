@@ -1,19 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AIPaste.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AIPaste.Models.SettingsServices;
+﻿using AIPaste.Models.SettingsServices;
 using Moq;
 using AIPaste.Models.LLMModels;
 using AIPaste.Models.ClipboardOperate;
 using AIPaste.common;
 using AIPaste.Models.DataModels;
-using NLog;
-using Microsoft.SemanticKernel.ChatCompletion;
-using ManagedCuda;
 using AIPasteTests;
 
 namespace AIPaste.ViewModels.Tests
@@ -44,7 +34,7 @@ namespace AIPaste.ViewModels.Tests
             var settingsServiceMoq = GetSettingsServiceMoq();
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
             var textCorrectorFactoryMoq = new Mock<ITextCorrectorFactory>();
-            textCorrectorFactoryMoq.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<ILogger>())).Returns(textCorrectorStub);
+            textCorrectorFactoryMoq.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
             var clipboardOperatorMoq = GetClipboardOperatorMoq();
             var resourceLoaderMoq = new Mock<IResourceLoaderWrapper>();
 
@@ -60,7 +50,7 @@ namespace AIPaste.ViewModels.Tests
             var clipboardOperatorMoq = GetClipboardOperatorMoq();
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
             var textCorrectorFactoryMoq = new Mock<ITextCorrectorFactory>();
-            textCorrectorFactoryMoq.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<ILogger>())).Returns(textCorrectorStub);
+            textCorrectorFactoryMoq.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
             var resourceLoaderMoq = new Mock<IResourceLoaderWrapper>();
             resourceLoaderMoq.Setup(x => x.GetString(It.IsAny<string>())).Returns("");
             var didFire = false;
@@ -84,7 +74,7 @@ namespace AIPaste.ViewModels.Tests
             var settingsServiceMoq = GetSettingsServiceMoq();
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
             var textCorrectorFactoryMoq = new Mock<ITextCorrectorFactory>();
-            textCorrectorFactoryMoq.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<ILogger>())).Returns(textCorrectorStub);
+            textCorrectorFactoryMoq.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
             var clipboardOperatorMoq = GetClipboardOperatorMoq();
             clipboardOperatorMoq.Setup(x => x.SetText(It.IsAny<string>())).Verifiable();
             var resourceLoaderMoq = new Mock<IResourceLoaderWrapper>();
