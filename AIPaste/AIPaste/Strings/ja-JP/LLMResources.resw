@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="OneShot_Ans" xml:space="preserve">
+    <value>明日のミーティングですが、午後2時からで問題ございませんでしょうか？</value>
+  </data>
+  <data name="OneShot_Instruction" xml:space="preserve">
+    <value>ビジネス文章になおして</value>
+  </data>
+  <data name="OneShot_TargetText" xml:space="preserve">
+    <value>明日のミーティング、2時からでOK？</value>
+  </data>
   <data name="SystemPrompt" xml:space="preserve">
     <value>あなたは文章編集の専門家です。対象テキストとユーザ指示を与えるので、対象テキストをユーザ指示に厳密に従って修正してください。出力するテキストは理由や説明等はなにもつけず、必ず修正したテキストのみを出力してください。</value>
   </data>

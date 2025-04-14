@@ -6,8 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel.Services;
 using HuggingfaceHub;
 using LLamaSharp.SemanticKernel.ChatCompletion;
-using LLamaSharp.SemanticKernel;
 using AIPaste.Models.LLMModels;
+using AIPaste.common;
 
 namespace AIPasteTests.Models.LLMModels
 {
@@ -28,17 +28,32 @@ namespace AIPasteTests.Models.LLMModels
             return moqLlmStrategy;
         }
 
+        private Mock<IResourceLoaderWrapper> GetResourceLoaderMoq(string dummyAns)
+        {
+            var moqResourceLoader = new Mock<IResourceLoaderWrapper>();
+            moqResourceLoader.Setup(x => x.GetString(It.IsAny<string>())).Returns(dummyAns);
+            return moqResourceLoader;
+        }
+
         [TestMethod()]
         public void LlmTextCorrectorTest()
         {
             var moqLlmStrategy = GetLlmStrategyMoq("dummy");
             var testSystemPrompt = "test system prompt";
+            var dummyString = "dummy";
+            var moqResourceLoader = GetResourceLoaderMoq(dummyString);
 
-            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, testSystemPrompt);
+            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, testSystemPrompt, moqResourceLoader.Object);
 
-            Assert.AreEqual(1, corrector.ChatHistory.Count());
+            Assert.IsNotNull(corrector);
+            Assert.AreEqual(3, corrector.ChatHistory.Count());
             Assert.AreEqual("system", corrector.ChatHistory[0].Role.ToString());
             Assert.AreEqual(testSystemPrompt, corrector.ChatHistory[0].ToString());
+            Assert.AreEqual("user", corrector.ChatHistory[1].Role.ToString());
+            var expected = new LlmRequest(dummyString, dummyString, moqResourceLoader.Object).ToOptimizedRequest();
+            Assert.AreEqual(expected, corrector.ChatHistory[1].ToString());
+            Assert.AreEqual("assistant", corrector.ChatHistory[2].Role.ToString());
+            Assert.AreEqual(dummyString, corrector.ChatHistory[2].ToString());
         }
 
 
@@ -47,16 +62,22 @@ namespace AIPasteTests.Models.LLMModels
         {
             var moqLlmStrategy = GetLlmStrategyMoq("dummy");
             var testSystemPrompt = "test system prompt";
-            var chatHistory = new ChatHistory();
-            chatHistory.AddUserMessage("test user message");
-            chatHistory.AddAssistantMessage("test assistant message");
+            var dummyString = "dummy";
+            var moqResourceLoader = GetResourceLoaderMoq(dummyString);
 
-            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, testSystemPrompt, chatHistory);
+            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, testSystemPrompt, moqResourceLoader.Object);
+            corrector.ChatHistory.AddUserMessage("dummy message");
             corrector.ResetChat();
 
-            Assert.AreEqual(1, corrector.ChatHistory.Count());
+            Assert.AreEqual(3, corrector.ChatHistory.Count());
+            Assert.AreEqual("system", corrector.ChatHistory[0].Role.ToString());
             Assert.AreEqual(testSystemPrompt, corrector.ChatHistory[0].ToString());
-        }    
+            Assert.AreEqual("user", corrector.ChatHistory[1].Role.ToString());
+            var expected = new LlmRequest(dummyString, dummyString, moqResourceLoader.Object).ToOptimizedRequest();
+            Assert.AreEqual(expected, corrector.ChatHistory[1].ToString());
+            Assert.AreEqual("assistant", corrector.ChatHistory[2].Role.ToString());
+            Assert.AreEqual(dummyString, corrector.ChatHistory[2].ToString());
+        }
 
         [TestMethod()]
         public async Task GenerateText()
@@ -68,8 +89,9 @@ namespace AIPasteTests.Models.LLMModels
             var testSystemPrompt = "test system prompt";
             var moqRequest = new Mock<ILlmRequest>();
             moqRequest.Setup(x => x.ToOptimizedRequest()).Returns("dummy text");
+            var moqResourceLoader = GetResourceLoaderMoq("dummy");
 
-            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, testSystemPrompt);
+            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, testSystemPrompt, moqResourceLoader.Object);
             var results = corrector.GeneratingText(moqRequest.Object);
 
             await foreach (var result in results)
@@ -88,13 +110,13 @@ namespace AIPasteTests.Models.LLMModels
             moqLlmStrategy.SetupSequence(x => x.GetTokenCount(It.IsAny<ChatHistory>()))
                 .Returns(2)
                 .Returns(0);
-            var chatHistory = new ChatHistory();
-            chatHistory.AddUserMessage("dummy message1");
-            chatHistory.AddAssistantMessage("dummy message2");
             var moqRequest = new Mock<ILlmRequest>();
             moqRequest.Setup(x => x.ToOptimizedRequest()).Returns("dummy text");
+            var moqResourceLoader = GetResourceLoaderMoq("dummy");
 
-            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, "dummy system prompt", chatHistory);
+            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, "dummy system prompt", moqResourceLoader.Object);
+            corrector.ChatHistory.AddUserMessage("dummy message1");
+            corrector.ChatHistory.AddAssistantMessage("dummy message2");
             var results = corrector.GeneratingText(moqRequest.Object);
 
             await foreach (var result in results)
@@ -102,7 +124,7 @@ namespace AIPasteTests.Models.LLMModels
                 Assert.AreEqual(dummyAns, result);
             }
             Assert.AreEqual(dummyAns, corrector.PresentResponse);
-            Assert.IsTrue(corrector.ChatHistory.Count() < 5);
+            Assert.IsTrue(corrector.ChatHistory.Count() == 6);
         }
 
         [TestMethod()]
@@ -110,8 +132,9 @@ namespace AIPasteTests.Models.LLMModels
         {
             var dummyAns = "dummy answer";
             var moqLlmStrategy = GetLlmStrategyMoq(dummyAns);
+            var moqResourceLoader = GetResourceLoaderMoq("dummy");
 
-            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, "dummy");
+            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, "dummy", moqResourceLoader.Object);
             var result = corrector.CheckIntegrity();
 
             Assert.IsTrue(result);
@@ -122,8 +145,9 @@ namespace AIPasteTests.Models.LLMModels
         {
             var dummyAns = string.Empty;
             var moqLlmStrategy = GetLlmStrategyMoq(dummyAns);
+            var moqResourceLoader = GetResourceLoaderMoq("dummy");
 
-            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, "dummy");
+            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, "dummy", moqResourceLoader.Object);
             var result = corrector.CheckIntegrity();
 
             Assert.IsFalse(result);
@@ -134,8 +158,9 @@ namespace AIPasteTests.Models.LLMModels
         {
             var dummyAns = "dummy answer";
             var moqLlmStrategy = GetLlmStrategyMoq(dummyAns, true);
+            var moqResourceLoader = GetResourceLoaderMoq("dummy");
 
-            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, "dummy");
+            var corrector = new LlmTextCorrector(moqLlmStrategy.Object, "dummy", moqResourceLoader.Object);
             var result = corrector.CheckIntegrity();
 
             Assert.IsFalse(result);
@@ -149,8 +174,9 @@ namespace AIPasteTests.Models.LLMModels
             var localLlmStrategy = new LocalLlmStrategy(localLlmSettings, new HistoryTransform());
             var moqRequest = new Mock<ILlmRequest>();
             moqRequest.Setup(x => x.ToOptimizedRequest()).Returns("hello");
+            var moqResourceLoader = GetResourceLoaderMoq("dummy");
 
-            var corrector = new LlmTextCorrector(localLlmStrategy, "you are my assistant");
+            var corrector = new LlmTextCorrector(localLlmStrategy, "you are my assistant", moqResourceLoader.Object);
             var results = corrector.GeneratingText(moqRequest.Object);
 
             await foreach (var result in results)
@@ -168,8 +194,9 @@ namespace AIPasteTests.Models.LLMModels
             var geminiStrategy = new GeminiStrategy(geminiSettings);
             var moqRequest = new Mock<ILlmRequest>();
             moqRequest.Setup(x => x.ToOptimizedRequest()).Returns("hello");
+            var moqResourceLoader = GetResourceLoaderMoq("dummy");
 
-            var corrector = new LlmTextCorrector(geminiStrategy, "you are my assistant");
+            var corrector = new LlmTextCorrector(geminiStrategy, "you are my assistant", moqResourceLoader.Object);
             var results = corrector.GeneratingText(moqRequest.Object);
 
             await foreach (var result in results)

@@ -17,28 +17,41 @@ namespace AIPaste.Models.LLMModels
         private readonly IChatCompletionService _chatCompletionService;
         private readonly ChatHistory _chatHistory;
         private readonly string _systemPrompt;
-        public ChatHistory ChatHistory { get { return _chatHistory; } }
+        public ChatHistory ChatHistory => _chatHistory;
         private readonly PromptExecutionSettings _promptExecutionSettings;
         private readonly ILlmStrategy _llmStrategy;
+        private readonly IResourceLoaderWrapper _resourceLoader;
 
         private readonly IMyLogger _logger;
 
-        public LlmTextCorrector(ILlmStrategy llmStrategy, string systemPrompt, ChatHistory? chatHistory = null , IMyLogger? logger = null)
+        public LlmTextCorrector(ILlmStrategy llmStrategy, string systemPrompt , IResourceLoaderWrapper? resourceLoader = null, IMyLogger? logger = null)
         {
             _logger = logger ?? MyLogger.GetInstance();
+            _resourceLoader = resourceLoader ?? new ResourceLoaderWrapper();
             _llmStrategy = llmStrategy;
             _systemPrompt = systemPrompt;
             _promptExecutionSettings = _llmStrategy.GetPromptExecutionSettings();
             _kernel = _llmStrategy.GetKernel();
             _chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
-            _chatHistory = chatHistory ?? new ChatHistory();
-            _chatHistory.AddSystemMessage(_systemPrompt);
+            _chatHistory = [];
+            ResetChat();
         }
 
         public void ResetChat()
         {
             _chatHistory.Clear();
             _chatHistory.AddSystemMessage(_systemPrompt);
+            DoOneShotLearning();
+        }
+
+        private void DoOneShotLearning()
+        {
+            var oneShotTarget = _resourceLoader.GetString("/LLMResources/OneShot_TargetText");
+            var oneShotInstruction = _resourceLoader.GetString("/LLMResources/OneShot_Instruction");
+            var oneShotAns = _resourceLoader.GetString("/LLMResources/OneShot_Ans");
+            var oneShotRequest = new LlmRequest(oneShotTarget, oneShotInstruction, _resourceLoader);
+            _chatHistory.AddUserMessage(oneShotRequest.ToOptimizedRequest());
+            _chatHistory.AddAssistantMessage(oneShotAns);
         }
 
         /// <summary>

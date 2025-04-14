@@ -117,26 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Settings_HotkeyAlt.Content" xml:space="preserve">
-    <value>Alt</value>
+  <data name="OneShot_Ans" xml:space="preserve">
+    <value>Regarding tomorrow's meeting, would 2 PM work for you?  </value>
   </data>
-  <data name="Settings_HotkeyCtrl.Content" xml:space="preserve">
-    <value>Ctrl</value>
+  <data name="OneShot_Instruction" xml:space="preserve">
+    <value>rewrite this in bussiness-style</value>
   </data>
-  <data name="Settings_HotkeyEnable.Header" xml:space="preserve">
-    <value>Hotkey Activation</value>
-  </data>
-  <data name="Settings_HotkeyEnable.OffContent" xml:space="preserve">
-    <value>off</value>
-  </data>
-  <data name="Settings_HotkeyEnable.OnContent" xml:space="preserve">
-    <value>On</value>
-  </data>
-  <data name="Settings_HotkeyShift.Content" xml:space="preserve">
-    <value>Shift</value>
-  </data>
-  <data name="Settings_HotkeyWin.Content" xml:space="preserve">
-    <value>Win</value>
+  <data name="OneShot_TargetText" xml:space="preserve">
+    <value>Is tomorrow's meeting at 2 o'clock okay?  </value>
   </data>
   <data name="SystemPrompt" xml:space="preserve">
     <value>You are a text editing expert. Given a target text and user instructions, please modify the target text strictly according to the user instructions. In your response, include only the modified text without any explanations or reasons. Also, be careful not to change the original meaning or intent.</value>
