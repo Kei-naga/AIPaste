@@ -125,6 +125,10 @@ namespace AIPaste.ViewModels
 
         void OnClipboardContentChanged(object? sender, object? e) => SetTargetTextFromClipboard();
 
+        ~AiPastePageViewModel()
+        {
+            _clipboardOperator.UnregisterContentChangedHandler(OnClipboardContentChanged);
+        }
     }
 
 
