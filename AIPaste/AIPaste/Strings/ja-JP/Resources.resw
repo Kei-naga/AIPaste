@@ -154,7 +154,7 @@
     <value>ローカルLLMモデルのパス</value>
   </data>
   <data name="MainPage_TabName_localLlm" xml:space="preserve">
-    <value>Local llm</value>
+    <value>Local LLM</value>
   </data>
   <data name="Settings_MaxTokenCount.Header" xml:space="preserve">
     <value>Max Token Count</value>

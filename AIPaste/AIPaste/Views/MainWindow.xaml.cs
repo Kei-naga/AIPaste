@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using AIPaste.common;
 using AIPaste.Models.DataModels;
 using AIPaste.ViewModels;
@@ -90,6 +91,7 @@ namespace AIPaste
 
         public void RestoreDefaultClosingBehavior()
         {
+            Closed -= OnWindowHideInsteadOfClose;
             Closed += (sender, args) =>
             {
                 ViewModel.UnRegisterHotKey();
@@ -131,14 +133,7 @@ namespace AIPaste
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error("FAILED_NAVIGATION", args.SelectedItemContainer.Tag.ToString() ?? "");
-                    _logger.Debug(ex);
-                    contentFrame.Navigate(typeof(SettingsPage));
-                    var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse();
-                    SendDialog(
-                        resourceLoader.GetString("Settings_DialogWarning"), 
-                        resourceLoader.GetString("Settings_DialogInvalidSettings")
-                    );
+                    FailedNavigation(ex, args.SelectedItemContainer.Tag.ToString() ?? "");
                 }
             }
         }
@@ -146,31 +141,48 @@ namespace AIPaste
         private void NavigationFailed(object sender, NavigationFailedEventArgs e)
         {
             e.Handled = true;
-            _logger.Error("FAILED_NAVIGATION", e.SourcePageType.FullName ?? "");
-            _logger.Debug(e.Exception);
+            FailedNavigation(e.Exception, e.SourcePageType.Name ?? "");
+        }
+
+        private void FailedNavigation(Exception ex, string pageName)
+        {
+            _logger.Error("FAILED_NAVIGATION", pageName);
+            _logger.Debug(ex);
             contentFrame.Navigate(typeof(SettingsPage));
-            var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse();
             SendDialog(
-                resourceLoader.GetString("Settings_DialogWarning"), 
-                resourceLoader.GetString("Settings_DialogInvalidSettings")
+                _resourceLoader.GetString("Settings_DialogWarning"),
+                _resourceLoader.GetString("Settings_DialogInvalidSettings")
             );
         }
 
         public async void SendDialog(string title, string content)
         {
-            var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse();
             var dialog = new ContentDialog
             {
                 Title = title,
                 Content = content,
-                CloseButtonText = resourceLoader.GetString("Settings_DialogCloseButton")
+                CloseButtonText = _resourceLoader.GetString("Settings_DialogCloseButton")
             };
-            while (RootGrid.XamlRoot == null)
+            if (RootGrid.XamlRoot == null)
             {
-                await System.Threading.Tasks.Task.Delay(100);
+                var tcs = new TaskCompletionSource();
+                RoutedEventHandler loadedHandler = null!;
+                loadedHandler = (s, e) =>
+                {
+                    RootGrid.Loaded -= loadedHandler;
+                    tcs.SetResult();
+                };
+
+                RootGrid.Loaded += loadedHandler;
+
+                var timeoutTask = Task.Delay(10000);
+                if (await Task.WhenAny(tcs.Task, timeoutTask) == timeoutTask)
+                {
+                    throw new TimeoutException("RootGrid.XamlRoot initialization timed out.");
+                }
             }
             dialog.XamlRoot = RootGrid.XamlRoot;
-            ContentDialogResult result = await dialog.ShowAsync();
+            await dialog.ShowAsync();
         }
 
         private void On_Navigated(object? sender, NavigationEventArgs e)
@@ -208,8 +220,7 @@ namespace AIPaste
 
             var navigationViewItems = new NavigationViewItem[]
                 {
-                new NavigationViewItem
-                {
+                new() {
                     Content = content,
                     Tag = TabName.AiPastePage.ToString(),
                     Name = llmModelType.ToString(),
