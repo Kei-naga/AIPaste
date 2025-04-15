@@ -21,16 +21,25 @@ namespace AIPaste
     public sealed partial class MainWindow : Window
     {
         private readonly MyLogger _logger = MyLogger.GetInstance();
+        private readonly ResourceLoaderWrapper _resourceLoader = new();
         public MainWindowViewModel ViewModel;
 
         public MainWindow()
         {
             InitializeComponent();
             ViewModel = new MainWindowViewModel(OnHotKeyPressed);
-            AiPastePageItem.Tag = TabName.AiPastePage.ToString();
-
+            SetNavigationViewitems();
             Closed += OnWindowHideInsteadOfClose;
             AppWindow.Resize(new Windows.Graphics.SizeInt32(600,400));
+        }
+
+        private void SetNavigationViewitems()
+        {
+            mainTab.MenuItems.Clear();
+            foreach (var item in GetNavigationViewItems())
+            {
+                mainTab.MenuItems.Add(item);
+            }
         }
 
         private void MainTab_Loaded(object sender, RoutedEventArgs e)
@@ -164,18 +173,49 @@ namespace AIPaste
             ContentDialogResult result = await dialog.ShowAsync();
         }
 
-        private void On_Navigated(object sender, NavigationEventArgs e)
+        private void On_Navigated(object? sender, NavigationEventArgs e)
         {
-            if (contentFrame.SourcePageType == typeof(SettingsPage))
+            if (e.Content is SettingsPage settingsPage)
             {
                 mainTab.SelectedItem = (NavigationViewItem)mainTab.SettingsItem;
+                settingsPage.SettingsUpdated += OnSettingsUpdated;
             }
-            else if (contentFrame.SourcePageType != null)
+            else if (e.Content is not null)
             {
                 mainTab.SelectedItem = mainTab.MenuItems
                             .OfType<NavigationViewItem>()
                             .First(i => i.Tag.Equals(contentFrame.SourcePageType.Name?.ToString()));
             }
+        }
+
+        private void OnSettingsUpdated(object? sender, EventArgs e)
+        {
+            SetNavigationViewitems();
+        }
+
+        private NavigationViewItem[] GetNavigationViewItems()
+        {
+            var llmModelType = ViewModel.AppSettings.ModelType;
+            var content = "";
+            if (llmModelType == ModelType.LocalLLM)
+            {
+                content = _resourceLoader.GetString("MainPage_TabName_localLlm");
+            }
+            else if (llmModelType == ModelType.Gemini)
+            {
+                content = _resourceLoader.GetString("MainPage_TabName_gemini");
+            }
+
+            var navigationViewItems = new NavigationViewItem[]
+                {
+                new NavigationViewItem
+                {
+                    Content = content,
+                    Tag = TabName.AiPastePage.ToString(),
+                    Name = llmModelType.ToString(),
+                }
+                };
+            return navigationViewItems;
         }
     }
 }

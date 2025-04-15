@@ -12,6 +12,8 @@ namespace AIPaste.ViewModels
         private readonly ISettingsService _settingsService;
         private readonly IMyLogger _logger;
 
+        public IAppSettings AppSettings => _settingsService.LoadSettings();
+
         public MainWindowViewModel(
             Action action, 
             IHotKeyManagerFactory? hotKeyManagerFactory = null, 
