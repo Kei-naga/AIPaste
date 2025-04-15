@@ -18,6 +18,7 @@ namespace AIPaste.Models.SettingsServices.Tests
         {
             var moqSettingsStore = new Mock<ISettingsStore>();
 
+            SettingsService.InitializeInstance();
             var firstSettingsService = SettingsService.GetInstance(moqSettingsStore.Object);
             var secondSettingsService = SettingsService.GetInstance(moqSettingsStore.Object);
 
@@ -31,6 +32,7 @@ namespace AIPaste.Models.SettingsServices.Tests
             var appSettings = AppSettings.GetDefaultSettings();
             moqSettingsStore.Setup(x => x.LoadSettings()).Returns(appSettings);
 
+            SettingsService.InitializeInstance();
             var settingsService = SettingsService.GetInstance(moqSettingsStore.Object);
             var loadedSettings = settingsService.LoadSettings();
 
@@ -47,6 +49,7 @@ namespace AIPaste.Models.SettingsServices.Tests
             savedSettings.AutoStart = false;
             moqSettingsStore.Setup(x => x.SaveSettings(savedSettings));
 
+            SettingsService.InitializeInstance();
             var settingsService = SettingsService.GetInstance(moqSettingsStore.Object);
             settingsService.SaveSettings(savedSettings);
             var loadedSettings = settingsService.LoadSettings();
@@ -65,6 +68,7 @@ namespace AIPaste.Models.SettingsServices.Tests
             moqSettingsStore.Setup(x => x.LoadSettings()).Returns(appSettings);
             moqSettingsStore.Setup(x => x.ResetSettings()).Returns(defaultAppSettings);
 
+            SettingsService.InitializeInstance();
             var settingsService = SettingsService.GetInstance(moqSettingsStore.Object);
             settingsService.ResetSettings();
             var loadedSettings = settingsService.LoadSettings();

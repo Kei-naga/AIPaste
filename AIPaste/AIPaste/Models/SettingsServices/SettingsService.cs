@@ -1,4 +1,5 @@
-﻿using AIPaste.common;
+﻿using System;
+using AIPaste.common;
 using AIPaste.Models.DataModels;
 
 namespace AIPaste.Models.SettingsServices
@@ -14,7 +15,7 @@ namespace AIPaste.Models.SettingsServices
         public static SettingsService GetInstance(ISettingsStore? settingsStore = null, IMyLogger? logger = null)
         {
             settingsStore ??= new SettingsStore(logger);
-            if (_instance == null || _instance._settingsStore.GetType != settingsStore.GetType)
+            if (_instance == null || _instance._settingsStore.GetType() != settingsStore.GetType())
             {
                 _instance = new SettingsService(settingsStore, logger);
             }
@@ -45,5 +46,7 @@ namespace AIPaste.Models.SettingsServices
             _presentAppSettings = _settingsStore.ResetSettings();
             return _presentAppSettings;
         }
+
+        public static void InitializeInstance() => _instance = null;
     }
 }
