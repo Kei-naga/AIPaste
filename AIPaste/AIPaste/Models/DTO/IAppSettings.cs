@@ -8,5 +8,6 @@
         ILlmModelSettings[] ModelSettingsList { get; set; }
         string ToString();
         bool Equals(IAppSettings otherSettings);
+        ILlmModelSettings? GetLlmModelSettings(ModelType modelType);
     }
 }

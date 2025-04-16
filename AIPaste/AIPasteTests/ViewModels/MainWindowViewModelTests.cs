@@ -1,15 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AIPaste.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AIPaste.Models.BackgroudServices;
+﻿using AIPaste.Models.BackgroudServices;
 using Moq;
-using AIPaste.Models.DataModels;
 using AIPaste.Models.SettingsServices;
-using Windows.System;
 using AIPaste.Models.DTO;
 
 namespace AIPaste.ViewModels.Tests

@@ -20,25 +20,17 @@ namespace AIPaste.ViewModels.Tests
             return moqClipboardOperator;
         }
 
-        private Mock<ISettingsService> GetSettingsServiceMoq()
-        {
-            var moqSettingsService = new Mock<ISettingsService>();
-            var moqAppSettings = new Mock<IAppSettings>();
-            moqSettingsService.Setup(x => x.LoadSettings()).Returns(moqAppSettings.Object);
-            return moqSettingsService;
-        }
-
         [TestMethod()]
         public void AiPastePageViewModelTest()
         {
-            var settingsServiceMoq = GetSettingsServiceMoq();
+            var moqLlmModelSettings = new Mock<ILlmModelSettings>();
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
             var textCorrectorFactoryMoq = new Mock<ITextCorrectorFactory>();
-            textCorrectorFactoryMoq.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
+            textCorrectorFactoryMoq.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
             var clipboardOperatorMoq = GetClipboardOperatorMoq();
             var resourceLoaderMoq = new Mock<IResourceLoaderWrapper>();
 
-            var viewModel = new AiPastePageViewModel(settingsServiceMoq.Object, textCorrectorFactoryMoq.Object, clipboardOperatorMoq.Object, resourceLoaderMoq.Object);
+            var viewModel = new AiPastePageViewModel(moqLlmModelSettings.Object, textCorrectorFactoryMoq.Object, clipboardOperatorMoq.Object, resourceLoaderMoq.Object);
 
             Assert.IsNotNull(viewModel);
         }
@@ -46,17 +38,17 @@ namespace AIPaste.ViewModels.Tests
         [TestMethod()]
         public async Task GeneratingTextTest()
         {
-            var SettingsServiceMoq = GetSettingsServiceMoq();
+            var moqLlmModelSettings = new Mock<ILlmModelSettings>(); ;
             var clipboardOperatorMoq = GetClipboardOperatorMoq();
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
             var textCorrectorFactoryMoq = new Mock<ITextCorrectorFactory>();
-            textCorrectorFactoryMoq.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
+            textCorrectorFactoryMoq.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
             var resourceLoaderMoq = new Mock<IResourceLoaderWrapper>();
             resourceLoaderMoq.Setup(x => x.GetString(It.IsAny<string>())).Returns("");
             var didFire = false;
             var expected = "";
 
-            var viewModel = new AiPastePageViewModel(SettingsServiceMoq.Object, textCorrectorFactoryMoq.Object, clipboardOperatorMoq.Object, resourceLoaderMoq.Object);
+            var viewModel = new AiPastePageViewModel(moqLlmModelSettings.Object, textCorrectorFactoryMoq.Object, clipboardOperatorMoq.Object, resourceLoaderMoq.Object);
             viewModel.PropertyChanged += (sender, e) => {
                 didFire = true;
                 expected = viewModel.OutputText;
@@ -71,15 +63,15 @@ namespace AIPaste.ViewModels.Tests
         [TestMethod()]
         public void ChangeTargetTextTest()
         {
-            var settingsServiceMoq = GetSettingsServiceMoq();
+            var moqLlmModelSettings = new Mock<ILlmModelSettings>();
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
             var textCorrectorFactoryMoq = new Mock<ITextCorrectorFactory>();
-            textCorrectorFactoryMoq.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
+            textCorrectorFactoryMoq.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
             var clipboardOperatorMoq = GetClipboardOperatorMoq();
             clipboardOperatorMoq.Setup(x => x.SetText(It.IsAny<string>())).Verifiable();
             var resourceLoaderMoq = new Mock<IResourceLoaderWrapper>();
 
-            var viewModel = new AiPastePageViewModel(settingsServiceMoq.Object, textCorrectorFactoryMoq.Object, clipboardOperatorMoq.Object, resourceLoaderMoq.Object);
+            var viewModel = new AiPastePageViewModel(moqLlmModelSettings.Object, textCorrectorFactoryMoq.Object, clipboardOperatorMoq.Object, resourceLoaderMoq.Object);
             viewModel.ChangeTargetText();
 
             clipboardOperatorMoq.Verify(x => x.SetText(It.IsAny<string>()), Times.Once);

@@ -3,22 +3,45 @@ using AIPaste.ViewModels;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Input;
+using Microsoft.UI.Xaml.Navigation;
+using AIPaste.Models.DTO;
+using System;
+using AIPaste.common;
 
 namespace AIPaste.Views
 {
     public sealed partial class AiPastePage : Page
     {
-        public AiPastePageViewModel ViewModel;
+        public AiPastePageViewModel? ViewModel;
+        private readonly MyLogger _logger = MyLogger.GetInstance();
         private Window? _window;
 
         public AiPastePage()
         {
             this.InitializeComponent();
-            ViewModel = new AiPastePageViewModel();
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            if (e.Parameter is ILlmModelSettings llmModelSettings)
+            {
+                ViewModel = new AiPastePageViewModel(llmModelSettings);
+            }
+            else
+            {
+                throw new ArgumentException("Parameter is not of type ILlmModelSettings");
+            }
         }
 
         private async void GenerateButton_Click(object sender, RoutedEventArgs e)
         {
+            if (ViewModel == null)
+            {
+                _logger.Debug("ViewModel is null when clicking the generate text button");
+                return;
+            }
+
             string userInput = UserInputBox.Text;
             if (string.IsNullOrWhiteSpace(userInput))
             {
@@ -33,6 +56,12 @@ namespace AIPaste.Views
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
+            if (ViewModel == null)
+            {
+                _logger.Debug("ViewModel is null when clicking the confirm button");
+                return;
+            }
+
             ViewModel.ChangeTargetText();
             UserInputBox.Focus(FocusState.Programmatic);
         }

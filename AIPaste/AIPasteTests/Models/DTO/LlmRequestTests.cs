@@ -2,7 +2,7 @@
 using AIPaste.common;
 using AIPaste.Models.DTO;
 
-namespace AIPaste.Models.DataModels.Tests
+namespace AIPaste.Models.DTO.Tests
 {
     [TestClass()]
     public class LlmRequestTests

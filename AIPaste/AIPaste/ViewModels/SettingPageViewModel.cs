@@ -350,7 +350,9 @@ namespace AIPaste.ViewModels
         {
             try
             {
-                var textCorrector = _textCorrectorFactory.CreateLlmTextCorrector(appSettings);
+                var llmModelSettings = appSettings.GetLlmModelSettings(appSettings.ActiveModelType) 
+                    ?? throw new Exception("LlmModelSettings not found");
+                var textCorrector = _textCorrectorFactory.CreateLlmTextCorrector(llmModelSettings);
                 if (!textCorrector.CheckIntegrity())
                 {
                     throw new Exception("Failed to generate text");

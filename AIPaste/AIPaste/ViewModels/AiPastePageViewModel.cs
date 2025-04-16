@@ -51,7 +51,7 @@ namespace AIPaste.ViewModels
         }
 
         public AiPastePageViewModel(
-            ISettingsService? settingsService = null,
+            ILlmModelSettings llmModelSettings,
             ITextCorrectorFactory? textCorrectorFactory = null,
             IClipboardOperator? clipboardOperator = null, 
             IResourceLoaderWrapper? resourceLoader = null, 
@@ -60,12 +60,11 @@ namespace AIPaste.ViewModels
             _logger = logger ?? MyLogger.GetInstance();
             _logger.Trace("AiPastePageViewModel created");
             _resourceLoader = resourceLoader ?? new ResourceLoaderWrapper();
-            var appSettings = settingsService?.LoadSettings() ?? SettingsService.GetInstance().LoadSettings();
             _clipboardOperator = clipboardOperator ?? new ClipboardOperator();
             _clipboardOperator.RegisterContentChangedHandler(OnClipboardContentChanged);
             SetTargetTextFromClipboard();
             textCorrectorFactory ??= new TextCorrectorFactory();
-            _llmTextCorrector = textCorrectorFactory.CreateLlmTextCorrector(appSettings);
+            _llmTextCorrector = textCorrectorFactory.CreateLlmTextCorrector(llmModelSettings);
         }
 
         public async Task GeneratingText(string userInput)

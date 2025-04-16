@@ -21,7 +21,7 @@ namespace AIPaste.Models.DTO
 
         public override string ToString()
         {
-            return $"ModelSettings:  AutoStart: {AutoStart}, ModelType: {ActiveModelType}";
+            return $"KeySettings: [{KeySettings}],  AutoStart: {AutoStart}, ModelType: {ActiveModelType}";
         }
 
         public bool Equals(IAppSettings otherSettings)
@@ -39,6 +39,16 @@ namespace AIPaste.Models.DTO
                 var otherLlmSettings = otherLlmSettingsList.FirstOrDefault(y => y.GetType() == x.GetType());
                 return otherLlmSettings != null && x.Equals(otherLlmSettings);
             }).All(x => x);
+        }
+
+        public ILlmModelSettings? GetLlmModelSettings(ModelType modelType)
+        {
+            return modelType switch
+            {
+                ModelType.LocalLLM => ModelSettingsList.FirstOrDefault(x => x is LlmLocalModelSettings) ?? null,
+                ModelType.Gemini => ModelSettingsList.FirstOrDefault(x => x is GeminiModelSettings) ?? null,
+                _ => null,
+            };
         }
     }
 

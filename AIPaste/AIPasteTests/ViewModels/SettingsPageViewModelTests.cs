@@ -1,5 +1,4 @@
-﻿using AIPaste.Models.DataModels;
-using AIPaste.Models.SettingsServices;
+﻿using AIPaste.Models.SettingsServices;
 using Moq;
 using AIPaste.Models.StartupServices;
 using AIPaste.Models.LLMModels;
@@ -126,7 +125,7 @@ namespace AIPaste.ViewModels.Tests
             var moqStartupManager = new Mock<IAutoStartupManager>();
             var moqTextCorrectorFactory = new Mock<ITextCorrectorFactory>();
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", true);
-            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
+            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
             var moqHotKeyManager = GetHotKeyManagerMoq();
 
             var viewModel = new SettingsPageViewModel(moqSettingsService.Object, moqStartupManager.Object, moqTextCorrectorFactory.Object, moqHotKeyManager.Object);
@@ -149,7 +148,7 @@ namespace AIPaste.ViewModels.Tests
             var moqStartupManager = new Mock<IAutoStartupManager>();
             var moqTextCorrectorFactory = new Mock<ITextCorrectorFactory>();
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
-            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
+            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
             var moqHotKeyManager = GetHotKeyManagerMoq();
             moqHotKeyManager.Setup(x => x.UpdateHotkeySettings(It.IsAny<IKeySettings>())).Throws(new Exception("Failed to register hotkey"));
 
@@ -174,7 +173,7 @@ namespace AIPaste.ViewModels.Tests
             moqStartupManager.Setup(x => x.IsAutoStartupMode()).ReturnsAsync(false);
             var moqTextCorrectorFactory = new Mock<ITextCorrectorFactory>();
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
-            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
+            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
             var moqHotKeyManager = GetHotKeyManagerMoq();
 
             var viewModel = new SettingsPageViewModel(moqSettingsService.Object, moqStartupManager.Object, moqTextCorrectorFactory.Object, moqHotKeyManager.Object);
@@ -198,7 +197,7 @@ namespace AIPaste.ViewModels.Tests
             moqStartupManager.Setup(x => x.IsAutoStartupMode()).ReturnsAsync(true);
             var moqTextCorrectorFactory = new Mock<ITextCorrectorFactory>();
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
-            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
+            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
             var moqHotKeyManager = GetHotKeyManagerMoq();
 
             var viewModel = new SettingsPageViewModel(moqSettingsService.Object, moqStartupManager.Object, moqTextCorrectorFactory.Object, moqHotKeyManager.Object);
@@ -230,7 +229,7 @@ namespace AIPaste.ViewModels.Tests
             moqStartupManager.Setup(x => x.IsAutoStartupMode()).ReturnsAsync(true);
             var moqTextCorrectorFactory = new Mock<ITextCorrectorFactory>();
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
-            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<IAppSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
+            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
             var moqHotKeyManager = GetHotKeyManagerMoq();
 
             var viewModel = new SettingsPageViewModel(moqSettingsService.Object, moqStartupManager.Object, moqTextCorrectorFactory.Object, moqHotKeyManager.Object);

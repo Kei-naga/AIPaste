@@ -127,7 +127,9 @@ namespace AIPaste
                     {
                         case nameof(TabName.AiPastePage):
                             _logger.Trace("navigating AiPastePage");
-                            contentFrame.Navigate(typeof(AiPastePage));
+                            var appSettings = ViewModel.AppSettings;
+                            var llmModelSettings = appSettings.GetLlmModelSettings(appSettings.ActiveModelType);
+                            contentFrame.Navigate(typeof(AiPastePage), llmModelSettings);
                             break;
                     }
                 }
@@ -192,7 +194,7 @@ namespace AIPaste
                 mainTab.SelectedItem = (NavigationViewItem)mainTab.SettingsItem;
                 settingsPage.SettingsUpdated += OnSettingsUpdated;
             }
-            else if (e.Content is not null)
+            else if (e.Content is AiPastePage aiPastePage)
             {
                 mainTab.SelectedItem = mainTab.MenuItems
                             .OfType<NavigationViewItem>()
