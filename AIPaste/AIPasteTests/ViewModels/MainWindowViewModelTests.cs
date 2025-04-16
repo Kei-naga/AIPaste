@@ -10,6 +10,7 @@ using Moq;
 using AIPaste.Models.DataModels;
 using AIPaste.Models.SettingsServices;
 using Windows.System;
+using AIPaste.Models.DTO;
 
 namespace AIPaste.ViewModels.Tests
 {

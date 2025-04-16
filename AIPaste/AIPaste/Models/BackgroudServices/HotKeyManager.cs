@@ -1,5 +1,5 @@
 ﻿using AIPaste.common;
-using AIPaste.Models.DataModels;
+using AIPaste.Models.DTO;
 using Windows.System;
 
 namespace AIPaste.Models.BackgroudServices

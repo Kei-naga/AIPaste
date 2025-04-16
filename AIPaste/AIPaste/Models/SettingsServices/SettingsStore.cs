@@ -1,8 +1,8 @@
 ﻿using System;
 using Windows.Storage;
 using Windows.System;
-using AIPaste.Models.DataModels;
 using AIPaste.common;
+using AIPaste.Models.DTO;
 
 namespace AIPaste.Models.SettingsServices
 {
@@ -61,7 +61,7 @@ namespace AIPaste.Models.SettingsServices
             }
         }
 
-        private LLMLocalModelSettings LoadLocalLLMModelSettings()
+        private LlmLocalModelSettings LoadLocalLLMModelSettings()
         {
             var modelPath = (string)_localLlmContainer.Values[MODEL_PATH_KEY];
             var gpuEnabled = (bool)_localLlmContainer.Values[GPU_ENABLED_KEY];
@@ -69,7 +69,7 @@ namespace AIPaste.Models.SettingsServices
             var contextSize = (uint)_localLlmContainer.Values[CONTEXT_SIZE_KEY];
             var maxTokens = (int)_localLlmContainer.Values[MAX_TOKENS_KEY];
 
-            return new LLMLocalModelSettings(
+            return new LlmLocalModelSettings(
                     ModelPath: modelPath,
                     GpuEnable: gpuEnabled,
                     GpuLayerCount: gpuLayerCount,
@@ -99,17 +99,17 @@ namespace AIPaste.Models.SettingsServices
         public void SaveSettings(IAppSettings appSettings)
         {
             _mainContainer.Values[AUTO_START_KEY] = appSettings.AutoStart;
-            _mainContainer.Values[MODEL_TYPE_KEY] = (int)appSettings.ModelType;
+            _mainContainer.Values[MODEL_TYPE_KEY] = (int)appSettings.ActiveModelType;
             SaveKeySettings(appSettings.KeySettings);
             SaveLlmModeSettings(appSettings.ModelSettingsList);
             _logger.Debug($"Saved settings: {appSettings}");
         }
 
-        private void SaveLlmModeSettings(ILLMModelSettings[] modelSettingsList)
+        private void SaveLlmModeSettings(ILlmModelSettings[] modelSettingsList)
         {
             foreach (var modelSettings in modelSettingsList)
             {
-                if (modelSettings is LLMLocalModelSettings localLlmModelSettings)
+                if (modelSettings is LlmLocalModelSettings localLlmModelSettings)
                 {
                     SaveLocalLLMModelSettings(localLlmModelSettings);
                 }
@@ -120,7 +120,7 @@ namespace AIPaste.Models.SettingsServices
             }
         }
 
-        private void SaveLocalLLMModelSettings(LLMLocalModelSettings llmModelSettings)
+        private void SaveLocalLLMModelSettings(LlmLocalModelSettings llmModelSettings)
         {
             _logger.Debug($"Saving Local LLM Settings: {llmModelSettings}");
             _localLlmContainer.Values[MODEL_PATH_KEY] = llmModelSettings.ModelPath;

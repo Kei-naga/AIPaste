@@ -1,38 +1,38 @@
 ﻿using System.Linq;
 
-namespace AIPaste.Models.DataModels
+namespace AIPaste.Models.DTO
 {
-    public class AppSettings(bool autoStartSetting, ModelType modelType, IKeySettings keySettings, ILLMModelSettings[] modelSettingsList) : IAppSettings
+    public class AppSettings(bool autoStartSetting, ModelType modelType, IKeySettings keySettings, ILlmModelSettings[] modelSettingsList) : IAppSettings
     {
         public bool AutoStart { get; set; } = autoStartSetting;
-        public ModelType ModelType { get; set; } = modelType;
+        public ModelType ActiveModelType { get; set; } = modelType;
         public IKeySettings KeySettings { get; set; } = keySettings;
-        public ILLMModelSettings[] ModelSettingsList { get; set; } = modelSettingsList;
+        public ILlmModelSettings[] ModelSettingsList { get; set; } = modelSettingsList;
 
         public static AppSettings GetDefaultSettings()
         {
             return new AppSettings(
                 autoStartSetting: true,
                 modelType: ModelType.LocalLLM,
-                keySettings: DataModels.KeySettings.GetDefaultSettings(),
-                modelSettingsList: new ILLMModelSettings[] { LLMLocalModelSettings.GetDefaultSettings(), GeminiModelSettings.GetDefaultSettings() }
+                keySettings: DTO.KeySettings.GetDefaultSettings(),
+                modelSettingsList: [LlmLocalModelSettings.GetDefaultSettings(), GeminiModelSettings.GetDefaultSettings()]
             );
         }
 
         public override string ToString()
         {
-            return $"ModelSettings:  AutoStart: {AutoStart}, ModelType: {ModelType}";
+            return $"ModelSettings:  AutoStart: {AutoStart}, ModelType: {ActiveModelType}";
         }
 
         public bool Equals(IAppSettings otherSettings)
         {
             return AutoStart == otherSettings.AutoStart &&
-                ModelType == otherSettings.ModelType &&
+                ActiveModelType == otherSettings.ActiveModelType &&
                 KeySettings.Equals(otherSettings.KeySettings) &&
                 SameLlmSettings(otherSettings.ModelSettingsList);
         }
 
-        private bool SameLlmSettings(ILLMModelSettings[] otherLlmSettingsList)
+        private bool SameLlmSettings(ILlmModelSettings[] otherLlmSettingsList)
         {
             return ModelSettingsList.Select(x =>
             {

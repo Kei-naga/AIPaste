@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AIPaste.common;
-using AIPaste.Models.DataModels;
+using AIPaste.Models.DTO;
 using AIPaste.ViewModels;
 using AIPaste.Views;
 using H.NotifyIcon;
@@ -207,7 +207,7 @@ namespace AIPaste
 
         private NavigationViewItem[] GetNavigationViewItems()
         {
-            var llmModelType = ViewModel.AppSettings.ModelType;
+            var llmModelType = ViewModel.AppSettings.ActiveModelType;
             var content = "";
             if (llmModelType == ModelType.LocalLLM)
             {

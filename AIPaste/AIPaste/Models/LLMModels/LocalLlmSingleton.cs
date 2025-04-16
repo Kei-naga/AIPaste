@@ -1,6 +1,6 @@
 ﻿using LLama.Common;
 using LLama;
-using AIPaste.Models.DataModels;
+using AIPaste.Models.DTO;
 
 namespace AIPaste.Models.LLMModels
 {
@@ -8,7 +8,7 @@ namespace AIPaste.Models.LLMModels
     {
         private static LocalLlmSingleton? _instance;
         private static readonly object _lock = new();
-        private LocalLlmSingleton(LLMLocalModelSettings modelSettings)
+        private LocalLlmSingleton(LlmLocalModelSettings modelSettings)
         {
             ModelSettings = modelSettings;
             Parameters = new ModelParams(ModelSettings.ModelPath)
@@ -18,7 +18,7 @@ namespace AIPaste.Models.LLMModels
             };
         }
 
-        public static LocalLlmSingleton GetInstance(LLMLocalModelSettings modelSettings)
+        public static LocalLlmSingleton GetInstance(LlmLocalModelSettings modelSettings)
         {
             if (_instance == null)
             {
@@ -38,7 +38,7 @@ namespace AIPaste.Models.LLMModels
             return _instance;
         }
 
-        public LLMLocalModelSettings ModelSettings { get; private set; }
+        public LlmLocalModelSettings ModelSettings { get; private set; }
         public ModelParams Parameters { get; private set; }
 
         public LLamaWeights Localmodel { get 

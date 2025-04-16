@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Windows.System;
 
-namespace AIPaste.Models.DataModels
+namespace AIPaste.Models.DTO
 {
     public class KeyPattern(HOT_KEY_MODIFIERS modifiers, VirtualKey key) : IKeyPattern
     {

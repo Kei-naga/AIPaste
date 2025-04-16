@@ -3,10 +3,10 @@ using System;
 using System.Text;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using AIPaste.Models.DataModels;
 using System.Threading.Tasks;
 using System.Linq;
 using AIPaste.common;
+using AIPaste.Models.DTO;
 
 namespace AIPaste.Models.LLMModels
 {

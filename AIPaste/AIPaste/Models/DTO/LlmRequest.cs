@@ -1,8 +1,7 @@
 ﻿using System;
 using AIPaste.common;
-using Windows.ApplicationModel.Resources;
 
-namespace AIPaste.Models.DataModels
+namespace AIPaste.Models.DTO
 {
     public class LlmRequest(string targetText, string userInput, IResourceLoaderWrapper? resourceLoader = null) : ILlmRequest
     {

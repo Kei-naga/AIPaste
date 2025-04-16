@@ -1,7 +1,7 @@
 ﻿using Moq;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using AIPaste.Models.DataModels;
+using AIPaste.Models.DTO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel.Services;
 using HuggingfaceHub;
@@ -170,7 +170,7 @@ namespace AIPasteTests.Models.LLMModels
         public async Task GenerateTextByLocalLlm()
         {
             var path = await HFDownloader.DownloadFileAsync("QuantFactory/Meta-Llama-3-8B-GGUF", "Meta-Llama-3-8B.Q2_K.gguf");
-            var localLlmSettings = new LLMLocalModelSettings(path, true, 32, 1024, 256);
+            var localLlmSettings = new LlmLocalModelSettings(path, true, 32, 1024, 256);
             var localLlmStrategy = new LocalLlmStrategy(localLlmSettings, new HistoryTransform());
             var moqRequest = new Mock<ILlmRequest>();
             moqRequest.Setup(x => x.ToOptimizedRequest()).Returns("hello");

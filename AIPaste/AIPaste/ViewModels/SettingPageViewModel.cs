@@ -5,11 +5,11 @@ using System.Linq;
 using Windows.System;
 using AIPaste.Models.LLMModels;
 using AIPaste.Models.StartupServices;
-using AIPaste.Models.DataModels;
 using AIPaste.Models.SettingsServices;
 using AIPaste.Models.BackgroudServices;
 using System.Threading.Tasks;
 using AIPaste.common;
+using AIPaste.Models.DTO;
 
 namespace AIPaste.ViewModels
 {
@@ -60,17 +60,17 @@ namespace AIPaste.ViewModels
             ShiftModifier = _appSettings.KeySettings.KeyPattern.Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_SHIFT);
             WinModifier = _appSettings.KeySettings.KeyPattern.Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_WIN);
             AutoStart = _appSettings.AutoStart;
-            ModelTypeName = _appSettings.ModelType;
+            ModelTypeName = _appSettings.ActiveModelType;
             var geminiModelSettings = _appSettings.ModelSettingsList
                 .FirstOrDefault(x => x is GeminiModelSettings) as GeminiModelSettings
                 ?? throw new Exception("Gemini settings not found");
             ApiKey = geminiModelSettings.ApiKey;
         }
 
-        private LLMLocalModelSettings GetLocalLlmSettings()
+        private LlmLocalModelSettings GetLocalLlmSettings()
         {
             var localLlmSettings = _appSettings.ModelSettingsList
-                .FirstOrDefault(x => x is LLMLocalModelSettings) as LLMLocalModelSettings
+                .FirstOrDefault(x => x is LlmLocalModelSettings) as LlmLocalModelSettings
                 ?? throw new Exception("Local LLM settings not found");
             return localLlmSettings;
         }
@@ -275,7 +275,7 @@ namespace AIPaste.ViewModels
         private AppSettings GetCurrentAppSettings()
         {
             var localLlmSettings = GetLocalLlmSettings();
-            var localModelSettings = new LLMLocalModelSettings(
+            var localModelSettings = new LlmLocalModelSettings(
                 ModelPath: LLMModelPath,
                 GpuEnable: GpuEnabled,
                 GpuLayerCount: GpuLayerCount,
@@ -328,7 +328,7 @@ namespace AIPaste.ViewModels
             try
             {
                 _settingsService.SaveSettings(newSettings);
-                if (newSettings.ModelType != ModelType.LocalLLM)
+                if (newSettings.ActiveModelType != ModelType.LocalLLM)
                 {
                     _logger.Trace("Disposing LocalLlmModel");
                     LocalLlmSingleton.Dispose();

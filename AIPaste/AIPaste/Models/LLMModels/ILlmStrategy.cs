@@ -1,4 +1,4 @@
-﻿using AIPaste.Models.DataModels;
+﻿using AIPaste.Models.DTO;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 
@@ -10,6 +10,6 @@ namespace AIPaste.Models.LLMModels
         PromptExecutionSettings GetPromptExecutionSettings();
         Kernel GetKernel();
         int GetTokenCount(ChatHistory chatHistory);
-        ILLMModelSettings ModelSettings { get; }
+        ILlmModelSettings ModelSettings { get; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using AIPaste.Models.DataModels;
+﻿using AIPaste.Models.DTO;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;
@@ -11,7 +11,7 @@ namespace AIPaste.Models.LLMModels
     public class GeminiStrategy(GeminiModelSettings modelSettings) : ILlmStrategy
     {
         private readonly GeminiModelSettings _modelSettings = modelSettings;
-        public ILLMModelSettings ModelSettings => _modelSettings;
+        public ILlmModelSettings ModelSettings => _modelSettings;
         public ModelType ModelType => ModelType.Gemini;
 
         public Kernel GetKernel()

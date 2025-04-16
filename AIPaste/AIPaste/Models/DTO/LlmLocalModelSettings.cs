@@ -1,6 +1,6 @@
-﻿namespace AIPaste.Models.DataModels
+﻿namespace AIPaste.Models.DTO
 {
-    public class LLMLocalModelSettings(string ModelPath, bool GpuEnable, int GpuLayerCount, uint MaxContextSize, int MaxTokens) : ILLMModelSettings
+    public class LlmLocalModelSettings(string ModelPath, bool GpuEnable, int GpuLayerCount, uint MaxContextSize, int MaxTokens) : ILlmModelSettings
     {
         public string ModelPath { get; set; } = ModelPath;
         public int GpuLayerCount { get; set; } = GpuLayerCount;
@@ -8,9 +8,9 @@
         public int MaxTokens { get; set; } = MaxTokens;
         public bool GpuEnabled { get; set; } = GpuEnable;
 
-        public static ILLMModelSettings GetDefaultSettings()
+        public static ILlmModelSettings GetDefaultSettings()
         {
-            return new LLMLocalModelSettings(
+            return new LlmLocalModelSettings(
                 ModelPath: @"",
                 GpuEnable: true,
                 GpuLayerCount: 32,
@@ -18,13 +18,13 @@
                 MaxTokens: 256
             );
         }
-        public bool Equals(ILLMModelSettings otherSettings)
+        public bool Equals(ILlmModelSettings otherSettings)
         {
-            if (otherSettings is not LLMLocalModelSettings)
+            if (otherSettings is not LlmLocalModelSettings)
             {
                 return false;
             }
-            var otherLocalSettings = (LLMLocalModelSettings)otherSettings;
+            var otherLocalSettings = (LlmLocalModelSettings)otherSettings;
             return ModelPath == otherLocalSettings.ModelPath &&
                 GpuLayerCount == otherLocalSettings.GpuLayerCount &&
                 MaxContextSize == otherLocalSettings.MaxContextSize &&

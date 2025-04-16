@@ -1,20 +1,20 @@
 ﻿using System.Globalization;
 
-namespace AIPaste.Models.DataModels
+namespace AIPaste.Models.DTO
 {
-    public class GeminiModelSettings(string apiKey, string modelName = "gemini-2.0-flash", string location = "", uint maxContextSize = 1048576) : ILLMModelSettings
+    public class GeminiModelSettings(string apiKey, string modelName = "gemini-2.0-flash", string location = "", uint maxContextSize = 1048576) : ILlmModelSettings
     {
         public string ApiKey { get; set; } = apiKey;
         public string ModelName { get; set; } = modelName;
         public string Location { get; set; } = string.IsNullOrEmpty(location) ? CultureInfo.CurrentCulture.TwoLetterISOLanguageName : location;
         public uint MaxContextSize { get; set; } = maxContextSize;
 
-        public static ILLMModelSettings GetDefaultSettings()
+        public static ILlmModelSettings GetDefaultSettings()
         {
             return new GeminiModelSettings("", "gemini-2.0-flash", CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
         }
 
-        public bool Equals(ILLMModelSettings otherSettings)
+        public bool Equals(ILlmModelSettings otherSettings)
         {
             if (otherSettings is not GeminiModelSettings)
             {

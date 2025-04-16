@@ -6,18 +6,19 @@ using AIPaste.Models.LLMModels;
 using AIPasteTests;
 using AIPaste.common;
 using AIPaste.Models.BackgroudServices;
+using AIPaste.Models.DTO;
 
 namespace AIPaste.ViewModels.Tests
 {
     [TestClass()]
     public class SettingsPageViewModelTests
     {
-        private Mock<IAppSettings> GetAppSettingsMoq(ILLMModelSettings[] llmModelSettings, IKeySettings keySettings)
+        private Mock<IAppSettings> GetAppSettingsMoq(ILlmModelSettings[] llmModelSettings, IKeySettings keySettings)
         {
             var moqAppSettings = new Mock<IAppSettings>();
             moqAppSettings.Setup(x => x.KeySettings).Returns(keySettings);
             moqAppSettings.Setup(x => x.ModelSettingsList).Returns(llmModelSettings);
-            moqAppSettings.Setup(x => x.ModelType).Returns(ModelType.LocalLLM);
+            moqAppSettings.Setup(x => x.ActiveModelType).Returns(ModelType.LocalLLM);
             moqAppSettings.Setup(x => x.AutoStart).Returns(true);
             return moqAppSettings;
         }
@@ -61,7 +62,7 @@ namespace AIPaste.ViewModels.Tests
             var gpuLayerCount = 4;
             var maxContextSize = 1024u;
             var maxTokens = 512;
-            var llmLocalModelSettingsdummy = new LLMLocalModelSettings(modelPath, gpuEnabled, gpuLayerCount, maxContextSize, maxTokens);
+            var llmLocalModelSettingsdummy = new LlmLocalModelSettings(modelPath, gpuEnabled, gpuLayerCount, maxContextSize, maxTokens);
             var dummyGeminiApiKey = "dummy_gemini_api_key";
             var geminiModelSettingsdummy = new GeminiModelSettings(dummyGeminiApiKey);
             var moqKeyPattern = GetKeyPatternMoq();
@@ -96,7 +97,7 @@ namespace AIPaste.ViewModels.Tests
         {
             var moqKeyPattern = GetKeyPatternMoq();
             var moqKeySettings = GetKeySettingsMoq(moqKeyPattern, true);
-            var llmLocalModelSettingsdummy = new LLMLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
+            var llmLocalModelSettingsdummy = new LlmLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
             var dummyGeminiApiKey = "dummy_gemini_api_key";
             var geminiModelSettingsdummy = new GeminiModelSettings(dummyGeminiApiKey);
             return GetAppSettingsMoq([llmLocalModelSettingsdummy, geminiModelSettingsdummy], moqKeySettings.Object);
@@ -140,7 +141,7 @@ namespace AIPaste.ViewModels.Tests
         {
             var dummyKeyPattern = new KeyPattern(HOT_KEY_MODIFIERS.MOD_CONTROL , Windows.System.VirtualKey.C);
             var dummyKeySettings = new KeySettings(true, dummyKeyPattern);
-            var dummyLlmLocalModelSettings = new LLMLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
+            var dummyLlmLocalModelSettings = new LlmLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
             var dummyGeminiApiKey = "dummy_gemini_api_key";
             var dummygeminiModelSettings = new GeminiModelSettings(dummyGeminiApiKey);
             var dummyAppSettings = new AppSettings(true, ModelType.LocalLLM, dummyKeySettings, [dummyLlmLocalModelSettings, dummygeminiModelSettings]);
@@ -165,7 +166,7 @@ namespace AIPaste.ViewModels.Tests
         {
             var keyPatternMoq = GetKeyPatternMoq();
             var keySettingsMoq = GetKeySettingsMoq(keyPatternMoq, true);
-            var llmLocalModelSettingsdummy = new LLMLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
+            var llmLocalModelSettingsdummy = new LlmLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
             var dummygeminiModelSettings = new GeminiModelSettings("dummy_gemini_api_key");
             var dummyAppSettings = new AppSettings(true, ModelType.LocalLLM, keySettingsMoq.Object, [llmLocalModelSettingsdummy, dummygeminiModelSettings]);
             var moqSettingsService = GetSettingsServiceMoq(dummyAppSettings);
@@ -189,7 +190,7 @@ namespace AIPaste.ViewModels.Tests
         {
             var keyPatternMoq = GetKeyPatternMoq();
             var keySettingsMoq = GetKeySettingsMoq(keyPatternMoq, true);
-            var llmLocalModelSettingsdummy = new LLMLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
+            var llmLocalModelSettingsdummy = new LlmLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
             var dummygeminiModelSettings = new GeminiModelSettings("dummy_gemini_api_key");
             var dummyAppSettings = new AppSettings(true, ModelType.LocalLLM, keySettingsMoq.Object, [llmLocalModelSettingsdummy, dummygeminiModelSettings]);
             var moqSettingsService = GetSettingsServiceMoq(dummyAppSettings);
@@ -212,7 +213,7 @@ namespace AIPaste.ViewModels.Tests
         {
             var keyPatternMoq = GetKeyPatternMoq();
             var keySettingsMoq = GetKeySettingsMoq(keyPatternMoq, true);
-            var llmLocalModelSettingsdummy = new LLMLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
+            var llmLocalModelSettingsdummy = new LlmLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
             var dummygeminiModelSettings = new GeminiModelSettings("dummy_gemini_api_key");
             var dummyAppSettings = new AppSettings(true, ModelType.LocalLLM, keySettingsMoq.Object, [llmLocalModelSettingsdummy, dummygeminiModelSettings]);
             var moqSettingsService = GetSettingsServiceMoq(dummyAppSettings);

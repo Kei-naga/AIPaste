@@ -1,11 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AIPaste.Models.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.System;
+using AIPaste.Models.DTO;
 
 namespace AIPaste.Models.DataModels.Tests
 {

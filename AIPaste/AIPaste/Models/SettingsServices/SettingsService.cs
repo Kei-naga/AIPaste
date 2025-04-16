@@ -1,6 +1,5 @@
-﻿using System;
-using AIPaste.common;
-using AIPaste.Models.DataModels;
+﻿using AIPaste.common;
+using AIPaste.Models.DTO;
 
 namespace AIPaste.Models.SettingsServices
 {

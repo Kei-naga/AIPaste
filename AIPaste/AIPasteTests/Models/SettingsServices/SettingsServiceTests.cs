@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Moq;
-using AIPaste.Models.DataModels;
+using AIPaste.Models.DTO;
 
 namespace AIPaste.Models.SettingsServices.Tests
 {

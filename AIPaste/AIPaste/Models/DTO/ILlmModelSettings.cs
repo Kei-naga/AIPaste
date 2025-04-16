@@ -1,15 +1,15 @@
 ﻿using System;
 
-namespace AIPaste.Models.DataModels
+namespace AIPaste.Models.DTO
 {
-    public interface ILLMModelSettings
+    public interface ILlmModelSettings
     {
-        public static ILLMModelSettings GetDefaultSettings()
+        public static ILlmModelSettings GetDefaultSettings()
         {
             // Provide a default implementation or throw a NotImplementedException
             throw new NotImplementedException();
         }
-        public bool Equals(ILLMModelSettings otherSettings);
+        public bool Equals(ILlmModelSettings otherSettings);
         public string ToString();
         public uint MaxContextSize { get; set; }
     }

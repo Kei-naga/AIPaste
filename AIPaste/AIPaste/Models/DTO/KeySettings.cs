@@ -1,6 +1,6 @@
 ﻿using Windows.System;
 
-namespace AIPaste.Models.DataModels
+namespace AIPaste.Models.DTO
 {
     public struct KeySettings(bool IsHotkeyEnabled, IKeyPattern KeyPattern) : IKeySettings
     {

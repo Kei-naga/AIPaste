@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using AIPaste.Models.DataModels;
+using AIPaste.Models.DTO;
 using AIPaste.Models.LLMModels;
-using HuggingfaceHub;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.Testing.Platform.Logging;
 
 namespace AIPasteTests
 {
@@ -18,7 +11,9 @@ namespace AIPasteTests
         /// <summary>
         /// default .env file path. Create .env file in the root of the test project if it does not exist.
         /// </summary>
+#pragma warning disable IDE1006 // 命名スタイル
         private static readonly string DEFAULT_ENV_FILENAME = Path.GetFullPath
+#pragma warning restore IDE1006 // 命名スタイル
                 (
                     Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty, @"..\..\..\.env")
                 );

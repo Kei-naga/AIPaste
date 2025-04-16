@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using AIPaste.Models.LLMModels;
 using AIPaste.Models.ClipboardOperate;
 using AIPaste.Models.SettingsServices;
-using AIPaste.Models.DataModels;
+using AIPaste.Models.DTO;
 using AIPaste.common;
 
 namespace AIPaste.ViewModels

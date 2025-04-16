@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using AIPaste.common;
-using AIPaste.Models.DataModels;
+using AIPaste.Models.DTO;
 using LLamaSharp.SemanticKernel.ChatCompletion;
 
 namespace AIPaste.Models.LLMModels
@@ -18,11 +18,11 @@ namespace AIPaste.Models.LLMModels
 
         private ILlmStrategy GetLlmStrategy(IAppSettings appSettings)
         {
-            switch (appSettings.ModelType)
+            switch (appSettings.ActiveModelType)
             {
                 case ModelType.LocalLLM:
                     var historyTransform = new HistoryTransform();
-                    var localLlmSettings = appSettings.ModelSettingsList.FirstOrDefault(x => x is LLMLocalModelSettings) as LLMLocalModelSettings 
+                    var localLlmSettings = appSettings.ModelSettingsList.FirstOrDefault(x => x is LlmLocalModelSettings) as LlmLocalModelSettings 
                         ?? throw new Exception("Local LLM settings not found");
                     return new LocalLlmStrategy(localLlmSettings, historyTransform);
                 case ModelType.Gemini:

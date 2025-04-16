@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using AIPaste.Models.DataModels;
+using AIPaste.Models.DTO;
 using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace AIPaste.Models.LLMModels

@@ -1,4 +1,4 @@
-﻿namespace AIPaste.Models.DataModels
+﻿namespace AIPaste.Views
 {
     public enum TabName
     {

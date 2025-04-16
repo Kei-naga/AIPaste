@@ -5,9 +5,8 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel;
 using Microsoft.Extensions.DependencyInjection;
 using LLama.Abstractions;
-using AIPaste.Models.DataModels;
+using AIPaste.Models.DTO;
 using System.Collections.Generic;
-
 
 namespace AIPaste.Models.LLMModels
 {
@@ -16,10 +15,10 @@ namespace AIPaste.Models.LLMModels
         private LocalLlmSingleton _llmInstance;
         private readonly IHistoryTransform _historyTransform;
         private readonly LLamaSharpPromptExecutionSettings _promptExecutionSettings;
-        public ILLMModelSettings ModelSettings => _llmInstance.ModelSettings;
+        public ILlmModelSettings ModelSettings => _llmInstance.ModelSettings;
         public ModelType ModelType => ModelType.LocalLLM;
 
-        public LocalLlmStrategy(LLMLocalModelSettings modelSettings, IHistoryTransform historyTransform)
+        public LocalLlmStrategy(LlmLocalModelSettings modelSettings, IHistoryTransform historyTransform)
         {
             _llmInstance = LocalLlmSingleton.GetInstance(modelSettings);
             _historyTransform = historyTransform;

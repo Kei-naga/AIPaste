@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using AIPaste.common;
-using AIPaste.Models.DataModels;
+using AIPaste.Models.DTO;
 using Microsoft.UI.Xaml;
 using Windows.Win32;
 using Windows.Win32.Foundation;

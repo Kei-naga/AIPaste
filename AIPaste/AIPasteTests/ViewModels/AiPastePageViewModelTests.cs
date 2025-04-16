@@ -3,8 +3,8 @@ using Moq;
 using AIPaste.Models.LLMModels;
 using AIPaste.Models.ClipboardOperate;
 using AIPaste.common;
-using AIPaste.Models.DataModels;
 using AIPasteTests;
+using AIPaste.Models.DTO;
 
 namespace AIPaste.ViewModels.Tests
 {
