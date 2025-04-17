@@ -46,12 +46,12 @@ namespace AIPaste.Models.BackgroudServices
                     _isRegistered = true;
                     return;
                 }
-                _logger.Trace("Failed to register hotkey, trying again");
+                _logger.Trace($"Failed to register hotkey (Attempt {attempts + 1}/3). Retrying...");
                 _hotkeyId = GetHashCode();
                 attempts++;
             }
             _isRegistered = false;
-            throw new InvalidOperationException($"Failed to register hotkey: {keyPattern}.");
+            throw new InvalidOperationException($"Failed to register hotkey: {keyPattern}. Error Code: {Marshal.GetLastWin32Error()}");
         }
 
         private void IntializeSettings()
@@ -62,20 +62,25 @@ namespace AIPaste.Models.BackgroudServices
             _hwnd = new HWND(WinRT.Interop.WindowNative.GetWindowHandle(_dummyWindow).ToInt32());
         }
 
-        private LRESULT HotKeyPrc(HWND hwnd,
-            uint uMsg,
-            WPARAM wParam,
-            LPARAM lParam)
+        private LRESULT HotKeyPrc(HWND hwnd, uint uMsg, WPARAM wParam, LPARAM lParam)
         {
-            if (uMsg == WM_HOTKEY)
+            try
             {
-                _onHotKeyPressed.Invoke();
-
+                if (uMsg == WM_HOTKEY)
+                {
+                    _onHotKeyPressed.Invoke();
+                    return (LRESULT)nint.Zero;
+                }
+                var wndProc = Marshal.GetDelegateForFunctionPointer<Windows.Win32.UI.WindowsAndMessaging.WNDPROC>(_origPrc);
+                var intPtrLRESULT = PInvoke.CallWindowProc(wndProc, hwnd, uMsg, wParam, lParam);
+                return new LRESULT(intPtrLRESULT);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Error in HotKeyPrc");
+                _logger.Debug(ex);
                 return (LRESULT)nint.Zero;
             }
-            var wndProc = Marshal.GetDelegateForFunctionPointer<Windows.Win32.UI.WindowsAndMessaging.WNDPROC>(_origPrc);
-            var intPtrLRESULT = PInvoke.CallWindowProc(wndProc, hwnd, uMsg, wParam, lParam);
-            return new LRESULT(intPtrLRESULT);
         }
 
         public void UnregisterHotKey()

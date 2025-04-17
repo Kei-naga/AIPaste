@@ -66,14 +66,7 @@ namespace AIPaste
         {
             if (contentFrame.SourcePageType.Name?.ToString() != tabName.ToString())
             {
-                if (tabName == TabName.Settings)
-                {
-                    contentFrame.Navigate(typeof(SettingsPage));
-                }
-                else if (tabName == TabName.AiPastePage)
-                {
-                    contentFrame.Navigate(typeof(AiPastePage));
-                }
+                NavigateToPage(tabName);
             }
 
             if (this.Visible == true)
@@ -81,6 +74,22 @@ namespace AIPaste
                 SetForegroundWindow();
             }
             Activate();
+        }
+
+        private void NavigateToPage(TabName tabName)
+        {
+            if (tabName == TabName.Settings)
+            {
+                _logger.Trace("navigating setting page");
+                contentFrame.Navigate(typeof(SettingsPage));
+            }
+            else if (tabName == TabName.AiPastePage)
+            {
+                _logger.Trace("navigating AiPastePage");
+                var appSettings = ViewModel.AppSettings;
+                var llmModelSettings = appSettings.GetLlmModelSettings(appSettings.ActiveModelType);
+                contentFrame.Navigate(typeof(AiPastePage), llmModelSettings);
+            }
         }
 
         private void SetForegroundWindow()
@@ -120,16 +129,12 @@ namespace AIPaste
                 {
                     if (args.IsSettingsSelected)
                     {
-                        _logger.Trace("navigating setting page");
-                        contentFrame.Navigate(typeof(SettingsPage));
+                        NavigateToPage(TabName.Settings);
                     }
                     switch (args.SelectedItemContainer.Tag.ToString())
                     {
                         case nameof(TabName.AiPastePage):
-                            _logger.Trace("navigating AiPastePage");
-                            var appSettings = ViewModel.AppSettings;
-                            var llmModelSettings = appSettings.GetLlmModelSettings(appSettings.ActiveModelType);
-                            contentFrame.Navigate(typeof(AiPastePage), llmModelSettings);
+                            NavigateToPage(TabName.AiPastePage);
                             break;
                     }
                 }
