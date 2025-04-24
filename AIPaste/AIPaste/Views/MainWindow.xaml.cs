@@ -24,6 +24,7 @@ namespace AIPaste
         private readonly MyLogger _logger = MyLogger.GetInstance();
         private readonly ResourceLoaderWrapper _resourceLoader = new();
         public MainWindowViewModel ViewModel;
+        private readonly Win32ApiWrapper _win32ApiWrapper = new();
 
         public MainWindow()
         {
@@ -95,7 +96,7 @@ namespace AIPaste
         private void SetForegroundWindow()
         {
             var hwnd = new Windows.Win32.Foundation.HWND(WinRT.Interop.WindowNative.GetWindowHandle(this));
-            Windows.Win32.PInvoke.SetForegroundWindow(hwnd);
+            _win32ApiWrapper.SetForegroundWindow(hwnd);
         }
 
         public void RestoreDefaultClosingBehavior()

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using AIPaste.common;
 using AIPaste.Models.DTO;
-using Microsoft.UI.Xaml;
-using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
@@ -16,17 +13,20 @@ namespace AIPaste.Models.BackgroudServices
 #pragma warning restore IDE1006 // 命名スタイル
         private readonly WNDPROC _hotKeyPrc;
         private readonly Action _onHotKeyPressed;
+        private readonly IWin32ApiWrapper _win32ApiWrapper;
+        private readonly IDummyWindowManager _dummyWindowManager;
         private readonly IMyLogger _logger;
         private bool _isRegistered = false;
 
         private int _hotkeyId;
-        private Window? _dummyWindow;
         private HWND _hwnd;
         private IntPtr _origPrc;
 
-        public HotkeyMessageManager(Action action, IMyLogger? logger = null)
+        public HotkeyMessageManager(Action action, IWin32ApiWrapper? win32ApiWrapper = null, IDummyWindowManager? dummyWindowManager = null, IMyLogger? logger = null)
         {
             _logger = logger ?? MyLogger.GetInstance();
+            _win32ApiWrapper = win32ApiWrapper ?? new Win32ApiWrapper();
+            _dummyWindowManager = dummyWindowManager ?? new DummyWindowManager();
             _onHotKeyPressed = action;
             _hotKeyPrc = HotKeyPrc;
         }
@@ -37,12 +37,12 @@ namespace AIPaste.Models.BackgroudServices
             int attempts = 0;
             while (attempts < 3)
             {
-                var success = PInvoke.RegisterHotKey(_hwnd, _hotkeyId, (Windows.Win32.UI.Input.KeyboardAndMouse.HOT_KEY_MODIFIERS)keyPattern.Modifiers, (uint)keyPattern.Key);
+                var success = _win32ApiWrapper.RegisterHotKey(_hwnd, _hotkeyId, (uint)keyPattern.Modifiers, (uint)keyPattern.Key);
                 if (success)
                 {
                     _logger.Trace($"Hotkey registered: {keyPattern}");
-                    var hotKeyPrcPointer = Marshal.GetFunctionPointerForDelegate(_hotKeyPrc);
-                    _origPrc = PInvoke.SetWindowLongPtr(_hwnd, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, hotKeyPrcPointer);
+                    var hotKeyPrcPointer = _win32ApiWrapper.GetFunctionPointerForDelegate(_hotKeyPrc);
+                    _origPrc = _win32ApiWrapper.SetWindowLongPtr(_hwnd, (int)WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, hotKeyPrcPointer);
                     _isRegistered = true;
                     return;
                 }
@@ -51,15 +51,14 @@ namespace AIPaste.Models.BackgroudServices
                 attempts++;
             }
             _isRegistered = false;
-            throw new InvalidOperationException($"Failed to register hotkey: {keyPattern}. Error Code: {Marshal.GetLastWin32Error()}");
+            throw new InvalidOperationException($"Failed to register hotkey: {keyPattern}. Error Code: {_win32ApiWrapper.GetLastWin32Error()}");
         }
 
         private void IntializeSettings()
         {
             UnregisterHotKey();
-            _hotkeyId = GetHashCode();
-            _dummyWindow = new Window();
-            _hwnd = new HWND(WinRT.Interop.WindowNative.GetWindowHandle(_dummyWindow).ToInt32());
+            _hotkeyId = GetHashCode();;
+            _hwnd = new HWND(_dummyWindowManager.GetHwndPtr());
         }
 
         private LRESULT HotKeyPrc(HWND hwnd, uint uMsg, WPARAM wParam, LPARAM lParam)
@@ -71,8 +70,7 @@ namespace AIPaste.Models.BackgroudServices
                     _onHotKeyPressed.Invoke();
                     return (LRESULT)nint.Zero;
                 }
-                var wndProc = Marshal.GetDelegateForFunctionPointer<Windows.Win32.UI.WindowsAndMessaging.WNDPROC>(_origPrc);
-                var intPtrLRESULT = PInvoke.CallWindowProc(wndProc, hwnd, uMsg, wParam, lParam);
+                var intPtrLRESULT = _win32ApiWrapper.CallWindowProc(_origPrc, hwnd, uMsg, wParam, lParam);
                 return new LRESULT(intPtrLRESULT);
             }
             catch (Exception ex)
@@ -87,9 +85,8 @@ namespace AIPaste.Models.BackgroudServices
         {
             if (_isRegistered)
             {
-                PInvoke.UnregisterHotKey(_hwnd, _hotkeyId);
-                _dummyWindow?.Close();
-                _dummyWindow = null;
+                _win32ApiWrapper.UnregisterHotKey(_hwnd, _hotkeyId);
+                _dummyWindowManager.ReleaseHwndPtr();
                 _isRegistered = false;
             }
         }

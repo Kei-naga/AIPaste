@@ -43,8 +43,4 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\BackgroudServices\" />
-  </ItemGroup>
-
 </Project>

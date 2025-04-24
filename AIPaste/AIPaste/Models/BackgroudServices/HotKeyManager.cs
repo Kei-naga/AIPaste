@@ -38,6 +38,11 @@ namespace AIPaste.Models.BackgroudServices
             return _instance;
         }
 
+        public static void DisposeInstance()
+        {
+            _instance = null;
+        }
+
         public void RegisterHotKey(IKeyPattern keyPattern)
         {
             _logger.Info("REGISTER_HOTKEY");
