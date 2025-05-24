@@ -14,7 +14,8 @@ namespace AIPaste.Models.SettingsServices
         private readonly IMyLogger _logger;
         #pragma warning disable IDE1006 // 命名スタイル
         private const string AUTO_START_KEY = "AutoStart";
-        private const string MODEL_TYPE_KEY = "ModelType";
+        private const string LOCAL_LLM_MODEL_SETTINGS_KEY = "LocalLlmModelActivated";
+        private const string GEMINI_MODEL_SETTINGS_KEY = "GeminiModelActivated";
         private const string MODEL_PATH_KEY = "ModelPath";
         private const string GPU_ENABLED_KEY = "GpuEnabled";
         private const string GPU_LAYER_COUNT_KEY = "GpuLayer";
@@ -46,8 +47,16 @@ namespace AIPaste.Models.SettingsServices
                 var geminiModelSettings = LoadGeminiModelSettings();
                 var keySettings = LoadKeySettings();
                 var AutoStart = (bool)_mainContainer.Values[AUTO_START_KEY];
-                var modelType = (ModelType)_mainContainer.Values[MODEL_TYPE_KEY];
-                var appSettings = new AppSettings(AutoStart, modelType, keySettings, [llmModelSettings, geminiModelSettings]);
+                var isLocalLlmActivate = (bool)_mainContainer.Values[LOCAL_LLM_MODEL_SETTINGS_KEY];
+                var isGeminiActivate = (bool)_mainContainer.Values[GEMINI_MODEL_SETTINGS_KEY];
+                var activeLlmModels = new ActiveLlmModels(isLocalLlmActivate, isGeminiActivate);
+                var appSettings = new AppSettings
+                    (
+                        AutoStart, 
+                        keySettings, 
+                        [llmModelSettings, geminiModelSettings], 
+                        activeLlmModels
+                    );
                 _logger.Debug($"Loaded settimgs: {appSettings}");
                 _logger.Debug($"Local LLM Settings: {llmModelSettings}");
                 _logger.Debug($"Gemini Setting: {geminiModelSettings}");
@@ -99,7 +108,7 @@ namespace AIPaste.Models.SettingsServices
         public void SaveSettings(IAppSettings appSettings)
         {
             _mainContainer.Values[AUTO_START_KEY] = appSettings.AutoStart;
-            _mainContainer.Values[MODEL_TYPE_KEY] = (int)appSettings.ActiveModelType;
+            SaveActiveLlmModels(appSettings.ActiveLlmModels);
             SaveKeySettings(appSettings.KeySettings);
             SaveLlmModeSettings(appSettings.ModelSettingsList);
             _logger.Debug($"Saved settings: {appSettings}");
@@ -145,6 +154,13 @@ namespace AIPaste.Models.SettingsServices
             _mainContainer.Values[IS_HOTKEY_ENABLED_KEY] = keySettings.IsHotkeyEnabled;
             _mainContainer.Values[HOTKEY_KEY] = (int)keySettings.KeyPattern.Key;
             _mainContainer.Values[MODIFERS_KEY] = (int)keySettings.KeyPattern.Modifiers;
+        }
+
+        private void SaveActiveLlmModels(IActiveLlmModels activeLlmModels)
+        {
+            _logger.Debug($"Saving Active LLM Models: {activeLlmModels}");
+            _mainContainer.Values[LOCAL_LLM_MODEL_SETTINGS_KEY] = activeLlmModels.IsLocalLlmActive;
+            _mainContainer.Values[GEMINI_MODEL_SETTINGS_KEY] = activeLlmModels.IsGeminiActive;
         }
 
         public IAppSettings ResetSettings()

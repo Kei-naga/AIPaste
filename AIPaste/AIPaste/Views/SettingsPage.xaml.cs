@@ -36,9 +36,6 @@ namespace AIPaste.Views
                     App.MainWindow?.SendDialog(
                         _resourceLoader.GetString("Settings_DialogWarning"),
                         _resourceLoader.GetString("Settings_DialogFailedSave"));
-
-                    // Manually updates the display of the model types combo box because, for some reason, it does not update automatically.
-                    ModelTypesCombo.SelectedIndex = (int)ViewModel.ModelTypeName; ;
                 }
             }
             catch (System.Exception ex)
@@ -46,11 +43,6 @@ namespace AIPaste.Views
                 _logger.Error("FAILED_SAVING");
                 _logger.Debug(ex);
             }
-        }
-
-        private void ModelTypesLoaded(object sender, RoutedEventArgs e)
-        {
-            ModelTypesCombo.SelectedIndex = (int)ViewModel.ModelTypeName;
         }
 
         private void HotkeyModifiersToggle_UnChecked(object sender, RoutedEventArgs e)

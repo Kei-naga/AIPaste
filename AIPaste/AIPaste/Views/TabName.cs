@@ -2,7 +2,8 @@
 {
     public enum TabName
     {
-        AiPastePage,
+        LocalLlm,
+        Gemini,
         Settings
     }
 }

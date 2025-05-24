@@ -219,4 +219,10 @@
   <data name="MainPage_TabName_Gemini" xml:space="preserve">
     <value>Gemini</value>
   </data>
+  <data name="Settings_LocalLlmEnable.Content" xml:space="preserve">
+    <value>Local LLM Activation</value>
+  </data>
+  <data name="Settings_GeminiEnable.Content" xml:space="preserve">
+    <value>Gemini Activation</value>
+  </data>
 </root>

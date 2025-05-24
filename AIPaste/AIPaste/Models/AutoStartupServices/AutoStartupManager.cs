@@ -8,7 +8,9 @@ namespace AIPaste.Models.StartupServices
     public class AutoStartupManager(IMyLogger? logger = null) : IAutoStartupManager
     {
         private readonly IMyLogger _logger = logger ?? MyLogger.GetInstance();
+        #pragma warning disable IDE1006 // 命名スタイル
         private const string TASK_ID = "AIPasteAutoStart";
+        #pragma warning restore IDE1006 // 命名スタイル
 
         public async Task ToggleStartupAsync(bool enable)
         {

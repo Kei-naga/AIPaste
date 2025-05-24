@@ -2,34 +2,34 @@
 
 namespace AIPaste.Models.DTO
 {
-    public class AppSettings(bool autoStartSetting, ModelType modelType, IKeySettings keySettings, ILlmModelSettings[] modelSettingsList) : IAppSettings
+    public class AppSettings(bool autoStartSetting, IKeySettings keySettings, ILlmModelSettings[] modelSettingsList, IActiveLlmModels activeLlmModels) : IAppSettings
     {
         public bool AutoStart { get; set; } = autoStartSetting;
-        public ModelType ActiveModelType { get; set; } = modelType;
         public IKeySettings KeySettings { get; set; } = keySettings;
         public ILlmModelSettings[] ModelSettingsList { get; set; } = modelSettingsList;
+        public IActiveLlmModels ActiveLlmModels { get; set; } = activeLlmModels;
 
         public static AppSettings GetDefaultSettings()
         {
             return new AppSettings(
                 autoStartSetting: true,
-                modelType: ModelType.LocalLLM,
                 keySettings: DTO.KeySettings.GetDefaultSettings(),
-                modelSettingsList: [LlmLocalModelSettings.GetDefaultSettings(), GeminiModelSettings.GetDefaultSettings()]
+                modelSettingsList: [LlmLocalModelSettings.GetDefaultSettings(), GeminiModelSettings.GetDefaultSettings()],
+                activeLlmModels: DTO.ActiveLlmModels.GetDefaultSettings()
             );
         }
 
         public override string ToString()
         {
-            return $"KeySettings: [{KeySettings}],  AutoStart: {AutoStart}, ModelType: {ActiveModelType}";
+            return $"KeySettings: [{KeySettings}],  AutoStart: {AutoStart}, IsLocalLlmActive: [{ActiveLlmModels}]";
         }
 
         public bool Equals(IAppSettings otherSettings)
         {
             return AutoStart == otherSettings.AutoStart &&
-                ActiveModelType == otherSettings.ActiveModelType &&
                 KeySettings.Equals(otherSettings.KeySettings) &&
-                SameLlmSettings(otherSettings.ModelSettingsList);
+                SameLlmSettings(otherSettings.ModelSettingsList) &&
+                ActiveLlmModels.Equals(otherSettings.ActiveLlmModels);
         }
 
         private bool SameLlmSettings(ILlmModelSettings[] otherLlmSettingsList)

@@ -15,7 +15,7 @@ namespace AIPaste.Views
         public TrayView()
         {
             InitializeComponent();
-            IconClicked = new RelayCommand(_ => App.MainWindow?.ShowWindow(TabName.AiPastePage));
+            IconClicked = new RelayCommand(_ => App.MainWindow?.ShowWindow());
             ExitClicked = new RelayCommand(_ =>
             {
                 App.MainWindow?.RestoreDefaultClosingBehavior();

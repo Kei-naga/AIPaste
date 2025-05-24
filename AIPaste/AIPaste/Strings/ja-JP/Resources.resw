@@ -219,4 +219,10 @@
   <data name="MainPage_TabName_Gemini" xml:space="preserve">
     <value>Gemini</value>
   </data>
+  <data name="Settings_LocalLlmEnable.Content" xml:space="preserve">
+    <value>ローカルLlmの有効化</value>
+  </data>
+  <data name="Settings_GeminiEnable.Content" xml:space="preserve">
+    <value>Geminiの有効化</value>
+  </data>
 </root>

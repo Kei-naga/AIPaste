@@ -10,6 +10,7 @@ using AIPaste.Models.BackgroudServices;
 using System.Threading.Tasks;
 using AIPaste.common;
 using AIPaste.Models.DTO;
+using AIPaste.Views;
 
 namespace AIPaste.ViewModels
 {
@@ -60,7 +61,8 @@ namespace AIPaste.ViewModels
             ShiftModifier = _appSettings.KeySettings.KeyPattern.Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_SHIFT);
             WinModifier = _appSettings.KeySettings.KeyPattern.Modifiers.HasFlag(HOT_KEY_MODIFIERS.MOD_WIN);
             AutoStart = _appSettings.AutoStart;
-            ModelTypeName = _appSettings.ActiveModelType;
+            ActivatedLocalLlm = _appSettings.ActiveLlmModels.IsLocalLlmActive;
+            ActivatedGemini = _appSettings.ActiveLlmModels.IsGeminiActive;
             var geminiModelSettings = _appSettings.ModelSettingsList
                 .FirstOrDefault(x => x is GeminiModelSettings) as GeminiModelSettings
                 ?? throw new Exception("Gemini settings not found");
@@ -239,24 +241,32 @@ namespace AIPaste.ViewModels
             }
         }
 
-        private ModelType _modelTypeName = ModelType.LocalLLM;
-        public ModelType ModelTypeName
+        private bool _activatedLocalLlm = true;
+        public bool ActivatedLocalLlm
         {
-            get => _modelTypeName;
+            get => _activatedLocalLlm;
             set
             {
-                if (_modelTypeName != value)
+                if (_activatedLocalLlm != value)
                 {
-                    _modelTypeName = value;
-                    OnPropertyChanged(nameof(ModelType));
-                    OnPropertyChanged(nameof(IsLocalLLMSelected));
-                    OnPropertyChanged(nameof(IsGeminiSelected));
+                    _activatedLocalLlm = value;
+                    OnPropertyChanged(nameof(ActivatedLocalLlm));
                 }
             }
         }
-
-        public bool IsLocalLLMSelected => ModelTypeName == ModelType.LocalLLM;
-        public bool IsGeminiSelected => ModelTypeName == ModelType.Gemini;
+        private bool _activatedGemini = false;
+        public bool ActivatedGemini
+        {
+            get => _activatedGemini;
+            set
+            {
+                if (_activatedGemini != value)
+                {
+                    _activatedGemini = value;
+                    OnPropertyChanged(nameof(ActivatedGemini));
+                }
+            }
+        }
 
         private string _apiKey = "";
         public string ApiKey
@@ -286,11 +296,12 @@ namespace AIPaste.ViewModels
             var modifier = KeyPattern.GetModifiers(CtrlModifier, AltModifier, ShiftModifier, WinModifier);
             var keyPattern = new KeyPattern(modifier, Key);
             var keySettings = new KeySettings(IsHotkeyEnabled, keyPattern);
+            var activeLlmModels = new ActiveLlmModels(ActivatedLocalLlm, ActivatedGemini);
             return new AppSettings(
                 AutoStart,
-                ModelTypeName,
                 keySettings,
-                [localModelSettings, geminiModelSettings]
+                [localModelSettings, geminiModelSettings],
+                activeLlmModels
             );
         }
 
@@ -328,7 +339,7 @@ namespace AIPaste.ViewModels
             try
             {
                 _settingsService.SaveSettings(newSettings);
-                if (newSettings.ActiveModelType != ModelType.LocalLLM)
+                if (!newSettings.ActiveLlmModels.IsLocalLlmActive)
                 {
                     _logger.Trace("Disposing LocalLlmModel");
                     LocalLlmSingleton.Dispose();
@@ -350,12 +361,15 @@ namespace AIPaste.ViewModels
         {
             try
             {
-                var llmModelSettings = appSettings.GetLlmModelSettings(appSettings.ActiveModelType) 
-                    ?? throw new Exception("LlmModelSettings not found");
-                var textCorrector = _textCorrectorFactory.CreateLlmTextCorrector(llmModelSettings);
-                if (!textCorrector.CheckIntegrity())
+                foreach (var modelType in GetActiveModelTypes(appSettings.ActiveLlmModels))
                 {
-                    throw new Exception("Failed to generate text");
+                    var llmModelSettings = appSettings.GetLlmModelSettings(modelType)
+                        ?? throw new Exception("LlmModelSettings not found");
+                    var textCorrector = _textCorrectorFactory.CreateLlmTextCorrector(llmModelSettings);
+                    if (!textCorrector.CheckIntegrity())
+                    {
+                        throw new Exception("Failed to generate text");
+                    }
                 }
                 return true;
             }
@@ -366,6 +380,19 @@ namespace AIPaste.ViewModels
             }
         }
 
+        private ModelType[] GetActiveModelTypes(IActiveLlmModels activeLlmModels)
+        {
+            var modelTypes = new List<ModelType>();
+            if (activeLlmModels.IsLocalLlmActive)
+            {
+                modelTypes.Add(ModelType.LocalLLM);
+            }
+            if (activeLlmModels.IsGeminiActive)
+            {
+                modelTypes.Add(ModelType.Gemini);
+            }
+            return [.. modelTypes];
+        }
         private bool ApplyHostkeySettings(AppSettings newSettings)
         {
             try

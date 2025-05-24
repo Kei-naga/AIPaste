@@ -31,11 +31,16 @@ namespace AIPaste.Models.DTO.Tests
                 maxContextSize: 1024
             );
 
+            var activeLlmModels = new ActiveLlmModels(
+                IsLocalLlmActive: true,
+                IsGeminiActive: false
+            );
+
             return new AppSettings(
                 autoStartSetting: true,
-                modelType: ModelType.LocalLLM,
                 keySettings: keySettings,
-                modelSettingsList: [localLlmSettings, geminiSettings]
+                modelSettingsList: [localLlmSettings, geminiSettings],
+                activeLlmModels: activeLlmModels
             );
         }
 
@@ -49,7 +54,7 @@ namespace AIPaste.Models.DTO.Tests
             var result = appSettings.ToString();
 
             // Assert
-            Assert.AreEqual("KeySettings: [IsHotkeyEnabled:True, HotKey:Ctrl+C],  AutoStart: True, ModelType: LocalLLM", result);
+            Assert.AreEqual("KeySettings: [IsHotkeyEnabled:True, HotKey:Ctrl+C],  AutoStart: True, IsLocalLlmActive: [IsLocalLlmActive: True, IsGeminiActive: False]", result);
         }
 
         [TestMethod]

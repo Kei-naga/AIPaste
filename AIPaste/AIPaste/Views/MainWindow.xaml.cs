@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AIPaste.common;
@@ -47,7 +48,7 @@ namespace AIPaste
         private void MainTab_Loaded(object sender, RoutedEventArgs e)
         {
             contentFrame.Navigated += On_Navigated;
-            SetFirstTab(TabName.AiPastePage);
+            SetFirstTab(GetFirstTab());
         }
 
         private void OnWindowHideInsteadOfClose(object sender, WindowEventArgs args)
@@ -55,12 +56,18 @@ namespace AIPaste
             _logger.Info("CLOSE_WINDOW");
             args.Handled = true;
             this.Hide();
-            this.SetFirstTab(TabName.AiPastePage);
+            this.SetFirstTab(GetFirstTab());
         }
 
         private void OnHotKeyPressed()
         {
-            this.ShowWindow(TabName.AiPastePage);
+            this.ShowWindow(GetFirstTab());
+        }
+
+        public void ShowWindow()
+        {
+            var firstTab = GetFirstTab();
+            ShowWindow(firstTab);
         }
 
         public void ShowWindow(TabName tabName)
@@ -83,14 +90,33 @@ namespace AIPaste
             {
                 _logger.Trace("navigating setting page");
                 contentFrame.Navigate(typeof(SettingsPage));
+                mainTab.SelectedItem = mainTab.SettingsItem;
             }
-            else if (tabName == TabName.AiPastePage)
+            else if (tabName == TabName.LocalLlm)
             {
                 _logger.Trace("navigating AiPastePage");
                 var appSettings = ViewModel.AppSettings;
-                var llmModelSettings = appSettings.GetLlmModelSettings(appSettings.ActiveModelType);
+                var llmModelSettings = appSettings.GetLlmModelSettings(ModelType.LocalLLM);
                 contentFrame.Navigate(typeof(AiPastePage), llmModelSettings);
+                mainTab.SelectedItem = mainTab.MenuItems
+                            .OfType<NavigationViewItem>()
+                            .First(i => i.Tag.Equals(TabName.LocalLlm.ToString()));
             }
+            else if (tabName == TabName.Gemini)
+            {
+                _logger.Trace("navigating GeminiPage");
+                var appSettings = ViewModel.AppSettings;
+                var llmModelSettings = appSettings.GetLlmModelSettings(ModelType.Gemini);
+                contentFrame.Navigate(typeof(AiPastePage), llmModelSettings);
+                mainTab.SelectedItem = mainTab.MenuItems
+                            .OfType<NavigationViewItem>()
+                            .First(i => i.Tag.Equals(TabName.Gemini.ToString()));
+            }
+            else
+            {
+                throw new ArgumentException($"Unknown tab name: {tabName}");
+            }
+
         }
 
         private void SetForegroundWindow()
@@ -122,6 +148,14 @@ namespace AIPaste
             );
         }
 
+        private TabName GetFirstTab()
+        {
+            var firstTab = mainTab.MenuItems[0] as NavigationViewItem;
+            return firstTab == null
+                ? throw new InvalidOperationException("No items in the navigation view.")
+                : (TabName)Enum.Parse(typeof(TabName), firstTab.Tag.ToString() ?? "");
+        }
+
         private void OnNavigationViewSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
             if (args.SelectedItemContainer != null)
@@ -134,8 +168,11 @@ namespace AIPaste
                     }
                     switch (args.SelectedItemContainer.Tag.ToString())
                     {
-                        case nameof(TabName.AiPastePage):
-                            NavigateToPage(TabName.AiPastePage);
+                        case nameof(TabName.LocalLlm):
+                            NavigateToPage(TabName.LocalLlm);
+                            break;
+                        case nameof(TabName.Gemini):
+                            NavigateToPage(TabName.Gemini);
                             break;
                     }
                 }
@@ -156,7 +193,7 @@ namespace AIPaste
         {
             _logger.Error("FAILED_NAVIGATION", pageName);
             _logger.Debug(ex);
-            contentFrame.Navigate(typeof(SettingsPage));
+            NavigateToPage(TabName.Settings);
             SendDialog(
                 _resourceLoader.GetString("Settings_DialogWarning"),
                 _resourceLoader.GetString("Settings_DialogInvalidSettings")
@@ -197,14 +234,7 @@ namespace AIPaste
         {
             if (e.Content is SettingsPage settingsPage)
             {
-                mainTab.SelectedItem = (NavigationViewItem)mainTab.SettingsItem;
                 settingsPage.SettingsUpdated += OnSettingsUpdated;
-            }
-            else if (e.Content is AiPastePage aiPastePage)
-            {
-                mainTab.SelectedItem = mainTab.MenuItems
-                            .OfType<NavigationViewItem>()
-                            .First(i => i.Tag.Equals(contentFrame.SourcePageType.Name?.ToString()));
             }
         }
 
@@ -215,26 +245,32 @@ namespace AIPaste
 
         private NavigationViewItem[] GetNavigationViewItems()
         {
-            var llmModelType = ViewModel.AppSettings.ActiveModelType;
-            var content = "";
-            if (llmModelType == ModelType.LocalLLM)
+            var activeLlmModels = ViewModel.AppSettings.ActiveLlmModels;
+            var navigationViewItems = new List<NavigationViewItem>();
+
+            if (activeLlmModels.IsLocalLlmActive)
             {
-                content = _resourceLoader.GetString("MainPage_TabName_localLlm");
-            }
-            else if (llmModelType == ModelType.Gemini)
-            {
-                content = _resourceLoader.GetString("MainPage_TabName_gemini");
+                var navigationViewItem = new NavigationViewItem
+                {
+                    Content = _resourceLoader.GetString("MainPage_TabName_localLlm"),
+                    Tag = TabName.LocalLlm.ToString(),
+                    Name = ModelType.LocalLLM.ToString(),
+                };
+                navigationViewItems.Add(navigationViewItem);
             }
 
-            var navigationViewItems = new NavigationViewItem[]
+            if (activeLlmModels.IsGeminiActive)
+            {
+                var navigationViewItem = new NavigationViewItem
                 {
-                new() {
-                    Content = content,
-                    Tag = TabName.AiPastePage.ToString(),
-                    Name = llmModelType.ToString(),
-                }
+                    Content = _resourceLoader.GetString("MainPage_TabName_gemini"),
+                    Tag = TabName.Gemini.ToString(),
+                    Name = ModelType.Gemini.ToString(),
                 };
-            return navigationViewItems;
+                navigationViewItems.Add(navigationViewItem);
+            }
+
+            return [.. navigationViewItems];
         }
     }
 }

@@ -12,12 +12,28 @@ namespace AIPaste.ViewModels.Tests
     [TestClass()]
     public class SettingsPageViewModelTests
     {
-        private Mock<IAppSettings> GetAppSettingsMoq(ILlmModelSettings[] llmModelSettings, IKeySettings keySettings)
+        private Mock<ISettingsService> _moqSettingsService;
+        private Mock<IAutoStartupManager> _moqStartupManager;
+        private Mock<ITextCorrectorFactory> _moqTextCorrectorFactory;
+        private Mock<IHotKeyManager> _moqHotKeyManager;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            _moqSettingsService = new Mock<ISettingsService>();
+            _moqStartupManager = new Mock<IAutoStartupManager>();
+            _moqTextCorrectorFactory = new Mock<ITextCorrectorFactory>();
+            _moqHotKeyManager = new Mock<IHotKeyManager>();
+            _moqHotKeyManager.Setup(x => x.RegisterHotKey(It.IsAny<IKeyPattern>()));
+            _moqHotKeyManager.Setup(x => x.UnRegisterHotKey());
+        }
+
+        private Mock<IAppSettings> GetAppSettingsMoq(ILlmModelSettings[] llmModelSettings, IKeySettings keySettings, IActiveLlmModels activeLlmModels)
         {
             var moqAppSettings = new Mock<IAppSettings>();
             moqAppSettings.Setup(x => x.KeySettings).Returns(keySettings);
             moqAppSettings.Setup(x => x.ModelSettingsList).Returns(llmModelSettings);
-            moqAppSettings.Setup(x => x.ActiveModelType).Returns(ModelType.LocalLLM);
+            moqAppSettings.Setup(x => x.ActiveLlmModels).Returns(activeLlmModels);
             moqAppSettings.Setup(x => x.AutoStart).Returns(true);
             return moqAppSettings;
         }
@@ -38,21 +54,6 @@ namespace AIPaste.ViewModels.Tests
             return moqKeySettings;
         }
 
-        private Mock<ISettingsService> GetSettingsServiceMoq(IAppSettings moqAppSettings)
-        {
-            var moqSettingsService = new Mock<ISettingsService>();
-            moqSettingsService.Setup(x => x.LoadSettings()).Returns(moqAppSettings);
-            return moqSettingsService;
-        }
-
-        private Mock<IHotKeyManager> GetHotKeyManagerMoq()
-        {
-            var moqHotKeyManager = new Mock<IHotKeyManager>();
-            moqHotKeyManager.Setup(x => x.RegisterHotKey(It.IsAny<IKeyPattern>()));
-            moqHotKeyManager.Setup(x => x.UnRegisterHotKey());
-            return moqHotKeyManager;
-        }
-
         [TestMethod()]
         public void SettingsPageViewModelTest()
         {
@@ -66,13 +67,11 @@ namespace AIPaste.ViewModels.Tests
             var geminiModelSettingsdummy = new GeminiModelSettings(dummyGeminiApiKey);
             var moqKeyPattern = GetKeyPatternMoq();
             var moqKeySettings = GetKeySettingsMoq(moqKeyPattern, true);
-            var moqAppSettings = GetAppSettingsMoq([llmLocalModelSettingsdummy, geminiModelSettingsdummy], moqKeySettings.Object);
-            var moqSettingsService = GetSettingsServiceMoq(moqAppSettings.Object);
-            var moqStartupManager = new Mock<IAutoStartupManager>();
-            var moqTextCorrectorFactory = new Mock<ITextCorrectorFactory>();
-            var moqHotKeyManager = GetHotKeyManagerMoq();
+            var activeLlmModels = new ActiveLlmModels(true, false);
+            var moqAppSettings = GetAppSettingsMoq([llmLocalModelSettingsdummy, geminiModelSettingsdummy], moqKeySettings.Object, activeLlmModels);
+            _moqSettingsService.Setup(x => x.LoadSettings()).Returns(moqAppSettings.Object);
 
-            var viewModel = new SettingsPageViewModel(moqSettingsService.Object, moqStartupManager.Object, moqTextCorrectorFactory.Object, moqHotKeyManager.Object);
+            var viewModel = new SettingsPageViewModel(_moqSettingsService.Object, _moqStartupManager.Object, _moqTextCorrectorFactory.Object, _moqHotKeyManager.Object);
 
             Assert.IsNotNull(viewModel);
             Assert.AreEqual(modelPath, viewModel.LLMModelPath);
@@ -86,9 +85,8 @@ namespace AIPaste.ViewModels.Tests
             Assert.IsFalse(viewModel.ShiftModifier);
             Assert.IsFalse(viewModel.WinModifier);
             Assert.IsTrue(viewModel.AutoStart);
-            Assert.AreEqual(ModelType.LocalLLM, viewModel.ModelTypeName);
-            Assert.IsTrue(viewModel.IsLocalLLMSelected);
-            Assert.IsFalse(viewModel.IsGeminiSelected);
+            Assert.IsTrue(viewModel.ActivatedLocalLlm);
+            Assert.IsFalse(viewModel.ActivatedGemini);
             Assert.AreEqual(dummyGeminiApiKey, viewModel.ApiKey);
         }
 
@@ -99,19 +97,17 @@ namespace AIPaste.ViewModels.Tests
             var llmLocalModelSettingsdummy = new LlmLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
             var dummyGeminiApiKey = "dummy_gemini_api_key";
             var geminiModelSettingsdummy = new GeminiModelSettings(dummyGeminiApiKey);
-            return GetAppSettingsMoq([llmLocalModelSettingsdummy, geminiModelSettingsdummy], moqKeySettings.Object);
+            var activeLlmModels = new ActiveLlmModels(true, false);
+            return GetAppSettingsMoq([llmLocalModelSettingsdummy, geminiModelSettingsdummy], moqKeySettings.Object, activeLlmModels);
         }
 
         [TestMethod()]
         public void SaveSettingsTest_RetuenTrueWhenNoSettingsChanged()
         {
             var moqAppSettings = GetDummyAppSettingsMoq();
-            var moqSettingsService = GetSettingsServiceMoq(moqAppSettings.Object);
-            var moqStartupManager = new Mock<IAutoStartupManager>();
-            var moqTextCorrectorFactory = new Mock<ITextCorrectorFactory>();
-            var moqHotKeyManager = GetHotKeyManagerMoq();
+            _moqSettingsService.Setup(x => x.LoadSettings()).Returns(moqAppSettings.Object);
 
-            var viewModel = new SettingsPageViewModel(moqSettingsService.Object, moqStartupManager.Object, moqTextCorrectorFactory.Object, moqHotKeyManager.Object);
+            var viewModel = new SettingsPageViewModel(_moqSettingsService.Object, _moqStartupManager.Object, _moqTextCorrectorFactory.Object, _moqHotKeyManager.Object);
             var result = viewModel.SaveSettings();
 
             Assert.IsTrue(result);
@@ -121,14 +117,11 @@ namespace AIPaste.ViewModels.Tests
         public void SaveSettingsTest_ReturnFalseWhenInvalidLlmSettings()
         {
             var moqAppSettings = GetDummyAppSettingsMoq();
-            var moqSettingsService = GetSettingsServiceMoq(moqAppSettings.Object);
-            var moqStartupManager = new Mock<IAutoStartupManager>();
-            var moqTextCorrectorFactory = new Mock<ITextCorrectorFactory>();
+            _moqSettingsService.Setup(x => x.LoadSettings()).Returns(moqAppSettings.Object);
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", true);
-            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
-            var moqHotKeyManager = GetHotKeyManagerMoq();
+            _moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
 
-            var viewModel = new SettingsPageViewModel(moqSettingsService.Object, moqStartupManager.Object, moqTextCorrectorFactory.Object, moqHotKeyManager.Object);
+            var viewModel = new SettingsPageViewModel(_moqSettingsService.Object, _moqStartupManager.Object, _moqTextCorrectorFactory.Object, _moqHotKeyManager.Object);
             viewModel.LLMModelPath = "changing!";
             var result = viewModel.SaveSettings();
 
@@ -143,16 +136,14 @@ namespace AIPaste.ViewModels.Tests
             var dummyLlmLocalModelSettings = new LlmLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
             var dummyGeminiApiKey = "dummy_gemini_api_key";
             var dummygeminiModelSettings = new GeminiModelSettings(dummyGeminiApiKey);
-            var dummyAppSettings = new AppSettings(true, ModelType.LocalLLM, dummyKeySettings, [dummyLlmLocalModelSettings, dummygeminiModelSettings]);
-            var moqSettingsService = GetSettingsServiceMoq(dummyAppSettings);
-            var moqStartupManager = new Mock<IAutoStartupManager>();
-            var moqTextCorrectorFactory = new Mock<ITextCorrectorFactory>();
+            var dummyactiveLlmModels = new ActiveLlmModels(true, false);
+            var dummyAppSettings = new AppSettings(true, dummyKeySettings, [dummyLlmLocalModelSettings, dummygeminiModelSettings], dummyactiveLlmModels);
+            _moqSettingsService.Setup(x => x.LoadSettings()).Returns(dummyAppSettings);
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
-            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
-            var moqHotKeyManager = GetHotKeyManagerMoq();
-            moqHotKeyManager.Setup(x => x.UpdateHotkeySettings(It.IsAny<IKeySettings>())).Throws(new Exception("Failed to register hotkey"));
+            _moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
+            _moqHotKeyManager.Setup(x => x.UpdateHotkeySettings(It.IsAny<IKeySettings>())).Throws(new Exception("Failed to register hotkey"));
 
-            var viewModel = new SettingsPageViewModel(moqSettingsService.Object, moqStartupManager.Object, moqTextCorrectorFactory.Object, moqHotKeyManager.Object);
+            var viewModel = new SettingsPageViewModel(_moqSettingsService.Object, _moqStartupManager.Object, _moqTextCorrectorFactory.Object, _moqHotKeyManager.Object);
             viewModel.LLMModelPath = "changing!";
             var result = viewModel.SaveSettings();
 
@@ -167,16 +158,14 @@ namespace AIPaste.ViewModels.Tests
             var keySettingsMoq = GetKeySettingsMoq(keyPatternMoq, true);
             var llmLocalModelSettingsdummy = new LlmLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
             var dummygeminiModelSettings = new GeminiModelSettings("dummy_gemini_api_key");
-            var dummyAppSettings = new AppSettings(true, ModelType.LocalLLM, keySettingsMoq.Object, [llmLocalModelSettingsdummy, dummygeminiModelSettings]);
-            var moqSettingsService = GetSettingsServiceMoq(dummyAppSettings);
-            var moqStartupManager = new Mock<IAutoStartupManager>();
-            moqStartupManager.Setup(x => x.IsAutoStartupMode()).ReturnsAsync(false);
-            var moqTextCorrectorFactory = new Mock<ITextCorrectorFactory>();
+            var dummyActiveLlmModels = new ActiveLlmModels(true, false);
+            var dummyAppSettings = new AppSettings(true, keySettingsMoq.Object, [llmLocalModelSettingsdummy, dummygeminiModelSettings], dummyActiveLlmModels);
+            _moqSettingsService.Setup(x => x.LoadSettings()).Returns(dummyAppSettings);
+            _moqStartupManager.Setup(x => x.IsAutoStartupMode()).ReturnsAsync(false);
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
-            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
-            var moqHotKeyManager = GetHotKeyManagerMoq();
+            _moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
 
-            var viewModel = new SettingsPageViewModel(moqSettingsService.Object, moqStartupManager.Object, moqTextCorrectorFactory.Object, moqHotKeyManager.Object);
+            var viewModel = new SettingsPageViewModel(_moqSettingsService.Object, _moqStartupManager.Object, _moqTextCorrectorFactory.Object, _moqHotKeyManager.Object);
             viewModel.LLMModelPath = "changing!";
             var result = viewModel.SaveSettings();
 
@@ -191,16 +180,14 @@ namespace AIPaste.ViewModels.Tests
             var keySettingsMoq = GetKeySettingsMoq(keyPatternMoq, true);
             var llmLocalModelSettingsdummy = new LlmLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
             var dummygeminiModelSettings = new GeminiModelSettings("dummy_gemini_api_key");
-            var dummyAppSettings = new AppSettings(true, ModelType.LocalLLM, keySettingsMoq.Object, [llmLocalModelSettingsdummy, dummygeminiModelSettings]);
-            var moqSettingsService = GetSettingsServiceMoq(dummyAppSettings);
-            var moqStartupManager = new Mock<IAutoStartupManager>();
-            moqStartupManager.Setup(x => x.IsAutoStartupMode()).ReturnsAsync(true);
-            var moqTextCorrectorFactory = new Mock<ITextCorrectorFactory>();
+            var dummyActiveLlmModels = new ActiveLlmModels(true, false);
+            var dummyAppSettings = new AppSettings(true, keySettingsMoq.Object, [llmLocalModelSettingsdummy, dummygeminiModelSettings], dummyActiveLlmModels);
+            _moqSettingsService.Setup(x => x.LoadSettings()).Returns(dummyAppSettings);
+            _moqStartupManager.Setup(x => x.IsAutoStartupMode()).ReturnsAsync(true);
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
-            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
-            var moqHotKeyManager = GetHotKeyManagerMoq();
+            _moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
 
-            var viewModel = new SettingsPageViewModel(moqSettingsService.Object, moqStartupManager.Object, moqTextCorrectorFactory.Object, moqHotKeyManager.Object);
+            var viewModel = new SettingsPageViewModel(_moqSettingsService.Object, _moqStartupManager.Object, _moqTextCorrectorFactory.Object, _moqHotKeyManager.Object);
             viewModel.LLMModelPath = "changing!";
             var result = viewModel.SaveSettings();
 
@@ -208,16 +195,17 @@ namespace AIPaste.ViewModels.Tests
         }
 
         [TestMethod()]
-        public void SaceSettingsTest_ReturnFalseWhenSavingIsFailed()
+        public void SaveSettingsTest_ReturnFalseWhenSavingIsFailed()
         {
             var keyPatternMoq = GetKeyPatternMoq();
             var keySettingsMoq = GetKeySettingsMoq(keyPatternMoq, true);
             var llmLocalModelSettingsdummy = new LlmLocalModelSettings("dummy_model_path", true, 4, 1024u, 512);
             var dummygeminiModelSettings = new GeminiModelSettings("dummy_gemini_api_key");
-            var dummyAppSettings = new AppSettings(true, ModelType.LocalLLM, keySettingsMoq.Object, [llmLocalModelSettingsdummy, dummygeminiModelSettings]);
-            var moqSettingsService = GetSettingsServiceMoq(dummyAppSettings);
+            var dummyActiveLlmModels = new ActiveLlmModels(true, false);
+            var dummyAppSettings = new AppSettings(true, keySettingsMoq.Object, [llmLocalModelSettingsdummy, dummygeminiModelSettings], dummyActiveLlmModels);
+            _moqSettingsService.Setup(x => x.LoadSettings()).Returns(dummyAppSettings);
             var count = 0;
-            moqSettingsService.Setup(x => x.SaveSettings(It.IsAny<IAppSettings>())).Callback(() =>
+            _moqSettingsService.Setup(x => x.SaveSettings(It.IsAny<IAppSettings>())).Callback(() =>
             {
                 count++;
                 if (count == 1)
@@ -225,15 +213,14 @@ namespace AIPaste.ViewModels.Tests
                     throw new Exception("Failed to save settings");
                 }
             });
-            var moqStartupManager = new Mock<IAutoStartupManager>();
-            moqStartupManager.Setup(x => x.IsAutoStartupMode()).ReturnsAsync(true);
-            var moqTextCorrectorFactory = new Mock<ITextCorrectorFactory>();
+            _moqStartupManager.Setup(x => x.IsAutoStartupMode()).ReturnsAsync(true);
             var textCorrectorStub = new LlmTextCorrectorStub("dummy", false);
-            moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
-            var moqHotKeyManager = GetHotKeyManagerMoq();
+            _moqTextCorrectorFactory.Setup(x => x.CreateLlmTextCorrector(It.IsAny<ILlmModelSettings>(), It.IsAny<IResourceLoaderWrapper>(), It.IsAny<IMyLogger>())).Returns(textCorrectorStub);
 
-            var viewModel = new SettingsPageViewModel(moqSettingsService.Object, moqStartupManager.Object, moqTextCorrectorFactory.Object, moqHotKeyManager.Object);
-            viewModel.LLMModelPath = "changing!";
+            var viewModel = new SettingsPageViewModel(_moqSettingsService.Object, _moqStartupManager.Object, _moqTextCorrectorFactory.Object, _moqHotKeyManager.Object)
+            {
+                LLMModelPath = "changing!"
+            };
             var result = viewModel.SaveSettings();
 
             Assert.IsFalse(result);
