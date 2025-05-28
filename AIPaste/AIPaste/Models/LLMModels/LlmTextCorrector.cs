@@ -6,7 +6,6 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using System.Threading.Tasks;
 using System.Linq;
 using AIPaste.common;
-using AIPaste.Models.DTO;
 
 namespace AIPaste.Models.LLMModels
 {
@@ -57,8 +56,9 @@ namespace AIPaste.Models.LLMModels
         /// <summary>
         /// Generate text using the LLM model with streaming support.
         /// </summary>
-        public async IAsyncEnumerable<string> GeneratingText(ILlmRequest requestModel)
+        public async IAsyncEnumerable<string> GeneratingText(string targetText, string userInput)
         {
+            var requestModel = new LlmRequest(targetText, userInput, _resourceLoader);
             _chatHistory.AddUserMessage(requestModel.ToOptimizedRequest());
             TruncateChatHistoryByTokenLimit();
             var responseBuilder = new StringBuilder();

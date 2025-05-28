@@ -1,5 +1,5 @@
 ﻿using AIPaste.common;
-using AIPaste.Models.DTO;
+using AIPaste.Models.SettingsServices.SettingModels;
 
 namespace AIPaste.Models.SettingsServices
 {

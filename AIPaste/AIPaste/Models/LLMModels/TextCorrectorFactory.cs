@@ -1,6 +1,6 @@
 ﻿using System;
 using AIPaste.common;
-using AIPaste.Models.DTO;
+using AIPaste.Models.SettingsServices.SettingModels;
 using LLamaSharp.SemanticKernel.ChatCompletion;
 
 namespace AIPaste.Models.LLMModels

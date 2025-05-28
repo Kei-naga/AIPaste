@@ -2,12 +2,12 @@
 using Moq;
 using AIPaste.Models.StartupServices;
 using AIPaste.Models.LLMModels;
-using AIPasteTests;
 using AIPaste.common;
 using AIPaste.Models.BackgroudServices;
-using AIPaste.Models.DTO;
+using AIPaste.Models.SettingsServices.SettingModels;
+using AIPaste.ViewModels;
 
-namespace AIPaste.ViewModels.Tests
+namespace AIPasteTests.ViewModels
 {
     [TestClass()]
     public class SettingsPageViewModelTests

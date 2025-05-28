@@ -1,6 +1,6 @@
 ﻿using System;
 using AIPaste.common;
-using AIPaste.Models.DTO;
+using AIPaste.Models.SettingsServices.SettingModels;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 

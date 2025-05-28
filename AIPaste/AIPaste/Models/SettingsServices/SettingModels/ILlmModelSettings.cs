@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AIPaste.Models.DTO
+namespace AIPaste.Models.SettingsServices.SettingModels
 {
     public interface ILlmModelSettings
     {

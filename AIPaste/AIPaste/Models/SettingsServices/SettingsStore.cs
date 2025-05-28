@@ -2,7 +2,7 @@
 using Windows.Storage;
 using Windows.System;
 using AIPaste.common;
-using AIPaste.Models.DTO;
+using AIPaste.Models.SettingsServices.SettingModels;
 
 namespace AIPaste.Models.SettingsServices
 {

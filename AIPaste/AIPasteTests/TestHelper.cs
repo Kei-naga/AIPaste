@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
-using AIPaste.Models.DTO;
 using AIPaste.Models.LLMModels;
 using Microsoft.SemanticKernel.ChatCompletion;
 
@@ -11,9 +10,8 @@ namespace AIPasteTests
         /// <summary>
         /// default .env file path. Create .env file in the root of the test project if it does not exist.
         /// </summary>
-#pragma warning disable IDE1006 // 命名スタイル
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:命名スタイル", Justification = "<保留中>")]
         private static readonly string DEFAULT_ENV_FILENAME = Path.GetFullPath
-#pragma warning restore IDE1006 // 命名スタイル
                 (
                     Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty, @"..\..\..\.env")
                 );
@@ -37,13 +35,13 @@ namespace AIPasteTests
 
     public class LlmTextCorrectorStub(string response, bool errorFlag) : ILlmTextCorrector
     {
-        public async IAsyncEnumerable<string> GeneratingText(ILlmRequest requestModel)
+        public async IAsyncEnumerable<string> GeneratingText(string targetText, string userInput)
         {
             if (_errorFlag)
             {
                 throw new Exception("error");
             }
-            ChatHistory.AddUserMessage(requestModel.ToOptimizedRequest());
+            ChatHistory.AddUserMessage("Target:" + targetText + ", Input:" + userInput);
             foreach (var chunk in _dummyResponse.Select(x => x.ToString()).ToArray())
             {
                 yield return chunk;

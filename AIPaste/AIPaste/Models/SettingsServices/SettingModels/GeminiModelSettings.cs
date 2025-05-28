@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace AIPaste.Models.DTO
+namespace AIPaste.Models.SettingsServices.SettingModels
 {
     public class GeminiModelSettings(string apiKey, string modelName = "gemini-2.0-flash", string location = "", uint maxContextSize = 1048576) : ILlmModelSettings
     {

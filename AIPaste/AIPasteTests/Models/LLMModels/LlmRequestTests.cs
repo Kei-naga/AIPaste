@@ -1,8 +1,8 @@
 ﻿using Moq;
 using AIPaste.common;
-using AIPaste.Models.DTO;
+using AIPaste.Models.LLMModels;
 
-namespace AIPaste.Models.DTO.Tests
+namespace AIPasteTests.Models.LLMModels
 {
     [TestClass()]
     public class LlmRequestTests

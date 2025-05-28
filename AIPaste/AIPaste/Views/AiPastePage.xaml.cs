@@ -4,9 +4,9 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Navigation;
-using AIPaste.Models.DTO;
 using System;
 using AIPaste.common;
+using AIPaste.Models.SettingsServices.SettingModels;
 
 namespace AIPaste.Views
 {

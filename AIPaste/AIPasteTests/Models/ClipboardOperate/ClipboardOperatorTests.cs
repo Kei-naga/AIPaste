@@ -1,6 +1,7 @@
-﻿using Windows.ApplicationModel.DataTransfer;
+﻿using AIPaste.Models.ClipboardOperate;
+using Windows.ApplicationModel.DataTransfer;
 
-namespace AIPaste.Models.ClipboardOperate.Tests
+namespace AIPasteTests.Models.ClipboardOperate
 {
     [TestClass()]
     public class ClipboardOperatorTests

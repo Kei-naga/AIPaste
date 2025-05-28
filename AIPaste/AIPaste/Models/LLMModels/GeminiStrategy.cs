@@ -1,4 +1,4 @@
-﻿using AIPaste.Models.DTO;
+﻿using AIPaste.Models.SettingsServices.SettingModels;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Google;

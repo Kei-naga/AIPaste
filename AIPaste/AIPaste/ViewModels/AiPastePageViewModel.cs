@@ -3,9 +3,8 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using AIPaste.Models.LLMModels;
 using AIPaste.Models.ClipboardOperate;
-using AIPaste.Models.SettingsServices;
-using AIPaste.Models.DTO;
 using AIPaste.common;
+using AIPaste.Models.SettingsServices.SettingModels;
 
 namespace AIPaste.ViewModels
 {
@@ -69,11 +68,10 @@ namespace AIPaste.ViewModels
 
         public async Task GeneratingText(string userInput)
         {
-            var requestModel = new LlmRequest(TargetText, userInput, _resourceLoader);
             OutputText = "";
             try
             {
-                await foreach (var chunk in _llmTextCorrector.GeneratingText(requestModel))
+                await foreach (var chunk in _llmTextCorrector.GeneratingText(TargetText, userInput))
                 {
                     OutputText += chunk;
                 }

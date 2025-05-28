@@ -1,8 +1,8 @@
 ﻿using System;
 using AIPaste.common;
 using AIPaste.Models.BackgroudServices;
-using AIPaste.Models.DTO;
 using AIPaste.Models.SettingsServices;
+using AIPaste.Models.SettingsServices.SettingModels;
 
 namespace AIPaste.ViewModels
 {

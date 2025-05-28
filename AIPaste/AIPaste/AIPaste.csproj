@@ -72,6 +72,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Include="..\..\.editorconfig" Link=".editorconfig" />
+    </ItemGroup>
+
+    <ItemGroup>
         <None Update="NLog.config">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>

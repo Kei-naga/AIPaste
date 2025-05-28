@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AIPaste.Models.DTO
+﻿
+namespace AIPaste.Models.SettingsServices.SettingModels
 {
     public class ActiveLlmModels(bool IsLocalLlmActive, bool IsGeminiActive): IActiveLlmModels
     {

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using AIPaste.Models.DTO;
 using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace AIPaste.Models.LLMModels
@@ -9,7 +8,7 @@ namespace AIPaste.Models.LLMModels
         string PresentResponse { get; }
         ChatHistory ChatHistory { get; }
         void ResetChat();
-        IAsyncEnumerable<string> GeneratingText(ILlmRequest requestModel);
+        IAsyncEnumerable<string> GeneratingText(string targetText, string userInput);
         bool CheckIntegrity();
     }
 }

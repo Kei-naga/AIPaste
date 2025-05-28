@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AIPaste.common;
-using AIPaste.Models.DTO;
+using AIPaste.Models.SettingsServices.SettingModels;
 using AIPaste.ViewModels;
 using AIPaste.Views;
 using H.NotifyIcon;

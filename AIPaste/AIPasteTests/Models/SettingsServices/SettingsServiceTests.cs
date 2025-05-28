@@ -1,14 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Moq;
+using AIPaste.Models.SettingsServices.SettingModels;
 using AIPaste.Models.SettingsServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
-using AIPaste.Models.DTO;
 
-namespace AIPaste.Models.SettingsServices.Tests
+namespace AIPasteTests.Models.SettingsServices
 {
     [TestClass()]
     public class SettingsServiceTests

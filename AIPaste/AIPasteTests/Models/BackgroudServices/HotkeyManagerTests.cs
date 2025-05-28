@@ -6,10 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AIPaste.common;
-using AIPaste.Models.DTO;
 using Moq;
+using AIPaste.Models.SettingsServices.SettingModels;
 
-namespace AIPaste.Models.BackgroudServices.Tests
+namespace AIPasteTests.Models.BackgroudServices
 {
     [TestClass]
     public class HotKeyManagerTests

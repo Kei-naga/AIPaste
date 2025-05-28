@@ -1,12 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AIPaste.Models.DTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AIPaste.Models.SettingsServices.SettingModels;
 
-namespace AIPaste.Models.DTO.Tests
+namespace AIPasteTests.Models.SettingsServices.SettingModels
 {
     [TestClass()]
     public class AppSettingsTests

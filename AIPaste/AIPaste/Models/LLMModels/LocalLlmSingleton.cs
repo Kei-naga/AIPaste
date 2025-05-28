@@ -1,6 +1,6 @@
 ﻿using LLama.Common;
 using LLama;
-using AIPaste.Models.DTO;
+using AIPaste.Models.SettingsServices.SettingModels;
 
 namespace AIPaste.Models.LLMModels
 {

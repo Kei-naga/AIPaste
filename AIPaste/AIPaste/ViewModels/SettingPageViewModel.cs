@@ -9,8 +9,8 @@ using AIPaste.Models.SettingsServices;
 using AIPaste.Models.BackgroudServices;
 using System.Threading.Tasks;
 using AIPaste.common;
-using AIPaste.Models.DTO;
 using AIPaste.Views;
+using AIPaste.Models.SettingsServices.SettingModels;
 
 namespace AIPaste.ViewModels
 {

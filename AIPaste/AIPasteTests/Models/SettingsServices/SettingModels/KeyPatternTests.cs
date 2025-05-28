@@ -1,7 +1,7 @@
 ﻿using Windows.System;
-using AIPaste.Models.DTO;
+using AIPaste.Models.SettingsServices.SettingModels;
 
-namespace AIPaste.Models.DTO.Tests
+namespace AIPasteTests.Models.SettingsServices.SettingModels
 {
     [TestClass()]
     public class KeyPatternTests

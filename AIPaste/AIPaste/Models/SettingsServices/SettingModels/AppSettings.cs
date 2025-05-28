@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace AIPaste.Models.DTO
+namespace AIPaste.Models.SettingsServices.SettingModels
 {
     public class AppSettings(bool autoStartSetting, IKeySettings keySettings, ILlmModelSettings[] modelSettingsList, IActiveLlmModels activeLlmModels) : IAppSettings
     {
@@ -13,9 +13,9 @@ namespace AIPaste.Models.DTO
         {
             return new AppSettings(
                 autoStartSetting: true,
-                keySettings: DTO.KeySettings.GetDefaultSettings(),
+                keySettings: SettingModels.KeySettings.GetDefaultSettings(),
                 modelSettingsList: [LlmLocalModelSettings.GetDefaultSettings(), GeminiModelSettings.GetDefaultSettings()],
-                activeLlmModels: DTO.ActiveLlmModels.GetDefaultSettings()
+                activeLlmModels: SettingModels.ActiveLlmModels.GetDefaultSettings()
             );
         }
 

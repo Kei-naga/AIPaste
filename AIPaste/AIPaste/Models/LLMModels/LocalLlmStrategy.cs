@@ -5,8 +5,8 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel;
 using Microsoft.Extensions.DependencyInjection;
 using LLama.Abstractions;
-using AIPaste.Models.DTO;
 using System.Collections.Generic;
+using AIPaste.Models.SettingsServices.SettingModels;
 
 namespace AIPaste.Models.LLMModels
 {

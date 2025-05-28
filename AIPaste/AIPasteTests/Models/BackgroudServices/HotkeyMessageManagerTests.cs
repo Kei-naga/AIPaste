@@ -6,11 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AIPaste.common;
-using AIPaste.Models.DTO;
 using Moq;
 using Windows.System;
+using AIPaste.Models.SettingsServices.SettingModels;
 
-namespace AIPaste.Models.BackgroudServices.Tests
+namespace AIPasteTests.Models.BackgroudServices
 {
     [TestClass()]
     public class HotkeyMessageManagerTests
@@ -45,7 +45,7 @@ namespace AIPaste.Models.BackgroudServices.Tests
         public void RegisterHotKeyTest_Success()
         {
             _mockWin32
-                .SetupSequence(m => m.RegisterHotKey(It.IsAny<IntPtr>(), It.IsAny<int>(), It.IsAny<uint>(), It.IsAny<uint>()))
+                .SetupSequence(m => m.RegisterHotKey(It.IsAny<nint>(), It.IsAny<int>(), It.IsAny<uint>(), It.IsAny<uint>()))
                 .Returns(false)  // 1回目失敗 -> 再試行させるため
                 .Returns(true);  // 2回目成功
 
@@ -63,7 +63,7 @@ namespace AIPaste.Models.BackgroudServices.Tests
             manager.RegisterHotKey(keyPattern.Object);
 
             // Assert
-            _mockWin32.Verify(m => m.RegisterHotKey(It.IsAny<IntPtr>(), It.IsAny<int>(), It.IsAny<uint>(), It.IsAny<uint>()), Times.Exactly(2));
+            _mockWin32.Verify(m => m.RegisterHotKey(It.IsAny<nint>(), It.IsAny<int>(), It.IsAny<uint>(), It.IsAny<uint>()), Times.Exactly(2));
         }
 
         [TestMethod]
@@ -71,7 +71,7 @@ namespace AIPaste.Models.BackgroudServices.Tests
         public void RegisterHotKeyTest_FailAfterRetries()
         {
             _mockWin32
-                .Setup(m => m.RegisterHotKey(It.IsAny<IntPtr>(), It.IsAny<int>(), It.IsAny<uint>(), It.IsAny<uint>()))
+                .Setup(m => m.RegisterHotKey(It.IsAny<nint>(), It.IsAny<int>(), It.IsAny<uint>(), It.IsAny<uint>()))
                 .Returns(false);
 
             var keyPattern = new Mock<IKeyPattern>();
@@ -88,7 +88,7 @@ namespace AIPaste.Models.BackgroudServices.Tests
         public void UnregisterHotKeyTest()
         {
             _mockWin32
-                .Setup(m => m.RegisterHotKey(It.IsAny<IntPtr>(), It.IsAny<int>(), It.IsAny<uint>(), It.IsAny<uint>()))
+                .Setup(m => m.RegisterHotKey(It.IsAny<nint>(), It.IsAny<int>(), It.IsAny<uint>(), It.IsAny<uint>()))
                 .Returns(true);
 
             var keyPattern = new Mock<IKeyPattern>();
@@ -104,7 +104,7 @@ namespace AIPaste.Models.BackgroudServices.Tests
             manager.UnregisterHotKey();
 
             // Assert
-            _mockWin32.Verify(m => m.UnregisterHotKey(It.IsAny<IntPtr>(), It.IsAny<int>()), Times.Once);
+            _mockWin32.Verify(m => m.UnregisterHotKey(It.IsAny<nint>(), It.IsAny<int>()), Times.Once);
             _mockDummyWndManager.Verify(dm => dm.ReleaseHwndPtr(), Times.Once);
         }
     }

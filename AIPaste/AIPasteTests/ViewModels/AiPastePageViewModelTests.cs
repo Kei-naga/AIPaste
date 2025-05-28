@@ -1,12 +1,11 @@
-﻿using AIPaste.Models.SettingsServices;
-using Moq;
+﻿using Moq;
 using AIPaste.Models.LLMModels;
 using AIPaste.Models.ClipboardOperate;
 using AIPaste.common;
-using AIPasteTests;
-using AIPaste.Models.DTO;
+using AIPaste.Models.SettingsServices.SettingModels;
+using AIPaste.ViewModels;
 
-namespace AIPaste.ViewModels.Tests
+namespace AIPasteTests.ViewModels
 {
     [TestClass()]
     public class AiPastePageViewModelTests

@@ -1,4 +1,4 @@
-﻿namespace AIPaste.Models.DTO
+﻿namespace AIPaste.Models.SettingsServices.SettingModels
 {
     public class LlmLocalModelSettings(string ModelPath, bool GpuEnable, int GpuLayerCount, uint MaxContextSize, int MaxTokens) : ILlmModelSettings
     {

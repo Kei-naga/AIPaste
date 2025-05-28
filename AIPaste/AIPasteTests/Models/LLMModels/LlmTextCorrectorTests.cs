@@ -1,13 +1,13 @@
 ﻿using Moq;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using AIPaste.Models.DTO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel.Services;
 using HuggingfaceHub;
 using LLamaSharp.SemanticKernel.ChatCompletion;
 using AIPaste.Models.LLMModels;
 using AIPaste.common;
+using AIPaste.Models.SettingsServices.SettingModels;
 
 namespace AIPasteTests.Models.LLMModels
 {
@@ -87,12 +87,12 @@ namespace AIPasteTests.Models.LLMModels
             moqLlmStrategy.Setup(x => x.GetTokenCount(It.IsAny<ChatHistory>())).Returns(0);
             moqLlmStrategy.Setup(x => x.ModelSettings.MaxContextSize).Returns(1);
             var testSystemPrompt = "test system prompt";
-            var moqRequest = new Mock<ILlmRequest>();
-            moqRequest.Setup(x => x.ToOptimizedRequest()).Returns("dummy text");
+            var dummyTargetText = "dummy target text";
+            var dummyUserInput = "dummy user input";
             var moqResourceLoader = GetResourceLoaderMoq("dummy");
 
             var corrector = new LlmTextCorrector(moqLlmStrategy.Object, testSystemPrompt, moqResourceLoader.Object);
-            var results = corrector.GeneratingText(moqRequest.Object);
+            var results = corrector.GeneratingText(dummyTargetText, dummyUserInput);
 
             await foreach (var result in results)
             {
@@ -110,14 +110,14 @@ namespace AIPasteTests.Models.LLMModels
             moqLlmStrategy.SetupSequence(x => x.GetTokenCount(It.IsAny<ChatHistory>()))
                 .Returns(2)
                 .Returns(0);
-            var moqRequest = new Mock<ILlmRequest>();
-            moqRequest.Setup(x => x.ToOptimizedRequest()).Returns("dummy text");
+            var dummyTargetText = "dummy target text";
+            var dummyUserInput = "dummy user input";
             var moqResourceLoader = GetResourceLoaderMoq("dummy");
 
             var corrector = new LlmTextCorrector(moqLlmStrategy.Object, "dummy system prompt", moqResourceLoader.Object);
             corrector.ChatHistory.AddUserMessage("dummy message1");
             corrector.ChatHistory.AddAssistantMessage("dummy message2");
-            var results = corrector.GeneratingText(moqRequest.Object);
+            var results = corrector.GeneratingText(dummyTargetText, dummyUserInput);
 
             await foreach (var result in results)
             {
@@ -172,12 +172,12 @@ namespace AIPasteTests.Models.LLMModels
             var path = await HFDownloader.DownloadFileAsync("QuantFactory/Meta-Llama-3-8B-GGUF", "Meta-Llama-3-8B.Q2_K.gguf");
             var localLlmSettings = new LlmLocalModelSettings(path, true, 32, 1024, 256);
             var localLlmStrategy = new LocalLlmStrategy(localLlmSettings, new HistoryTransform());
-            var moqRequest = new Mock<ILlmRequest>();
-            moqRequest.Setup(x => x.ToOptimizedRequest()).Returns("hello");
+            var dummyTargetText = "dummy target text";
+            var dummyUserInput = "dummy user input";
             var moqResourceLoader = GetResourceLoaderMoq("dummy");
 
             var corrector = new LlmTextCorrector(localLlmStrategy, "you are my assistant", moqResourceLoader.Object);
-            var results = corrector.GeneratingText(moqRequest.Object);
+            var results = corrector.GeneratingText(dummyTargetText, dummyUserInput);
 
             await foreach (var result in results)
             {
@@ -192,12 +192,12 @@ namespace AIPasteTests.Models.LLMModels
             TestHelper.Load();
             var geminiSettings = new GeminiModelSettings(TestHelper.GEMINI_API_KEY);
             var geminiStrategy = new GeminiStrategy(geminiSettings);
-            var moqRequest = new Mock<ILlmRequest>();
-            moqRequest.Setup(x => x.ToOptimizedRequest()).Returns("hello");
+            var dummyTargetText = "dummy target text";
+            var dummyUserInput = "dummy user input";
             var moqResourceLoader = GetResourceLoaderMoq("dummy");
 
             var corrector = new LlmTextCorrector(geminiStrategy, "you are my assistant", moqResourceLoader.Object);
-            var results = corrector.GeneratingText(moqRequest.Object);
+            var results = corrector.GeneratingText(dummyTargetText, dummyUserInput);
 
             await foreach (var result in results)
             {
