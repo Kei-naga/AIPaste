@@ -45,6 +45,7 @@ Please download the binary files for the following libraries and place them with
 * LLamaSharp.Backend.Vulkan.Windows
 
 **Directory Structure:**
+```
 Binary
  └── LLamaSharpBackend
    └── win-x64
@@ -55,6 +56,7 @@ Binary
        ├── avx2
        ├── cuda11
        └── ...
+```
 
 ### 2. Build
 
