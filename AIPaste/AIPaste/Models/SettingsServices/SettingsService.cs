@@ -1,5 +1,8 @@
-﻿using AIPaste.common;
+﻿using System.Collections.Generic;
+using System;
+using AIPaste.common;
 using AIPaste.Models.SettingsServices.SettingModels;
+using AIPaste.DTO.SettingsDTO;
 
 namespace AIPaste.Models.SettingsServices
 {
@@ -25,7 +28,7 @@ namespace AIPaste.Models.SettingsServices
         {
             _logger = logger ?? MyLogger.GetInstance();
             _settingsStore = settingsStore;
-            _presentAppSettings = _settingsStore.LoadSettings();
+;            _presentAppSettings = _settingsStore.LoadSettings();
         }
 
         public IAppSettings LoadSettings()

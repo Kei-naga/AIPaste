@@ -1,4 +1,5 @@
-﻿using AIPaste.Models.SettingsServices.SettingModels;
+﻿using AIPaste.common;
+using AIPaste.Models.SettingsServices.SettingModels;
 
 namespace AIPasteTests.Models.SettingsServices.SettingModels
 {
@@ -26,8 +27,8 @@ namespace AIPasteTests.Models.SettingsServices.SettingModels
             );
 
             var activeLlmModels = new ActiveLlmModels(
-                IsLocalLlmActive: true,
-                IsGeminiActive: false
+                isLocalLlmActive: true,
+                isGeminiActive: false
             );
 
             return new AppSettings(

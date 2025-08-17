@@ -1,5 +1,6 @@
 ﻿using Windows.System;
 using AIPaste.Models.SettingsServices.SettingModels;
+using AIPaste.common;
 
 namespace AIPasteTests.Models.SettingsServices.SettingModels
 {

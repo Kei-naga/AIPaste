@@ -1,10 +1,10 @@
 ﻿
 namespace AIPaste.Models.SettingsServices.SettingModels
 {
-    public class ActiveLlmModels(bool IsLocalLlmActive, bool IsGeminiActive): IActiveLlmModels
+    public class ActiveLlmModels(bool isLocalLlmActive, bool isGeminiActive): IActiveLlmModels
     {
-        public bool IsLocalLlmActive { get; set; } = IsLocalLlmActive;
-        public bool IsGeminiActive { get; set; } = IsGeminiActive;
+        public bool IsLocalLlmActive { get; set; } = isLocalLlmActive;
+        public bool IsGeminiActive { get; set; } = isGeminiActive;
         public static ActiveLlmModels GetDefaultSettings()
         {
             return new ActiveLlmModels(true, false);

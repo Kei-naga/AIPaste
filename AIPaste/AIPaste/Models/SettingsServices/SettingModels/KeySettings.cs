@@ -1,4 +1,5 @@
-﻿using Windows.System;
+﻿using AIPaste.common;
+using Windows.System;
 
 namespace AIPaste.Models.SettingsServices.SettingModels
 {

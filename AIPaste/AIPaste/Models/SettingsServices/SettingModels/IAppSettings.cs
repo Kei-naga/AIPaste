@@ -1,4 +1,7 @@
 ﻿
+using AIPaste.DTO.Convertor;
+using AIPaste.DTO.SettingsDTO;
+
 namespace AIPaste.Models.SettingsServices.SettingModels
 {
     public interface IAppSettings

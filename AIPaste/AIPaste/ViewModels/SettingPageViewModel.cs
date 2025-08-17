@@ -9,8 +9,9 @@ using AIPaste.Models.SettingsServices;
 using AIPaste.Models.BackgroudServices;
 using System.Threading.Tasks;
 using AIPaste.common;
-using AIPaste.Views;
 using AIPaste.Models.SettingsServices.SettingModels;
+using AIPaste.DTO.SettingsDTO;
+using AIPaste.DTO.Convertor;
 
 namespace AIPaste.ViewModels
 {
@@ -18,6 +19,7 @@ namespace AIPaste.ViewModels
     {
         private IAppSettings _appSettings;
         private readonly ISettingsService _settingsService;
+        private readonly ISettingsConvertor _settingsConvertor;
         private readonly IAutoStartupManager _startupManager;
         private readonly ITextCorrectorFactory _textCorrectorFactory;
         private readonly IHotKeyManager _hotKeyManager;
@@ -25,7 +27,8 @@ namespace AIPaste.ViewModels
         private readonly IMyLogger _logger;
 
         public SettingsPageViewModel(
-            ISettingsService? settingsService = null, 
+            ISettingsService? settingsService = null,
+            ISettingsConvertor? settingsConvertor = null,
             IAutoStartupManager? startupManager =null, 
             ITextCorrectorFactory? textCorrectorFactory = null,
             IHotKeyManager? hotKeyManager = null,
@@ -34,6 +37,7 @@ namespace AIPaste.ViewModels
             _logger = logger ??MyLogger.GetInstance();
             _logger.Trace("SettingsPageViewModel created");
             _settingsService = settingsService ?? SettingsService.GetInstance();
+            _settingsConvertor = settingsConvertor ?? new SettingsConvertor();
             _appSettings = _settingsService.LoadSettings();
             _startupManager = startupManager ?? new AutoStartupManager();
             _textCorrectorFactory = textCorrectorFactory ?? new TextCorrectorFactory();
@@ -43,7 +47,7 @@ namespace AIPaste.ViewModels
             UpdateSettingsOnView();
         }
 
-        private void UpdateSettingsOnView(AppSettings? newSettings = null)
+        private void UpdateSettingsOnView(IAppSettings? newSettings = null)
         {
             if (newSettings != null)
             {
@@ -282,32 +286,36 @@ namespace AIPaste.ViewModels
             }
         }
 
-        private AppSettings GetCurrentAppSettings()
+        private AppSettingsDTO GetCurrentAppSettings()
         {
             var localLlmSettings = GetLocalLlmSettings();
-            var localModelSettings = new LlmLocalModelSettings(
+            var localModelSettings = new LocalModelSettingsDTO(
                 ModelPath: LLMModelPath,
                 GpuEnable: GpuEnabled,
                 GpuLayerCount: GpuLayerCount,
                 MaxContextSize: localLlmSettings.MaxContextSize,
                 MaxTokens: MaxTokens
-            );
-            var geminiModelSettings = new GeminiModelSettings(ApiKey);
+                );
+            var geminiModelSettings = new GeminiSettingsDTO(ApiKey);
             var modifier = KeyPattern.GetModifiers(CtrlModifier, AltModifier, ShiftModifier, WinModifier);
-            var keyPattern = new KeyPattern(modifier, Key);
-            var keySettings = new KeySettings(IsHotkeyEnabled, keyPattern);
-            var activeLlmModels = new ActiveLlmModels(ActivatedLocalLlm, ActivatedGemini);
-            return new AppSettings(
-                AutoStart,
-                keySettings,
-                [localModelSettings, geminiModelSettings],
-                activeLlmModels
+            var keyPattern = new KeyPatternDTO(modifier, Key);
+            var keySettings = new KeySettingsDTO(IsHotkeyEnabled, keyPattern);
+            var activeLlmModels = new EnabledModelDTO(ActivatedLocalLlm, ActivatedGemini);
+            var appSettingsDto = new AppSettingsDTO(
+                autoStartSetting: AutoStart,
+                keySettings: keySettings,
+                enabledModel: activeLlmModels,
+                localModelSettings: localModelSettings,
+                geminiSettings: geminiModelSettings
             );
+            return appSettingsDto;
         }
+
 
         public bool SaveSettings()
         {
-            var newSettings = GetCurrentAppSettings();
+            var newSettingsDto = GetCurrentAppSettings();
+            var newSettings = _settingsConvertor.ConvertToAppSettings(newSettingsDto);
 
             if (newSettings.Equals(_appSettings))
             {
@@ -357,7 +365,7 @@ namespace AIPaste.ViewModels
             return true;
         }
 
-        private bool IsValidLlmSettings(AppSettings appSettings)
+        private bool IsValidLlmSettings(IAppSettings appSettings)
         {
             try
             {
@@ -393,7 +401,7 @@ namespace AIPaste.ViewModels
             }
             return [.. modelTypes];
         }
-        private bool ApplyHostkeySettings(AppSettings newSettings)
+        private bool ApplyHostkeySettings(IAppSettings newSettings)
         {
             try
             {
@@ -410,7 +418,7 @@ namespace AIPaste.ViewModels
             }
         }
 
-        private bool ApplyAutoStartSettings(AppSettings newSettings)
+        private bool ApplyAutoStartSettings(IAppSettings newSettings)
         {
             var result = Task.Run(() =>
                 {

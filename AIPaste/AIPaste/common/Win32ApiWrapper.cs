@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
-using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace AIPaste.common;
@@ -11,7 +10,7 @@ public class Win32ApiWrapper : IWin32ApiWrapper
 {
     public bool RegisterHotKey(IntPtr hwnd, int id, uint modifiers, uint key)
     {
-        return PInvoke.RegisterHotKey(new HWND(hwnd.ToInt32()), id, (HOT_KEY_MODIFIERS)modifiers, key);
+        return PInvoke.RegisterHotKey(new HWND(hwnd.ToInt32()), id, (Windows.Win32.UI.Input.KeyboardAndMouse.HOT_KEY_MODIFIERS)(HOT_KEY_MODIFIERS)modifiers, key);
     }
 
     public bool UnregisterHotKey(IntPtr hwnd, int id)
