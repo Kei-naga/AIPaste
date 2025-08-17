@@ -25,7 +25,7 @@ It runs in the background and can be called up at any time with a hotkey, so it 
 
 ## 🛠️ System Requirements
 
-* **OS**: Windows 10 (version 2004) or later
+* **OS**: Windows 11 or later
 * **Framework**: .NET 8.0
 * **Platform**: WinUI 3 / Windows App SDK
 
