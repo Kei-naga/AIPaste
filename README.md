@@ -2,6 +2,8 @@
 
 AIPaste is a Windows application for editing clipboard text with AI. Simply summon the app with a hotkey and provide instructions to easily modify your copied text. The result is then copied back to your clipboard for immediate use.
 
+![AIPaste demo](img/demo.gif)
+
 
 
 ## 📝 Overview
