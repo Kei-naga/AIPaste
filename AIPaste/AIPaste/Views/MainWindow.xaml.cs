@@ -11,7 +11,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
-
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -26,14 +25,18 @@ namespace AIPaste
         private readonly ResourceLoaderWrapper _resourceLoader = new();
         public MainWindowViewModel ViewModel;
         private readonly Win32ApiWrapper _win32ApiWrapper = new();
+        private bool _isUpdatingNavigationSelection;
+        private TabName? _currentTab;
 
         public MainWindow()
         {
+            CrashDiagnostics.WriteTrace("MainWindow constructor started");
             InitializeComponent();
             ViewModel = new MainWindowViewModel(OnHotKeyPressed);
             SetNavigationViewitems();
             Closed += OnWindowHideInsteadOfClose;
-            AppWindow.Resize(new Windows.Graphics.SizeInt32(600,400));
+            AppWindow.Resize(new Windows.Graphics.SizeInt32(600, 400));
+            CrashDiagnostics.WriteTrace("MainWindow constructor completed");
         }
 
         private void SetNavigationViewitems()
@@ -47,8 +50,9 @@ namespace AIPaste
 
         private void MainTab_Loaded(object sender, RoutedEventArgs e)
         {
+            CrashDiagnostics.WriteTrace("MainTab loaded");
             contentFrame.Navigated += On_Navigated;
-            SetFirstTab(GetFirstTab());
+            NavigateAndSelectTab(GetFirstTab());
         }
 
         private void OnWindowHideInsteadOfClose(object sender, WindowEventArgs args)
@@ -56,12 +60,12 @@ namespace AIPaste
             _logger.Info("CLOSE_WINDOW");
             args.Handled = true;
             this.Hide();
-            this.SetFirstTab(GetFirstTab());
+            NavigateAndSelectTab(GetFirstTab());
         }
 
         private void OnHotKeyPressed()
         {
-            this.ShowWindow(GetFirstTab());
+            ShowWindow(GetFirstTab());
         }
 
         public void ShowWindow()
@@ -72,51 +76,58 @@ namespace AIPaste
 
         public void ShowWindow(TabName tabName)
         {
-            if (contentFrame.SourcePageType.Name?.ToString() != tabName.ToString())
+            if (_currentTab != tabName)
             {
-                NavigateToPage(tabName);
+                NavigateAndSelectTab(tabName);
+            }
+            else
+            {
+                SelectNavigationItem(tabName);
             }
 
-            if (this.Visible == true)
+            if (Visible)
             {
                 SetForegroundWindow();
             }
+
             Activate();
         }
 
         private void NavigateToPage(TabName tabName)
         {
+            CrashDiagnostics.WriteTrace($"NavigateToPage start: {tabName}");
+            bool isSucceeded;
             if (tabName == TabName.Settings)
             {
                 _logger.Trace("navigating setting page");
-                contentFrame.Navigate(typeof(SettingsPage));
-                mainTab.SelectedItem = mainTab.SettingsItem;
+                isSucceeded = contentFrame.Navigate(typeof(SettingsPage));
             }
             else if (tabName == TabName.LocalLlm)
             {
                 _logger.Trace("navigating AiPastePage");
                 var appSettings = ViewModel.AppSettings;
                 var llmModelSettings = appSettings.GetLlmModelSettings(ModelType.LocalLLM);
-                contentFrame.Navigate(typeof(AiPastePage), llmModelSettings);
-                mainTab.SelectedItem = mainTab.MenuItems
-                            .OfType<NavigationViewItem>()
-                            .First(i => i.Tag.Equals(TabName.LocalLlm.ToString()));
+                isSucceeded = contentFrame.Navigate(typeof(AiPastePage), llmModelSettings);
             }
             else if (tabName == TabName.Gemini)
             {
                 _logger.Trace("navigating GeminiPage");
                 var appSettings = ViewModel.AppSettings;
                 var llmModelSettings = appSettings.GetLlmModelSettings(ModelType.Gemini);
-                contentFrame.Navigate(typeof(AiPastePage), llmModelSettings);
-                mainTab.SelectedItem = mainTab.MenuItems
-                            .OfType<NavigationViewItem>()
-                            .First(i => i.Tag.Equals(TabName.Gemini.ToString()));
+                isSucceeded = contentFrame.Navigate(typeof(AiPastePage), llmModelSettings);
             }
             else
             {
                 throw new ArgumentException($"Unknown tab name: {tabName}");
             }
 
+            if (!isSucceeded)
+            {
+                throw new InvalidOperationException($"Failed to navigate to {tabName}.");
+            }
+
+            _currentTab = tabName;
+            CrashDiagnostics.WriteTrace($"NavigateToPage completed: {tabName}");
         }
 
         private void SetForegroundWindow()
@@ -136,49 +147,47 @@ namespace AIPaste
             };
         }
 
-        private void SetFirstTab(TabName tabName)
+        private void NavigateAndSelectTab(TabName tabName)
         {
-            if (tabName == TabName.Settings)
-            {
-                mainTab.SelectedItem = mainTab.SettingsItem;
-                return;
-            }
-            mainTab.SelectedItem = mainTab.MenuItems.FirstOrDefault(
-                x => (x as NavigationViewItem)?.Tag.ToString() == tabName.ToString(), mainTab.MenuItems.IndexOf(0)
-            );
+            SelectNavigationItem(tabName);
+            NavigateToPage(tabName);
         }
 
         private TabName GetFirstTab()
         {
-            var firstTab = mainTab.MenuItems[0] as NavigationViewItem;
-            return firstTab == null
-                ? throw new InvalidOperationException("No items in the navigation view.")
-                : (TabName)Enum.Parse(typeof(TabName), firstTab.Tag.ToString() ?? "");
+            var firstTab = mainTab.MenuItems.OfType<NavigationViewItem>().FirstOrDefault();
+            if (firstTab?.Tag is string tabNameText &&
+                Enum.TryParse<TabName>(tabNameText, out var tabName))
+            {
+                return tabName;
+            }
+
+            return TabName.Settings;
         }
 
         private void OnNavigationViewSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if (args.SelectedItemContainer != null)
+            if (_isUpdatingNavigationSelection)
+            {
+                _isUpdatingNavigationSelection = false;
+                return;
+            }
+
+            if (args.IsSettingsSelected || args.SelectedItemContainer != null)
             {
                 try
                 {
-                    if (args.IsSettingsSelected)
+                    var tabName = GetSelectedTabName(args);
+                    if (_currentTab == tabName)
                     {
-                        NavigateToPage(TabName.Settings);
+                        return;
                     }
-                    switch (args.SelectedItemContainer.Tag.ToString())
-                    {
-                        case nameof(TabName.LocalLlm):
-                            NavigateToPage(TabName.LocalLlm);
-                            break;
-                        case nameof(TabName.Gemini):
-                            NavigateToPage(TabName.Gemini);
-                            break;
-                    }
+
+                    NavigateToPage(tabName);
                 }
                 catch (Exception ex)
                 {
-                    FailedNavigation(ex, args.SelectedItemContainer.Tag.ToString() ?? "");
+                    FailedNavigation(ex, args.SelectedItemContainer?.Tag?.ToString() ?? nameof(TabName.Settings));
                 }
             }
         }
@@ -186,11 +195,12 @@ namespace AIPaste
         private void NavigationFailed(object sender, NavigationFailedEventArgs e)
         {
             e.Handled = true;
-            FailedNavigation(e.Exception, e.SourcePageType.Name ?? "");
+            FailedNavigation(e.Exception, e.SourcePageType.Name ?? string.Empty);
         }
 
         private void FailedNavigation(Exception ex, string pageName)
         {
+            CrashDiagnostics.WriteException($"MainWindow.FailedNavigation({pageName})", ex);
             _logger.Error("FAILED_NAVIGATION", pageName);
             _logger.Debug(ex);
             NavigateToPage(TabName.Settings);
@@ -232,6 +242,7 @@ namespace AIPaste
 
         private void On_Navigated(object? sender, NavigationEventArgs e)
         {
+            CrashDiagnostics.WriteTrace($"Frame navigated to {e.SourcePageType?.Name}");
             if (e.Content is SettingsPage settingsPage)
             {
                 settingsPage.SettingsUpdated += OnSettingsUpdated;
@@ -241,6 +252,10 @@ namespace AIPaste
         private void OnSettingsUpdated(object? sender, EventArgs e)
         {
             SetNavigationViewitems();
+            var nextTab = _currentTab.HasValue
+                ? GetAvailableTab(_currentTab.Value)
+                : GetFirstTab();
+            NavigateAndSelectTab(nextTab);
         }
 
         private NavigationViewItem[] GetNavigationViewItems()
@@ -271,6 +286,50 @@ namespace AIPaste
             }
 
             return [.. navigationViewItems];
+        }
+
+        private void SelectNavigationItem(TabName tabName)
+        {
+            object? targetItem = GetNavigationItem(tabName);
+            if (targetItem == null || ReferenceEquals(mainTab.SelectedItem, targetItem))
+            {
+                return;
+            }
+
+            _isUpdatingNavigationSelection = true;
+            mainTab.SelectedItem = targetItem;
+        }
+
+        private object? GetNavigationItem(TabName tabName)
+        {
+            return tabName == TabName.Settings
+                ? mainTab.SettingsItem
+                : mainTab.MenuItems
+                    .OfType<NavigationViewItem>()
+                    .FirstOrDefault(i => i.Tag?.ToString() == tabName.ToString());
+        }
+
+        private TabName GetSelectedTabName(NavigationViewSelectionChangedEventArgs args)
+        {
+            if (args.IsSettingsSelected)
+            {
+                return TabName.Settings;
+            }
+
+            if (args.SelectedItemContainer?.Tag is string tag &&
+                Enum.TryParse<TabName>(tag, out var tabName))
+            {
+                return tabName;
+            }
+
+            throw new ArgumentException("Unknown tab name");
+        }
+
+        private TabName GetAvailableTab(TabName tabName)
+        {
+            return GetNavigationItem(tabName) != null
+                ? tabName
+                : GetFirstTab();
         }
     }
 }

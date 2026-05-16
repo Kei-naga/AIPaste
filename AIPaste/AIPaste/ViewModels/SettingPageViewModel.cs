@@ -323,21 +323,23 @@ namespace AIPaste.ViewModels
                 return true;
             }
 
-            if (!IsValidLlmSettings(newSettings))
+            var modelTypesToValidate = GetModelTypesToValidate(newSettings);
+
+            if (!IsValidLlmSettings(newSettings, modelTypesToValidate))
             {
                 _logger.Warn("INVALID_LLM_SETINGS");
                 UpdateSettingsOnView();
                 return false;
             }
 
-            if (!ApplyHostkeySettings(newSettings))
+            if (HasHotkeySettingsChanged(newSettings) && !ApplyHostkeySettings(newSettings))
             {
                 _logger.Error("FAILED_TO_APPLY_HOTKEY");
                 UpdateSettingsOnView();
                 return false;
             }
 
-            if (!ApplyAutoStartSettings(newSettings))
+            if (HasAutoStartSettingsChanged(newSettings) && !ApplyAutoStartSettings(newSettings))
             {
                 _logger.Error("FAILED_TO_APPLY_AUTOSTART");
                 UpdateSettingsOnView();
@@ -365,11 +367,16 @@ namespace AIPaste.ViewModels
             return true;
         }
 
-        private bool IsValidLlmSettings(IAppSettings appSettings)
+        private bool IsValidLlmSettings(IAppSettings appSettings, ModelType[] modelTypesToValidate)
         {
+            if (modelTypesToValidate.Length == 0)
+            {
+                return true;
+            }
+
             try
             {
-                foreach (var modelType in GetActiveModelTypes(appSettings.ActiveLlmModels))
+                foreach (var modelType in modelTypesToValidate)
                 {
                     var llmModelSettings = appSettings.GetLlmModelSettings(modelType)
                         ?? throw new Exception("LlmModelSettings not found");
@@ -388,6 +395,23 @@ namespace AIPaste.ViewModels
             }
         }
 
+        private ModelType[] GetModelTypesToValidate(IAppSettings newSettings)
+        {
+            var modelTypesToValidate = new List<ModelType>();
+            foreach (var modelType in GetActiveModelTypes(newSettings.ActiveLlmModels))
+            {
+                var currentSettings = _appSettings.GetLlmModelSettings(modelType);
+                var newModelSettings = newSettings.GetLlmModelSettings(modelType)
+                    ?? throw new Exception("LlmModelSettings not found");
+                var wasActive = IsModelActive(_appSettings.ActiveLlmModels, modelType);
+                if (!wasActive || currentSettings == null || !currentSettings.Equals(newModelSettings))
+                {
+                    modelTypesToValidate.Add(modelType);
+                }
+            }
+            return [.. modelTypesToValidate];
+        }
+
         private ModelType[] GetActiveModelTypes(IActiveLlmModels activeLlmModels)
         {
             var modelTypes = new List<ModelType>();
@@ -401,6 +425,27 @@ namespace AIPaste.ViewModels
             }
             return [.. modelTypes];
         }
+
+        private bool IsModelActive(IActiveLlmModels activeLlmModels, ModelType modelType)
+        {
+            return modelType switch
+            {
+                ModelType.LocalLLM => activeLlmModels.IsLocalLlmActive,
+                ModelType.Gemini => activeLlmModels.IsGeminiActive,
+                _ => false,
+            };
+        }
+
+        private bool HasHotkeySettingsChanged(IAppSettings newSettings)
+        {
+            return !newSettings.KeySettings.Equals(_appSettings.KeySettings);
+        }
+
+        private bool HasAutoStartSettingsChanged(IAppSettings newSettings)
+        {
+            return newSettings.AutoStart != _appSettings.AutoStart;
+        }
+
         private bool ApplyHostkeySettings(IAppSettings newSettings)
         {
             try

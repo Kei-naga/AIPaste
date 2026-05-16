@@ -62,6 +62,33 @@ Binary
 
 Open the `AIPaste.sln` file in Visual Studio 2022 or later and build the project.
 
+### 3. Local packaged installation
+
+In this repository, the `Binary\LLamaSharpBackend` files are already present, so you can usually skip the manual placement step above unless you removed them.
+
+The packaged app is the supported startup path. Directly running `bin\x64\Debug\...\AIPaste.exe` is not expected to work reliably.
+
+From the repository root, run the following in PowerShell or Developer PowerShell for Visual Studio:
+
+```powershell
+Set-Location <repository-root>
+
+msbuild `
+  '.\AIPaste\AIPaste\AIPaste.csproj' `
+  /t:Build `
+  /p:Configuration=Debug `
+  /p:Platform=x64 `
+  /p:GenerateAppxPackageOnBuild=true `
+  /p:AppxBundle=Never `
+  /nologo
+
+powershell -ExecutionPolicy Bypass -File `
+  '.\AIPaste\AIPaste\bin\publish\AIPaste_1.0.0.0_x64_Debug_Test\Install.ps1' `
+  -Force -SkipLoggingTelemetry
+```
+
+After installation, launch the app from the Start menu as **AIPaste**.
+
 ---
 
 ## How to Use

@@ -113,8 +113,9 @@ namespace AIPaste.Models.LLMModels
                     return false;
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.Debug(ex, $"{_llmStrategy.ModelType} integrity check failed");
                 return false;
             }
             return true;

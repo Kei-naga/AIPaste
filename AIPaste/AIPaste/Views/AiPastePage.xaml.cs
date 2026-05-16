@@ -1,12 +1,12 @@
-using Microsoft.UI.Xaml;
-using AIPaste.ViewModels;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Input;
-using Microsoft.UI.Xaml.Navigation;
 using System;
 using AIPaste.common;
 using AIPaste.Models.SettingsServices.SettingModels;
+using AIPaste.ViewModels;
+using Microsoft.UI.Input;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace AIPaste.Views
 {
@@ -14,19 +14,22 @@ namespace AIPaste.Views
     {
         public AiPastePageViewModel? ViewModel;
         private readonly MyLogger _logger = MyLogger.GetInstance();
-        private Window? _window;
 
         public AiPastePage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
+            CrashDiagnostics.WriteTrace("AiPastePage constructed");
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            CrashDiagnostics.WriteTrace($"AiPastePage.OnNavigatedTo parameter type: {e.Parameter?.GetType().FullName ?? "<null>"}");
+
             if (e.Parameter is ILlmModelSettings llmModelSettings)
             {
                 ViewModel = new AiPastePageViewModel(llmModelSettings);
+                CrashDiagnostics.WriteTrace("AiPastePageViewModel created successfully");
             }
             else
             {
@@ -78,30 +81,12 @@ namespace AIPaste.Views
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            _window = App.MainWindow;
-            if (_window != null)
-            {
-                _window.Activated += OnWindowActivated;
-            }
+            CrashDiagnostics.WriteTrace("AiPastePage loaded");
             UserInputBox.Focus(FocusState.Programmatic);
-        }
-
-        // TODO : マウスでactivateされると一瞬文字にfocusがいくため、治す
-        private void OnWindowActivated(object sender, WindowActivatedEventArgs e)
-        {
-            if (e.WindowActivationState == WindowActivationState.CodeActivated)
-            {
-                UserInputBox.Focus(FocusState.Programmatic);
-            }
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (_window != null)
-            {
-                _window.Activated -= OnWindowActivated;
-                _window = null;
-            }
         }
     }
 }

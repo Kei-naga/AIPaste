@@ -14,6 +14,11 @@ namespace AIPaste.common
         public void SetDevelopmentMode(bool isDev)
         {
             IsDevelopmentMode = isDev;
+            if (LogManager.Configuration == null)
+            {
+                return;
+            }
+
             if (isDev)
             {
                 LogManager.Configuration.Variables["isDevelopment"] = "true";
@@ -23,6 +28,8 @@ namespace AIPaste.common
             {
                 LogManager.Configuration.Variables["isDevelopment"] = "false";
             }
+
+            LogManager.ReconfigExistingLoggers();
         }
 
         public static MyLogger GetInstance()
@@ -36,7 +43,14 @@ namespace AIPaste.common
 
         private MyLogger()
         {
-            LogManager.Configuration.Variables["isDevelopment"] = "false";
+            CrashDiagnostics.Initialize();
+            if (LogManager.Configuration != null)
+            {
+                LogManager.Configuration.Variables["isDevelopment"] = "false";
+                LogManager.Configuration.Variables["logRoot"] = CrashDiagnostics.LogDirectory;
+                LogManager.ReconfigExistingLoggers();
+            }
+
             _nLogger = LogManager.GetCurrentClassLogger();
         }
 
